@@ -8,6 +8,9 @@ from scipy.optimize import curve_fit
 plt.rcParams.update({ 'axes.linewidth':1.2, 'xtick.direction': 'in', 'ytick.direction': 'in','xtick.top': True, 'ytick.right': True, 'xtick.minor.visible':True, 'ytick.minor.visible':True, 'xtick.major.size' : 6, 'xtick.major.width' : 1, 'ytick.major.size' : 8, 'ytick.major.width' : 1, 'xtick.minor.size' : 3.5, 'xtick.minor.width' : 0.6, 'ytick.minor.size' : 3.5, 'ytick.minor.width' : 0.6})
 plt.rcParams.update({'font.size': 15}) 
 import os
+import tempfile
+import random
+
 # from flask import Flask, request, render_template
 # from flask import send_file
 
@@ -137,7 +140,7 @@ def fit_data(file_path, t_cri):
     print('Q0, alpha:',Q0,alpha)
     return Qb, alpha, Q0, lgt_filtered
 
-def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri):
+def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     """
     Plot original data and reconstructed curve for visual comparison.
     """
@@ -149,7 +152,7 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri):
     
     M_reconstructed = Qb * 10**lgM(lgt_filtered, alpha, Q0)
     
-    output_file = f'M_reconstructed_{iteration}.txt'
+    output_file = f"./{random_subdir}/M_reconstructed_{iteration}.txt"
     np.savetxt(output_file, np.column_stack((lgt_filtered, M_reconstructed)), 
                header='lgt_filtered\tM_reconstructed', fmt='%.6e', comments='')
     
@@ -174,13 +177,11 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri):
     # Annotate 'Qbar' text near the line
     plt.text(lgt_filtered[-1], max_M_reconstructed, f'$Q_{{bar}}$', color='r', fontsize=12,
              verticalalignment='bottom', horizontalalignment='right')
-    #
     plt.xlabel(r"$ \log_{10} (t)$", fontsize=18)
     plt.ylabel(r"$ \log_{10} M(t)$", fontsize=18)
     plt.legend(fontsize=18)
     plt.tight_layout()
-    #plt.savefig(f'LF_fit_{iteration}.png')
-    plt.savefig(f'Mt_fit.png')
+    plt.savefig(f'./{random_subdir}/Mt_fit_{iteration}.png')
     plt.close()
 
 
@@ -294,11 +295,18 @@ def read_kappa(file_path):
   
 # Integrating the functionality into the main workflow
 def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
-    log_file = "simlog.txt"  # Name of the log file
     
-    Z_asplund = 0.01334462136084096e0 # scaling metallicity to solar
+
+    # Making a temporary file 
+    base_tmp_dir = "./tmp"
+    os.makedirs(base_tmp_dir, exist_ok=True)
+    random_subdir = tempfile.mkdtemp(dir=base_tmp_dir) 
+    os.makedirs(random_subdir, exist_ok=True) 
+    log_file = os.path.join(random_subdir, "simlog.txt") 
     
-    
+    # scaling metallicity to solar
+    Z_asplund = 0.01334462136084096e0 
+       
     with open(log_file, 'w') as log:  # Open file in write mode
         def log_print(*args, **kwargs):
             """Print and log to file simultaneously."""
@@ -442,7 +450,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
         
             qbar, alpha, q0, lgt_filtered = fit_data(file_path, t_cri)
             
-            plot_fit(file_path, alpha, q0, qbar, iteration, t_cri)
+            plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir)
             
             mdot_old = mdot
         
@@ -538,7 +546,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
                 ax.set_xlabel("Iteration")
             #axes[2].set_xlabel("iteration")
             plt.tight_layout()
-            plt.savefig("./sim_log.png")
+            plt.savefig(f"./{random_subdir}/sim_log.png")
             
 
             #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
