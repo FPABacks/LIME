@@ -4,8 +4,11 @@ import json
 import os
 import threading
 import smtplib
-from email.mime.text import MIMEText
+import shutil
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -25,8 +28,8 @@ ATOMIC_MASSES = {
 "Setting up an SMTPS server, and recording the sender email, password"
 SMTP_SERVER = "smtps.kuleuven.be"
 SMTP_PORT = 587  
-SENDER_EMAIL = "equation.lime@kuleuven.be"
-SENDER_PASSWORD = "lime_equation2025"
+SENDER_EMAIL = "dwaipayan.debnath@kuleuven.be"
+SENDER_PASSWORD = "Lampard10"
 
 def calculate_metallicity(number_abundances):
     "Calculates the actual metallicty from the number "
@@ -44,13 +47,23 @@ def calculate_metallicity(number_abundances):
     
     return metallicity
 
-def send_email(recipient_email, subject, body):
-    "This subroutine handles emailing to the user"
+def send_email(recipient_email, subject, body, attachment_path=None):
+    "This subroutine handles emailing to the user, with optional attachment"
     msg = MIMEMultipart()
     msg["From"] = SENDER_EMAIL
     msg["To"] = recipient_email
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
+
+    # Attach file if provided
+    if attachment_path and os.path.exists(attachment_path):
+        with open(attachment_path, "rb") as attachment:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+
+        encoders.encode_base64(part)
+        part.add_header("Content-Disposition", f"attachment; filename={os.path.basename(attachment_path)}")
+        msg.attach(part)
 
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
@@ -80,19 +93,28 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         print(result.communicate())
-        print("line79")
-
+        
 
         if result.returncode == 0:
-            results = result.stdout
+            print("mcak_explore.py executed successfully")
         else:
-            results = f"Computation error: {result.stderr}"
+            print(f"Computation error: {result.stderr}")
+            #send_email(recipient_email, "Computation Error", f"Error occurred:\n{result.stderr}")
+            return  # Stop execution if there's an error
+
+        # Zip the results directory
+        output_dir = f"./tmp/{result}" 
+        zip_filename = os.path.join(output_dir, f"{result}.zip")
+        print(output_dir, zip_filename)
+        shutil.make_archive(zip_filename.replace(".zip", ""), 'zip', output_dir)
+
     except Exception as e:
-        print(e)
-        results = f"Unexpected error: {str(e)}"
+        print(f"Unexpected error: {str(e)}")
 
-    #send_email(recipient_email, "LIME Computation Results", results)
-
+    # Send email with the ZIP file
+    send_email(recipient_email, "LIME Computation Results", "Attached is the LIME output", zip_filename)
+    
+            
 @app.route('/')
 def home():
     return render_template("index.html")
