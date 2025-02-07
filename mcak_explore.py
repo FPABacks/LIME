@@ -2,6 +2,7 @@ import numpy as np
 import subprocess
 import os
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import sys
 import cgs_constants as cgs
 from scipy.optimize import curve_fit
@@ -10,15 +11,7 @@ plt.rcParams.update({'font.size': 15})
 import os
 import tempfile
 import random
-
-# from flask import Flask, request, render_template
-# from flask import send_file
-
-# app = Flask(__name__)
-
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
+import shutil
 
 # Atomic masses of elements (in atomic mass units, amu)
 atomic_masses = { 'H': 1.008,'HE': 4.003, 'LI': 6.941,'BE': 9.012,'B': 10.811,'C': 12.011,'N': 14.007,'O': 16.000,'F': 18.998,'NE': 20.180,'NA': 22.990,'MG': 24.305,'AL': 26.982,'SI': 28.085,'P': 30.974,'S': 32.066,'CL': 35.453,'AR': 39.948,'K': 39.098,'CA': 40.078,'SC': 44.956,'TI': 47.880,'V': 50.941,'CR': 51.996,'MN': 54.938,'FE': 55.847,'CO': 58.933,'NI': 58.690,'CU': 63.546,'ZN': 65.390 }
@@ -140,6 +133,9 @@ def fit_data(file_path, t_cri):
     print('Q0, alpha:',Q0,alpha)
     return Qb, alpha, Q0, lgt_filtered
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     """
     Plot original data and reconstructed curve for visual comparison.
@@ -159,31 +155,24 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     plt.figure(figsize=(8, 6))
     plt.semilogy(lgt, M_original, marker='H', color='g', markerfacecolor='yellowgreen',
                  markeredgecolor='darkolivegreen', label=r'$M(t)$', markersize=10)
-    plt.semilogy(lgt_filtered, M_reconstructed, color='k', label=r'$M_{FIT}(t)$', linewidth=2)
+    plt.semilogy(lgt_filtered, M_reconstructed, color='k', label=r'$M_{\rm FIT}(t)$', linewidth=2)
 
-    #added t_cri and Qbar on plot
-    if not t_cri is None:
-        # Mark t_cri with a vertical line
-        #plt.axvline(x=np.log10(t_cri), color='red', linestyle='--', label=f'$t_{{cri}}$')
-        plt.axvline(x=np.log10(t_cri), color='red', linestyle='--')    
-        # Add annotation for t_cri
-        plt.text(np.log10(t_cri), max(M_original), f'$t_{{cri}}$', color='red', fontsize=12, 
-                 verticalalignment='bottom', horizontalalignment='right')
-        #-------------------------
-    # Add horizontal red dashed line at max M_reconstructed
+    # Add vertical line for t_cri
+    if t_cri is not None:
+        plt.axvline(x=np.log10(t_cri), color='#892bed', linestyle='--', linewidth=2,label = fr"$\log_{{10}} t_{{\rm cri}}$: {np.around(np.log10(t_cri),2)}")
+        
+    # Add horizontal dashed line at max M_reconstructed
     max_M_reconstructed = np.max(M_reconstructed)
-    #plt.axhline(y=max_M_reconstructed, color='r', linestyle='--', label='$Q_{{bar}}$')
-    plt.axhline(y=max_M_reconstructed, color='r', linestyle='--')
-    # Annotate 'Qbar' text near the line
-    plt.text(lgt_filtered[-1], max_M_reconstructed, f'$Q_{{bar}}$', color='r', fontsize=12,
-             verticalalignment='bottom', horizontalalignment='right')
+    plt.axhline(y=max_M_reconstructed, color='#f08205', linestyle='-.', linewidth=2, label = fr"$\bar{{Q}}$: {np.around(Qb,2)}")
+
+    
     plt.xlabel(r"$ \log_{10} (t)$", fontsize=18)
     plt.ylabel(r"$ \log_{10} M(t)$", fontsize=18)
-    plt.legend(fontsize=18)
+    plt.legend(fontsize=16, ncol=2)
     plt.tight_layout()
+
     plt.savefig(f'./{random_subdir}/Mt_fit_{iteration}.png')
     plt.close()
-
 
 def cak_massloss(lum, qbar, q0, alpha, gamma_e, rat): 
     """Calculate mass-loss rate using the CAK formalism."""
@@ -523,8 +512,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
 
             # Plotting some stuffs
 
-            #fig, axes = plt.subplots(5, 1, figsize=(7, 12), sharex=True)
-            fig, axes = plt.subplots(3, 2, figsize=(12, 12), sharex=True)
+            fig, axes = plt.subplots(3, 2, figsize=(8, 8), sharex=True)
             # Flatten axes for easy indexing
             axes = axes.flatten()
             axes[0].plot(it_num, np.log10([mdot * cgs.year / cgs.Msun for mdot in mdot_num]), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
@@ -544,6 +532,10 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
             # Set x-label for the bottom row only
             for ax in axes[-2:]:
                 ax.set_xlabel("Iteration")
+            for ax in axes:
+                ax.xaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
+                ax.yaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
+                ax.ticklabel_format(useOffset=False, style='plain', axis='both') 
             #axes[2].set_xlabel("iteration")
             plt.tight_layout()
             plt.savefig(f"./{random_subdir}/sim_log.png")
@@ -576,32 +568,14 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
               #return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho
               #print("Convergence not possible, values should not be trusted")
               log_print("Not yet converged")
-    return {
-            'result': (mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho),
-            'log': '\n'.join(log_content)  # Return the log as a string
-        }                       
-
-
-# @app.route('/', methods=['POST'])
-# def calculate():
-#     # Get the values from the form
-#     lum = float(request.form.get('luminosity'))  
-#     T_eff = float(request.form.get('teff'))  
-#     M_star = float(request.form.get('mstar'))  
-#     Z_scale = float(request.form.get('zscale'))      
-#     Yhel = float(request.form.get('helium_abundance'))            
-#     Z_star = float(request.form.get('zstar')) 
-
-#     result = main(lum, T_eff, M_star, Z_star, Z_scale, Yhel)
-
-#     with open("simlog.txt", "w") as log_file:
-#         log_file.write(result['log'])
     
-#     return send_file('simlog.txt', as_attachment=True)
+    
+    # Zip the directory
+    zip_filename = f"{random_subdir}.zip"
+    shutil.make_archive(random_subdir, 'zip', random_subdir)
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
+    # Return the zip file path
+    return os.path.abspath(zip_filename)
 
 if __name__ == "__main__":
 
