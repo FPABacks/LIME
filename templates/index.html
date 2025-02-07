@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCAK-Mforce Mass Loss Calculator</title>
+    <style>
+        body {
+            font-family: Serif, garamond;
+            margin: 0;
+            padding: 10px;
+            background-color: #f4f9f4;
+            color: #2c3e50;
+            text-align: left;
+            font-size: 18px; 
+        }
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px 20px;  /* Remove top padding */
+            background-color: #d6e9c6;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.0);
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #a0cfa5;  /* Header background color */
+            padding: 20px;
+            border-radius: 10px 10px 0 0;  /* Rounded top corners */
+            margin: -20px -20px 20px -20px; /* Remove any space around the header */
+            z-index: 1;  /* Ensure header is above tabs */
+        }
+
+
+        h1 {
+            color:#444544;
+            flex-grow: 1;
+            text-align: left;
+            font-size: 100px; 
+        }
+        h2 {
+            color: #2c3e50;
+            font-size: 22px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+            font-size: 20px;
+        }
+        input, select {
+            width: 90%; 
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: #333;
+            display: inline-block;
+            font-size: 18px;
+        }
+        input:read-only {
+            background-color: #e9ecef;
+        }
+        .logo {
+            width: 200px;
+            height: auto;
+            margin-left: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: left;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #7a8c97;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 0 10px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .active-tab {
+            background-color: #5f6d7e;
+        }
+
+        .active-content {
+            display: block;
+        }
+        .citation {
+            color: #1e5b85;
+        }  
+        .mathjax {
+            font-family: 'Times New Roman', serif;
+            font-size: 18px;
+        }
+
+        .button-container {
+            text-align: left;
+            margin-top: 20px;      
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #7a8c97;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 25px;
+        }
+        button:hover {
+            background-color: #5f6d7e;
+        }
+
+        .input-container {
+            margin-right: 20px;
+        }
+
+        .logos-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .logos-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .logos-container img {
+            margin: 0 20px;
+        }
+
+        .logo-ku {
+            width: 150px;
+            height: 50px;
+        }
+        
+        .logo-erc {
+            width: 100px;
+            height: auto;
+        }
+        
+        .logo-fwo {
+            width: 100px;
+            height: auto;
+        }
+
+    </style>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>    
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 style="margin-bottom: 5px;">LIME</h1>
+                <h2 style="margin-top: 0; font-size: 30px; font-weight: normal;">Line-driven Iterative Mass-loss Estimator</h2>
+            </div>
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="MCAK-Mforce Logo" class="logo">
+        </div>
+
+        <!-- Tab navigation -->
+        <div class="tabs">
+            <button class="tab active-tab" onclick="showTab('info')">Tool Info</button>
+            <button class="tab" onclick="showTab('calculator')">Calculator</button>
+        </div>
+
+        <!-- Tab contents -->
+        <div id="info" class="tab-content active-content">
+            <h2>About This Tool</h2>
+            <h3>Overview</h3>
+            <p>This online tool is designed to provide a fast, efficient, open-source, user-friendly, and real-time mass-loss calculator for line-driven winds from hot, massive stars with given basic stellar parameters and arbitrary chemical compositions.</p>
+            <p>The line force is computed on-the-fly from excitation and ionization balance calculations using the <span class="citation">“Munich Atomic Database” (Pauldrach et al. 2001; Puls et al. 2000)</span> consisting of more than 4 million spectral lines. Mass-loss rates are then derived from line-driven wind theory, including effects of a finite stellar disk and gas sound speed. The line-force parameters are calculated following <span class="citation">Gayley 1995; Poniatowski et al. 2022</span>. For a given set of stellar parameters and chemical composition, we obtain predictions for mass loss rates and the three line-force parameters \(\bar{Q}\), \(Q_0\), and \(\alpha\) at the wind critical point.</p>
+            <p>In addition to its speed and simplicity, a strength of our mass-loss calculator is that it avoids uncertainties related to applying fit formulae to underlying model grids calculated for more restricted parameter ranges. Moreover, individual chemical abundances can be trivially modified, and their effects upon predicted mass-loss rates explored. This thus also allows for direct applications toward stars that are significantly chemically modified at the surface.</p>
+
+            <h3>Usage</h3>
+            <p>To compute mass loss rates, the user needs to input some basic stellar parameters: the luminosity of the star \(L_\star\) (in terms of solar luminosity), mass of the star \(M_\star\) (in solar mass), the effective temperature of the star \(T_{\rm eff}\) (in Kelvin), and the metallicity of the star \(Z_\star\) (for solar \(Z_\star = 1\)). The default abundances are provided from the new solar abundances <span class="citation">(Asplund et al. 2009)</span>, but the user is free to change the abundances as they wish. A change in scaling metallicity would scale all the metals (i.e., from Li-Zn). If you use Line-driven mass loss rate calculator for your work, please cite <span class="citation">Sundqvist et al. 2025</span> and also provide a footnote with the URL of this website.</p>
+
+            <h3>Credits</h3>
+            <p>This tool has been developed by the EQUATION group (led by Prof. Jon Sunqvist) with funding from KU Leuven, European Research Council (ERC) and Fonds voor Wetenschappelijk Onderzoek – Vlaanderen (FWO).</p>
+        </div>
+        <div id="calculator" class="tab-content">
+            <h2>User info</h2>
+            <div class="input-container">
+                <label for="email">Enter your email id:</label>
+                <input type="email" id="email" name="email" required>
+            </div>    
+
+            <h2>Enter Stellar Parameters</h2>
+            <div class="input-container">
+                <label for="luminosity">Luminosity (\(L_\star\)):</label>
+                <input type="number" id="luminosity" step="any">
+
+                <label for="teff">Effective Temperature (\(T_{\rm eff}\)):</label>
+                <input type="number" id="teff" step="any">
+
+                <label for="mstar">Stellar Mass (\(M_\star\)):</label>
+                <input type="number" id="mstar" step="any">
+
+                <label for="zstar">Metallicity (\(Z_\star\)):</label>
+                <input type="number" id="zstar" step="any" onblur="updateAbundances()">
+            </div>
+            <div class="button-container">
+                <button onclick="runCalculation()">Run</button>
+            </div>
+
+            <h2>Element Abundances</h2>
+            <div id="abundances"></div>
+        </div>
+    </div>
+
+    <!-- Logos at the bottom -->
+    <div class="logos-container">
+        <img src="{{ url_for('static', filename='logo1.png') }}" alt="KU Leuven" class="logo-ku">
+        <img src="{{ url_for('static', filename='logo2.png') }}" alt="erc" class="logo-erc">
+        <img src="{{ url_for('static', filename='logo3.png') }}" alt="fwo" class="logo-fwo">
+    </div>
+    
+    <script>
+        const defaultAbundances = {
+            "H": 1.00000000000000, "HE": 0.08511380382000, "LI": 0.00000000001120, "BE": 0.00000000002399, "B": 0.00000000050119, "C": 0.00026915348039,
+            "N": 0.00006760829754, "O": 0.00048977881937, "F": 0.00000003630780, "NE": 0.00008511380382,
+            "NA": 0.00000017378008, "MG": 0.00003981071705, "AL": 0.00000281838293, "SI": 0.00003235936569,
+            "P": 0.00000025703958, "S": 0.00001318256738, "CL": 0.00000031622777, "AR": 0.00000251188643,
+            "K": 0.00000010715193, "CA": 0.00000218776162, "SC": 0.00000000141254, "TI": 0.00000008912509,
+            "V": 0.00000000851138, "CR": 0.00000043651583, "MN": 0.00000026915348, "FE": 0.00003162277660,
+            "CO": 0.00000009772372, "NI": 0.00000165958691, "CU": 0.00000001548817, "ZN": 0.00000003630780
+        };
+
+        function createAbundanceInputs() {
+            const abundancesDiv = document.getElementById("abundances");
+            for (const [element, value] of Object.entries(defaultAbundances)) {
+                const label = document.createElement("label");
+                label.textContent = element;
+                const input = document.createElement("input");
+                input.type = "number";
+                input.step = "any";
+                input.value = value;
+                input.id = `abundance-${element}`;
+                if (element === "H") {
+                    input.readOnly = true;
+                }
+                abundancesDiv.appendChild(label);
+                abundancesDiv.appendChild(input);
+            }
+        }
+
+        function updateAbundances() {
+            const zstar = parseFloat(document.getElementById("zstar").value);
+            if (!isNaN(zstar)) {
+                for (const element of Object.keys(defaultAbundances)) {
+                    if (element !== "H" && element !== "HE") {
+                        const input = document.getElementById(`abundance-${element}`);
+                        input.value = (defaultAbundances[element] * zstar).toExponential(8);
+                    }
+                }
+            }
+        }
+
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => tab.classList.remove('active-tab'));
+            contents.forEach(content => content.classList.remove('active-content'));
+
+            document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active-tab');
+            document.getElementById(tabId).classList.add('active-content');
+        }
+
+        function runCalculation() {
+            const luminosity = parseFloat(document.getElementById("luminosity").value);
+            const teff = parseFloat(document.getElementById("teff").value);
+            const mstar = parseFloat(document.getElementById("mstar").value);
+            const zscale = parseFloat(document.getElementById("zstar").value);
+            const email = document.getElementById("email").value;
+        
+            const abundances = {};
+            for (const element of Object.keys(defaultAbundances)) {
+                const value = parseFloat(document.getElementById(`abundance-${element}`).value);
+                abundances[element] = value;
+            }
+        
+            // Send data to Python backend using fetch
+            fetch('/process_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    luminosity: luminosity,
+                    teff: teff,
+                    mstar: mstar,
+                    zstar: zscale,
+                    email: email,
+                    abundances: abundances
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else if (data.error) {
+                    alert(data.error);
+                }
+                console.log(data);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("There was an error processing the data.");
+            });
+        }
+
+        createAbundanceInputs();
+    </script>
+    <!-- Footer -->
+    <div style="text-align: center; margin-top: 50px; padding: 20px; background-color: #a0cfa5; color: #2c3e50; font-size: 18px;">
+        <p>For more information, contact <a href="mailto:equation.lime@kuleuven.be">equation.lime@kuleuven.be</a></p>
+        <p>&copy; LIME. All rights reserved.</p>
+    </div>
+</body>
+</html>

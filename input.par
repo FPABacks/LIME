@@ -1,0 +1,16 @@
+&init_param
+DIR = 'output'
+lgTmin = 4.602E+00
+lgTmax = 4.602E+00
+N_lgT = 1
+lgDmin = -1.31296e+01
+lgDmax = -1.31296e+01
+N_lgD = 1
+lgttmin = -8.0d0
+lgttmax = 1.0d1
+N_tt = 50
+Ke_norm = -1.d1
+X_mass = 0.7d0
+Z_mass = 2.69756E-03
+ver = .FALSE.
+/

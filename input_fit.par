@@ -1,0 +1,13 @@
+&setup
+    ParamFile  = 'input.par'
+    PlotOutput = .TRUE. ! set to .TRUE. to produce fit plots 
+    Output_DIR = '_fit'  ! set the output dyrectory of this script
+    DMC_DIR    = '/DMC'  ! if PlotOutput = .TRUE. then plots are stored in directory 
+    PlotBack   = 'agg'   ! 'ps' - for postscript, '' - for interactive
+    al_min     = 0.0e-10   ! linear value
+    al_max     = 0.99999  ! linear value
+    N_al       = 500   ! integer
+    Q0_min     = -5.   ! log value
+    Q0_max     = 10.    ! log value
+    N_Q0       = 700   ! integer
+/
