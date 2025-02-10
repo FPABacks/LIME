@@ -1,0 +1,3 @@
+[submodule "mailing"]
+	path = mailing
+	url = https://github.com/IvS-KULeuven/LIME.git
