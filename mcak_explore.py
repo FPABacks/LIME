@@ -277,7 +277,7 @@ def get_user_abundances(default_abundances):
     return user_abundances
 
 def read_kappa(file_path):
-  data = np.loadtxt('./' + file_path + '/' + 'Ke_TD' , unpack=True)
+  data = np.loadtxt(file_path + '/' + 'Ke_TD' , unpack=True)
   kappa_e = data[1,1]
   return kappa_e
   
@@ -357,7 +357,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
         lgrho_ini = np.log10(rho_initial)
         
         parameters = {
-           "DIR": "'output'",
+           "DIR": f"'{random_subdir}/output'",
            "lgTmin": f"{lgTeff:.3E}",
            "lgTmax": f"{lgTeff:.3E}",
            "N_lgT": "1",
@@ -372,7 +372,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
            "Z_mass": f"{Z_star:.5E}",
            "ver": ".FALSE."
            }
-        input_file = "input.par"
+        input_file = os.path.join(random_subdir, "in")
         executable = "./run"
         
             
@@ -408,8 +408,8 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
             D = float(parameters["lgDmin"])  # lgDmin (assuming lgDmin == lgDmax)  
       
             output_file = construct_output_filename(T, D)
-            directory = parameters["DIR"].strip("'") 
-            file_path = './' + directory + '/' + output_file
+            directory = parameters["DIR"].strip("'")
+            file_path = directory + '/' + output_file
             log_print('Constructed file path:', file_path)
 
             # Write updated parameters and rerun the Fortran executable
@@ -539,6 +539,10 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
             #axes[2].set_xlabel("iteration")
             plt.tight_layout()
             plt.savefig(f"./{random_subdir}/sim_log.png")
+
+             # Zip the directory
+            #zip_filename = f"{random_subdir}.zip"
+            #shutil.make_archive(random_subdir, 'zip', random_subdir)
             
 
             #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
@@ -554,29 +558,30 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
                     
             if alpha > 0.95:
                 log_print('WARNING!!, alpha very high, approaching diverging limit')
-            if iteration < 3:
-              continue
+                log_print(str(random_subdir))
+                return str(random_subdir)                
+            elif iteration < 3:
+                continue
             elif 3 <= iteration < 8 and np.abs(rel_rho) <= tolerance and np.abs(rel_mdot) <= tolerance:
-              log_print('final values (mdot,Qbar,alpha,q0):')
-              log_print(mdot*cgs.year/cgs.Msun, qbar, alpha, q0)
-              return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho   
+                log_print('final values (mdot,Qbar,alpha,q0):')
+                log_print(mdot*cgs.year/cgs.Msun, qbar, alpha, q0)
+                log_print(str(random_subdir))
+                return str(random_subdir)
+                #return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho, os.path.abspath(zip_filename)
             elif iteration >= 8 and np.abs(rel_rho) < 1.e-2 and np.abs(rel_mdot)  < 1.e-2:
-              log_print('final values (mdot,Qbar,alpha,Q0):')
-              log_print(mdot*cgs.year/cgs.Msun, qbar, alpha, q0) 
-              return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho   
+                log_print('final values (mdot,Qbar,alpha,Q0):')
+                log_print(mdot*cgs.year/cgs.Msun, qbar, alpha, q0)
+                log_print(str(random_subdir))
+                return str(random_subdir) 
+                #return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho, os.path.abspath(zip_filename)
             else :
-              #return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho
-              #print("Convergence not possible, values should not be trusted")
-              log_print("Not yet converged")
-    
-    
-    # Zip the directory
-    zip_filename = f"{random_subdir}.zip"
-    shutil.make_archive(random_subdir, 'zip', random_subdir)
+                #return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho
+                #print("Convergence not possible, values should not be trusted")
+                log_print("Not yet converged")
+                log_print(str(random_subdir))
+                return str(random_subdir)
 
-    # Return the zip file path
-    return os.path.abspath(zip_filename)
-
+    
 if __name__ == "__main__":
 
     lum = float(sys.argv[1])
