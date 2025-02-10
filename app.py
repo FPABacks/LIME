@@ -3,12 +3,8 @@ import subprocess
 import json
 import os
 import threading
-import smtplib
 import shutil
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
+import re
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -25,15 +21,8 @@ ATOMIC_MASSES = {
     'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690, 'CU': 63.546, 'ZN': 65.390
 }
 
-"Setting up an SMTPS server, and recording the sender email, password"
-SMTP_SERVER = "smtps.kuleuven.be"
-SMTP_PORT = 587  
-SENDER_EMAIL = "dwaipayan.debnath@kuleuven.be"
-SENDER_PASSWORD = "Lampard10"
-
 def calculate_metallicity(number_abundances):
-    "Calculates the actual metallicty from the number "
-    " abundances input by the user"
+    """Calculates the actual metallicity from the number abundances input by the user"""
     total_mass_abundance = sum(
         number_abundances[element] * ATOMIC_MASSES[element]
         for element in number_abundances if element in ATOMIC_MASSES
@@ -47,81 +36,56 @@ def calculate_metallicity(number_abundances):
     
     return metallicity
 
-def send_email(recipient_email, subject, body, attachment_path=None):
-    "This subroutine handles emailing to the user, with optional attachment"
-    msg = MIMEMultipart()
-    msg["From"] = SENDER_EMAIL
-    msg["To"] = recipient_email
-    msg["Subject"] = subject
-    msg.attach(MIMEText(body, "plain"))
-
-    # Attach file if provided
-    if attachment_path and os.path.exists(attachment_path):
-        with open(attachment_path, "rb") as attachment:
-            part = MIMEBase("application", "octet-stream")
-            part.set_payload(attachment.read())
-
-        encoders.encode_base64(part)
-        part.add_header("Content-Disposition", f"attachment; filename={os.path.basename(attachment_path)}")
-        msg.attach(part)
-
-    try:
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
-        server.sendmail(SENDER_EMAIL, recipient_email, msg.as_string())
-        server.quit()
-        print("Email sent successfully.")
-    except Exception as e:
-        print(f"Error sending email: {str(e)}")
+def load_email_body(filename):
+    with open(filename, 'r') as file:
+        return file.read()
 
 def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email):
-    "The input abundances are written out in the txt file"
-    "This is later used by Mforce-LTE for it's calculations"
-    "RUNS mcak_explore by py subprocesses"
+    """Runs mcak_explore and emails the results"""
     try:
         abundance_filename = os.path.join(DATA_DIR, "number_abundance")
         with open(abundance_filename, "w") as f:
             for i, (element, value) in enumerate(abundances.items(), start=1):
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
-        # result = subprocess.Popen(
-        #     ["python3", "-c", "print(test)"],
-        #     stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        # )
-        result = subprocess.Popen(
-            ["python3", "mcak_explore.py", str(lum), str(teff), str(mstar), str(zstar), str(zscale), str(helium_abundance)],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        print(result.communicate())
-        
 
-        if result.returncode == 0:
-            print("mcak_explore.py executed successfully")
-        else:
+        # Run computation
+        result = subprocess.run(
+            ["python3", "mcak_explore.py", str(lum), str(teff), str(mstar), str(zstar), str(zscale), str(helium_abundance)],stdout=subprocess.PIPE, stderr=subprocess.PIPE)         
+        output = result.stdout.decode().strip()
+
+        output_lines = output.splitlines() 
+        generated_file = output_lines[-1] 
+        print(generated_file)
+
+        if result.returncode != 0:
             print(f"Computation error: {result.stderr}")
-            #send_email(recipient_email, "Computation Error", f"Error occurred:\n{result.stderr}")
-            return  # Stop execution if there's an error
-
-        # Zip the results directory
-        output_dir = f"./tmp/{result}" 
-        zip_filename = os.path.join(output_dir, f"{result}.zip")
-        print(output_dir, zip_filename)
+            return  
+        
+        # Get the directory from the generated file
+        output_dir = generated_file.strip()
+        output_filename = os.path.basename(output_dir)
+        
+        tmp_dir = './tmp'
+        
+        # Create a zip file of the contents of output_dir, not including the output_dir itself
+        zip_filename = os.path.join(tmp_dir, f"{output_filename}.zip")
         shutil.make_archive(zip_filename.replace(".zip", ""), 'zip', output_dir)
+        
 
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
 
-    # Send email with the ZIP file
-    send_email(recipient_email, "LIME Computation Results", "Attached is the LIME output", zip_filename)
+    body = load_email_body('./mailing/mail_template.j2')
     
-            
+    subprocess.run(["python3", "./mailing/mailer.py", "--t", recipient_email, "--s", "LIME Computation Results", "--b", body, "--a", zip_filename])
+
 @app.route('/')
 def home():
     return render_template("index.html")
 
 @app.route('/process_data', methods=['POST'])
 def process_data():
-    "Handles the communication with index.html"
+    """Handles the communication with index.html"""
     try:
         data = request.json
         print("Received data:", data)  # Debugging line
@@ -131,8 +95,8 @@ def process_data():
         teff = float(data.get("teff", 0.0))
         mstar = float(data.get("mstar", 0.0))
         zscale = float(data.get("zscale", 0.0))
-        abundances = data.get("abundances", {})  # Keep this as a dictionary
-        helium_abundance = float(abundances.get("HE", 0.0))  # Extract HE safely
+        abundances = data.get("abundances", {})  
+        helium_abundance = float(abundances.get("HE", 0.0))  
         user_email = data.get("email", "").strip()
 
         if not user_email:
