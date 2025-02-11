@@ -12,11 +12,10 @@
             background-color: #f4f9f4;
             color: #2c3e50;
             text-align: left;
-            font-size: 18px; 
+            font-size: 22px; 
         }
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
+            margin: 10px auto;
             padding: 20px 20px;  /* Remove top padding */
             background-color: #d6e9c6;
             border-radius: 10px;
@@ -43,14 +42,14 @@
         }
         h2 {
             color: #2c3e50;
-            font-size: 22px;
+            font-size: 28px;
         }
         label {
             display: block;
             margin-top: 10px;
             font-weight: bold;
-            color: #333;
-            font-size: 20px;
+            color: #333232;
+            font-size: 22px;
         }
         input, select {
             width: 90%; 
@@ -59,9 +58,9 @@
             border: 1px solid #e0e0e0;
             border-radius: 5px;
             background-color: #ffffff;
-            color: #333;
+            color: #333232;
             display: inline-block;
-            font-size: 18px;
+            font-size: 22px;
         }
         input:read-only {
             background-color: #e9ecef;
@@ -178,23 +177,69 @@
         <!-- Tab navigation -->
         <div class="tabs">
             <button class="tab active-tab" onclick="showTab('info')">Tool Info</button>
+            <button class="tab" onclick="showTab('example')">Example</button>
             <button class="tab" onclick="showTab('calculator')">Calculator</button>
         </div>
 
         <!-- Tab contents -->
         <div id="info" class="tab-content active-content">
-            <h2>About This Tool</h2>
-            <h3>Overview</h3>
+            <h2>Overview</h2>
             <p>This online tool is designed to provide a fast, efficient, open-source, user-friendly, and real-time mass-loss calculator for line-driven winds from hot, massive stars with given basic stellar parameters and arbitrary chemical compositions.</p>
             <p>The line force is computed on-the-fly from excitation and ionization balance calculations using the <span class="citation">“Munich Atomic Database” (Pauldrach et al. 2001; Puls et al. 2000)</span> consisting of more than 4 million spectral lines. Mass-loss rates are then derived from line-driven wind theory, including effects of a finite stellar disk and gas sound speed. The line-force parameters are calculated following <span class="citation">Gayley 1995; Poniatowski et al. 2022</span>. For a given set of stellar parameters and chemical composition, we obtain predictions for mass loss rates and the three line-force parameters \(\bar{Q}\), \(Q_0\), and \(\alpha\) at the wind critical point.</p>
             <p>In addition to its speed and simplicity, a strength of our mass-loss calculator is that it avoids uncertainties related to applying fit formulae to underlying model grids calculated for more restricted parameter ranges. Moreover, individual chemical abundances can be trivially modified, and their effects upon predicted mass-loss rates explored. This thus also allows for direct applications toward stars that are significantly chemically modified at the surface.</p>
 
-            <h3>Usage</h3>
+            <h2>Usage</h2>
             <p>To compute mass loss rates, the user needs to input some basic stellar parameters: the luminosity of the star \(L_\star\) (in terms of solar luminosity), mass of the star \(M_\star\) (in solar mass), the effective temperature of the star \(T_{\rm eff}\) (in Kelvin), and the metallicity of the star \(Z_\star\) (for solar \(Z_\star = 1\)). The default abundances are provided from the new solar abundances <span class="citation">(Asplund et al. 2009)</span>, but the user is free to change the abundances as they wish. A change in scaling metallicity would scale all the metals (i.e., from Li-Zn). If you use Line-driven mass loss rate calculator for your work, please cite <span class="citation">Sundqvist et al. 2025</span> and also provide a footnote with the URL of this website.</p>
 
-            <h3>Credits</h3>
+            <h2>Credits</h2>
             <p>This tool has been developed by the EQUATION group (led by Prof. Jon Sunqvist) with funding from KU Leuven, European Research Council (ERC) and Fonds voor Wetenschappelijk Onderzoek – Vlaanderen (FWO).</p>
         </div>
+        <div id="example" class="tab-content">           
+            <h2>Brief methodology</h2>
+            <p> The tool uses the CAK theory as formulated by <span class="citation"> Gayley (1995) </span> 
+                to calculate mass-loss rates, incorporating a high-opacity cut-off in line strength <span class="citation"> (Owocki et al. 1988) </span>. 
+                Additionally, the finite disk angle effect <span class="citation"> (Pauldrach et al. 1986) </span> is accounted for by following <span class="citation"> Kudritzki et al. (1989) </span>. 
+                It also includes a finite sound speed correction based on <span class="citation"> Owocki & ud-Doula (2004) </span>. 
+                For the explicit mass loss rate formula please check Eq (1) in <span class="citation"> Sundqvist et al. (2025) </span>. </p>   
+            <div style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+                <div style="flex: 1; max-width: 45%; text-align: center;">
+                    <img src="{{ url_for('static', filename='Mf.png') }}" alt="Line force Multiplier" style="width: 100%; height: auto;">
+                    <p><strong>Figure 1:</strong> Line force Multiplier</p>
+                </div>
+                <div style="flex: 1; max-width: 45%; text-align: center;">
+                    <img src="{{ url_for('static', filename='itr.png') }}" alt="Iteration" style="width: 100%; height: auto;">
+                    <p><strong>Figure 2:</strong> Iteration</p>
+                </div>
+            </div>
+            <p> For a given (\(\rho,T\)) the the line-force multiplier can be calculated. Using <span class="citation"> Gayley (1995) </span> the line force multiplier 
+                is fitted using 3 parameters \(\bar{Q}, Q_0\) and \(\alpha\). For simplicity we take the effective temperature of the star to be the temperature at the vcritical point.
+                However, the density at the critical point is not known a priori. To calculate that we use the mass loss rate at the critical point and using that new density we can 
+                calculate a new mass loss rate and iterate towards a some tolerance. In <span class="citation"> Figure 2 </span> it can be seen that the convergence is reached when the relative error is less then \(10^{-4}\)
+                in both mass loss rate and density. <span class="citation"> Figure 1</span> displays the force multiplier, which is fitted until the sobolev optical depth at the critical point (the black curve). For more detailed explanation we refer the
+                user to check <span class="citation"> Sundqvist et al. 2025</span>. <p>
+            
+            <h2>Comparison with existing empirical rates and prescirptions</h2>     
+            <p> This section displays the mass loss rates for a bunch of OB-stars in the large and small magellanic clouds obtined empirically 
+                <span class="citation">(Brands et al. 2022; Backs et al. 2024; Verhamme et al. 2024)</span> compared to our method and various prescriptions. <p>   
+            <div style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+                <div style="flex: 1; max-width: 45%; text-align: center;">
+                    <img src="{{ url_for('static', filename='massloss.png') }}" alt="Mass loss rate" style="width: 100%; height: auto;">
+                    <p><strong>Figure 3:</strong> Comparison with empirically obtained rates and prescriptions</p>
+                </div>
+                <div style="flex: 1; max-width: 45%; text-align: center;">
+                    <img src="{{ url_for('static', filename='lineparameters.png') }}" alt="Iteration" style="width: 100%; height: auto;">
+                    <p><strong>Figure 4:</strong> Line force parameters obtained for the dataset using our method</p>
+                </div>
+            </div>
+            <p> Figure 4 displays the logarithmic ratio of the mass loss rates obtained from certain prescriptions (<span class="citation">Vink et al. 2001; 
+                Krti&ccaron;ka et al.2019; Bjorklund et al. 2022</span>) compared to the emprically obtained mass loss rates. As clearly evident from the figure
+                this tool performs as well or even better than alternative recipes based on more elaborate line-driven wind models. In part this might be because these recipes are actually fit-formulae 
+                (typically assuming power-law scaling of \(\dot{M}\) with stellar parameters) based on underlying grid-calculations for a restricted number of models. This introduces scatter and
+                uncertainties when applied to actual stars. By contrast, our method computes everything on-the-fly for any given set of input stellar parameters, which then removes
+                such intrinsic uncertainties. Additionally, our approach allows us to directly tune individual abundances, whereas in <span class="citation"> Vink et al. 2001; 
+                Krti&ccaron;ka et al.2019; Bjorklund et al. 2022</span> only general scalings with overall metallicity Z are provided. <p>
+
+        </div>                   
         <div id="calculator" class="tab-content">
             <h2>User info</h2>
             <div class="input-container">
@@ -331,7 +376,7 @@
     </script>
     <!-- Footer -->
     <div style="text-align: center; margin-top: 50px; padding: 20px; background-color: #a0cfa5; color: #2c3e50; font-size: 18px;">
-        <p>For more information, contact <a href="mailto:equation.lime@kuleuven.be">equation.lime@kuleuven.be</a></p>
+        <p>For more information, contact <a href="mailto:dwaipayan.debnath@kuleuven.be">dwaipayan.debnath@kuleuven.be</a></p>
         <p>&copy; LIME. All rights reserved.</p>
     </div>
 </body>
