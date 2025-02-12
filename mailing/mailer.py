@@ -7,7 +7,7 @@ import argparse
 from email.utils import make_msgid
 
 ### Constants
-FRM = "Jesus.Christ@kuleuven.be"
+FRM = "lime.equation@kuleuven.be"
 SRV = "smtps.kuleuven.be"
 #BCC = "maarten.dirickx@kuleuven.be"
 DEFAULT_TO = "system@ster.kuleuven.be"

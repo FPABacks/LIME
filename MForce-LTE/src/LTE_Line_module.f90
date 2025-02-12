@@ -942,6 +942,13 @@ MODULE LTE_Line_module
      Mass_fractions(:) = OBJ%Aboundance(:) * OBJ%Atomic_weight(:) ! compute direct masses
      Mass_fractions(:) = Mass_fractions(:)/SUM(Mass_fractions(:)) ! normalize to compute mass fractions
      
+     print*, Mass_fractions(:)
+
+     stop
+     ! DD change reading mass fractions 
+     !Mass_fractions(:) = Mass_fractions(:)
+
+     
     
      !IF (.NOT.USE_solar_composition) THEN
      !   Mass_fractions(1) = X_frac ! set the H mass fraction  to X
