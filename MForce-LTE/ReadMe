@@ -1,0 +1,22 @@
+Setps to set the porblem up 
+
+1) Export the destination to the MForce-LTE directory
+>  export MFORCE_DIR =".../MForce-LTE" 
+
+2) Add to Path MForce-LTE directory 
+>  export PATH=$PATH:$MFORCE_DIR 
+
+3) Run the setup script in the desired directory for problem (use help)
+>  setup.pl -t=type 
+
+4) Modify the problem input file 
+>  vi input_run.par 
+
+5) [Optional] Modify the fitting input file 
+>  vi input_fit.par
+
+6) Run the script with setup file 
+>  ./run -i input_run.par 
+
+7) [Optional] Run the fitting routine (requires python 3 or higher)
+>  python fit_v1.5.py input_fit.par
