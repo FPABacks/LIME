@@ -21,6 +21,16 @@ ATOMIC_MASSES = {
     'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690, 'CU': 63.546, 'ZN': 65.390
 }
 
+def calculate_metallicity_massb(mass_abundances):
+    """Calculates the actual metallicity from the number abundances input by the user"""
+    metals = {e for e in ATOMIC_MASSES if e not in {'H', 'HE'}}
+    metallicity = sum(
+        mass_abundances[element]
+        for element in metals if element in mass_abundances
+    )
+    
+    return metallicity
+
 def calculate_metallicity(number_abundances):
     """Calculates the actual metallicity from the number abundances input by the user"""
     total_mass_abundance = sum(
@@ -36,6 +46,31 @@ def calculate_metallicity(number_abundances):
     
     return metallicity
 
+def He_number_abundance(mass_abundances):
+    """
+    Compute the number abundance of helium from mass abundances.
+    This is relative to the Hydrogen abundances.
+    
+    :return: Number abundance of helium (relative to all elements)
+    """
+    
+    mass_H = mass_abundances.get('H', 0.0)
+    mass_He = mass_abundances.get('HE', 0.0)
+    mass_C = mass_abundances.get('C', 0.0)
+    
+    total_num_abun = sum(mass_abundances[element] / ATOMIC_MASSES[element] for element in mass_abundances)
+
+    N_H = (mass_H / ATOMIC_MASSES['H']) / total_num_abun
+    N_He = (mass_He / ATOMIC_MASSES['HE']) / total_num_abun
+    N_C = (mass_He / ATOMIC_MASSES['C']) / total_num_abun
+
+    if N_H == 0.0:
+        NHe = N_He/N_He
+    else :
+        NHe = N_He/N_C     
+
+    return NHe
+
 def load_email_body(filename):
     with open(filename, 'r') as file:
         return file.read()
@@ -43,7 +78,7 @@ def load_email_body(filename):
 def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email):
     """Runs mcak_explore and emails the results"""
     try:
-        abundance_filename = os.path.join(DATA_DIR, "number_abundance")
+        abundance_filename = os.path.join(DATA_DIR, "mass_abundance")
         with open(abundance_filename, "w") as f:
             for i, (element, value) in enumerate(abundances.items(), start=1):
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
@@ -88,15 +123,14 @@ def process_data():
     """Handles the communication with index.html"""
     try:
         data = request.json
-        print("Received data:", data)  # Debugging line
+        print("Received data:", data)  
 
         # Ensure required parameters exist and are valid
         luminosity = float(data.get("luminosity", 0.0))
         teff = float(data.get("teff", 0.0))
         mstar = float(data.get("mstar", 0.0))
         zscale = float(data.get("zscale", 0.0))
-        abundances = data.get("abundances", {})  
-        helium_abundance = float(abundances.get("HE", 0.0))  
+        abundances = data.get("abundances", {})    
         user_email = data.get("email", "").strip()
 
         if not user_email:
@@ -105,8 +139,13 @@ def process_data():
         if not abundances:
             return jsonify({"error": "Abundances data is missing"}), 400
 
-        # Calculate Zstar correctly
-        zstar = calculate_metallicity(abundances)
+        # Calculate Zstar correctly from mass abundances
+        zstar = calculate_metallicity_massb(abundances)
+        
+        
+        # calculating the number abundance of helium from the mass abundance
+        helium_abundance = He_number_abundance(abundances)
+        print('helium',helium_abundance)
 
         computation_thread = threading.Thread(
             target=process_computation,

@@ -133,8 +133,6 @@ def fit_data(file_path, t_cri):
     print('Q0, alpha:',Q0,alpha)
     return Qb, alpha, Q0, lgt_filtered
 
-import numpy as np
-import matplotlib.pyplot as plt
 
 def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     """
@@ -296,12 +294,12 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
     # scaling metallicity to solar
     Z_asplund = 0.01334462136084096e0 
        
-    with open(log_file, 'w') as log:  # Open file in write mode
+    with open(log_file, 'w') as log: 
         def log_print(*args, **kwargs):
             """Print and log to file simultaneously."""
             print(*args, **kwargs)
             print(*args, **kwargs, file=log)
-
+            
         log_print(f"Running simulation with Luminosity={lum}, T_eff={T_eff}, M_star={M_star}, Yhe={Yhel}")    
     
         lum = lum*cgs.Lsun 
@@ -320,6 +318,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
         R_star = radius_calc(lum,T_eff)
         
         "Helium abundances are read from the user"
+        
         Yhe = Yhel 
         Ihe = 2
         if T_eff < 2.5e4:
@@ -513,7 +512,6 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
             # Plotting some stuffs
 
             fig, axes = plt.subplots(3, 2, figsize=(8, 8), sharex=True)
-            # Flatten axes for easy indexing
             axes = axes.flatten()
             axes[0].plot(it_num, np.log10([mdot * cgs.year / cgs.Msun for mdot in mdot_num]), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
             axes[1].plot(it_num, qbar_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
@@ -540,11 +538,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
             plt.tight_layout()
             plt.savefig(f"./{random_subdir}/sim_log.png")
 
-             # Zip the directory
-            #zip_filename = f"{random_subdir}.zip"
-            #shutil.make_archive(random_subdir, 'zip', random_subdir)
             
-
             #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
             if 3 <= iteration:
                 if mdot_lim < 1:

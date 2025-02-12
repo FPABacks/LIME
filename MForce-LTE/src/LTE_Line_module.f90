@@ -913,10 +913,10 @@ MODULE LTE_Line_module
  
      ! Open the line list info file
      !OPEN (UNIT=100, FILE=TRIM(DATA_DIR)//'/asplund_numabun_2009', STATUS='OLD',IOSTAT=IO_status)
-     OPEN (UNIT=100, FILE=TRIM(DATA_DIR)//'/number_abundance', STATUS='OLD',IOSTAT=IO_status)
+     OPEN (UNIT=100, FILE=TRIM(DATA_DIR)//'/mass_abundance', STATUS='OLD',IOSTAT=IO_status)
      ! Check if opening was sucssesful
      IF(IO_status .NE. 0) THEN
-        PRINT*,'---- Error Opening the '//TRIM(DATA_DIR)//'/number_abundance file STATUS ', &
+        PRINT*,'---- Error Opening the '//TRIM(DATA_DIR)//'/mass_abundance file STATUS ', &
              IO_status, ' ----'
         STOP
      ENDIF
@@ -925,7 +925,7 @@ MODULE LTE_Line_module
         READ(100,*)idum,cdum,OBJ%Aboundance(Z)
      END DO
      CLOSE(100)
-     IF(ver) PRINT*, '  - Aboundances READ'
+     IF(ver) PRINT*, '  - Mass Abundances READ'
  
      ! here we normalise abandences to H or He depending if there is Y aboundance and compute mass fractions for solar mixture.
      !IF (USE_H_normalisation) THEN
@@ -937,19 +937,12 @@ MODULE LTE_Line_module
      ! fix to read in abundances rather than 10**12 dex - DD
 
      !JS-ADD DEC 24:  always normalised to H here      
-     OBJ%Aboundance(:) = OBJ%Aboundance(:) !/OBJ%Aboundance(1)  
+     !OBJ%Aboundance(:) = OBJ%Aboundance(:) !/OBJ%Aboundance(1)  
         
-     Mass_fractions(:) = OBJ%Aboundance(:) * OBJ%Atomic_weight(:) ! compute direct masses
-     Mass_fractions(:) = Mass_fractions(:)/SUM(Mass_fractions(:)) ! normalize to compute mass fractions
+     !Mass_fractions(:) = OBJ%Aboundance(:) * OBJ%Atomic_weight(:) ! compute direct masses
+     !Mass_fractions(:) = Mass_fractions(:)/SUM(Mass_fractions(:)) ! normalize to compute mass fractions
      
-     print*, Mass_fractions(:)
-
-     stop
-     ! DD change reading mass fractions 
-     !Mass_fractions(:) = Mass_fractions(:)
-
-     
-    
+   
      !IF (.NOT.USE_solar_composition) THEN
      !   Mass_fractions(1) = X_frac ! set the H mass fraction  to X
      !   Mass_fractions(2) = Y_frac ! set the He mass fraction to Y
@@ -972,7 +965,9 @@ MODULE LTE_Line_module
      !   OBJ%Y_frac = Mass_fractions(2)
      !END IF
      
-     !>  DD 
+     ! DD change reading mass fractions 
+     Mass_fractions(:) = OBJ%Aboundance(:)
+
      
      !X_frac = Mass_fractions(1)
      Y_frac = Mass_fractions(2)
@@ -985,13 +980,12 @@ MODULE LTE_Line_module
      ! Allocate the input X and Y mass fractions
      OBJ%X_frac = X_frac
      OBJ%Y_frac = Y_frac
-     Mass_fractions(3:MaxZ) = Mass_fractions(3:MaxZ)/SUM(Mass_fractions(3:MaxZ))*Z_frac
      
-     OBJ%Aboundance(:) = OBJ%Aboundance(:)
+
+     !OBJ%Aboundance(:) = OBJ%Aboundance(:)
      
      
      
-     !print*, X_frac, Y_frac, Z_frac
      !stop
      !JS-TEST: Dec 24 
      !print*,'Mass and number fractions (H,He...):'
@@ -1061,16 +1055,20 @@ MODULE LTE_Line_module
      ! compute the output total number densities for each spicies H or He depending if there is Y aboundance
      
      
-     IF (OBJ%X_frac .NE. 0.0d0) THEN
-        IF(ver) PRINT*, '  - Using the X mass fraction for computations'
-        OBJ%Nuclei(:) = rho*OBJ%Aboundance(:)*OBJ%X_frac/OBJ%mH
-     ELSE IF (OBJ%X_frac .EQ. 0.0d0 .AND. OBJ%Y_frac .NE. 0.0d0) THEN
-        IF(ver) PRINT*, '  - Using the Y mass fraction for computations'
-        OBJ%Nuclei(:) = rho*OBJ%Aboundance(:)*OBJ%Y_frac/(4.0d0*OBJ%mH)
-     ELSE
-        IF(ver) PRINT*, '  - Using the Z mass fraction for computations'
-        OBJ%Nuclei(:) = rho*OBJ%Aboundance(:)*(1 - OBJ%X_frac - OBJ%Y_frac)/(12.0d0*OBJ%mH)    
-     END IF
+     ! DD change - calculating nuceli from number abundance
+     OBJ%Nuclei(:) = rho * OBJ%Aboundance(:) / (OBJ%Atomic_weight(:) * OBJ%mH) 
+
+     
+     !IF (OBJ%X_frac .NE. 0.0d0) THEN
+     !   IF(ver) PRINT*, '  - Using the X mass fraction for computations'
+     !   OBJ%Nuclei(:) = rho*OBJ%Aboundance(:)*OBJ%X_frac/OBJ%mH
+     !ELSE IF (OBJ%X_frac .EQ. 0.0d0 .AND. OBJ%Y_frac .NE. 0.0d0) THEN
+     !   IF(ver) PRINT*, '  - Using the Y mass fraction for computations'
+     !   OBJ%Nuclei(:) = rho*OBJ%Aboundance(:)*OBJ%Y_frac/(4.0d0*OBJ%mH)
+     !ELSE
+     !   IF(ver) PRINT*, '  - Using the Z mass fraction for computations'
+     !   OBJ%Nuclei(:) = rho*OBJ%Aboundance(:)*(1 - OBJ%X_frac - OBJ%Y_frac)/(12.0d0*OBJ%mH)    
+     !END IF
      
      ! DO Z = 1,30
      !    PRINT*,OBJ%Nuclei(Z)

@@ -258,14 +258,14 @@
                 <label for="mstar">Stellar Mass (\(M_\star\)):</label>
                 <input type="number" id="mstar" step="any">
 
-                <label for="zstar">Metallicity (\(Z_\star\)):</label>
-                <input type="number" id="zstar" step="any" onblur="updateAbundances()">
+                <label for="zscale">Metallicity (\(Z_{\rm scale}\)):</label>
+                <input type="number" id="zscale" step="any" onblur="updateAbundances()">
             </div>
             <div class="button-container">
                 <button onclick="runCalculation()">Run</button>
             </div>
 
-            <h2>Element Abundances</h2>
+            <h2>Mass fractions</h2>
             <div id="abundances"></div>
         </div>
     </div>
@@ -279,14 +279,17 @@
     
     <script>
         const defaultAbundances = {
-            "H": 1.00000000000000, "HE": 0.08511380382000, "LI": 0.00000000001120, "BE": 0.00000000002399, "B": 0.00000000050119, "C": 0.00026915348039,
-            "N": 0.00006760829754, "O": 0.00048977881937, "F": 0.00000003630780, "NE": 0.00008511380382,
-            "NA": 0.00000017378008, "MG": 0.00003981071705, "AL": 0.00000281838293, "SI": 0.00003235936569,
-            "P": 0.00000025703958, "S": 0.00001318256738, "CL": 0.00000031622777, "AR": 0.00000251188643,
-            "K": 0.00000010715193, "CA": 0.00000218776162, "SC": 0.00000000141254, "TI": 0.00000008912509,
-            "V": 0.00000000851138, "CR": 0.00000043651583, "MN": 0.00000026915348, "FE": 0.00003162277660,
-            "CO": 0.00000009772372, "NI": 0.00000165958691, "CU": 0.00000001548817, "ZN": 0.00000003630780
-        };
+    "H" : 0.7374078505762753,  "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
+    "B" : 3.9638342804111373e-9, "C" : 2.3649741118292409e-3,  "N" : 6.927752331287037e-4,  "O" : 5.7328054948662952e-3,  
+    "F" : 5.0460905860356957e-7, "NE": 1.2565170515587217e-3,  "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
+    "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4,  "P" : 5.8243105278933166e-6, "S" : 3.0923740022022601e-4,  
+    "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5,  "K" : 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
+    "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6,  "V" : 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
+    "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3,  "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
+    "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
+}
+
+;
 
         function createAbundanceInputs() {
             const abundancesDiv = document.getElementById("abundances");
@@ -298,21 +301,18 @@
                 input.step = "any";
                 input.value = value;
                 input.id = `abundance-${element}`;
-                if (element === "H") {
-                    input.readOnly = true;
-                }
                 abundancesDiv.appendChild(label);
                 abundancesDiv.appendChild(input);
             }
         }
 
         function updateAbundances() {
-            const zstar = parseFloat(document.getElementById("zstar").value);
-            if (!isNaN(zstar)) {
+            const zscale = parseFloat(document.getElementById("zscale").value);
+            if (!isNaN(zscale)) {
                 for (const element of Object.keys(defaultAbundances)) {
                     if (element !== "H" && element !== "HE") {
                         const input = document.getElementById(`abundance-${element}`);
-                        input.value = (defaultAbundances[element] * zstar).toExponential(8);
+                        input.value = (defaultAbundances[element] * zscale).toExponential(8);
                     }
                 }
             }
@@ -333,7 +333,7 @@
             const luminosity = parseFloat(document.getElementById("luminosity").value);
             const teff = parseFloat(document.getElementById("teff").value);
             const mstar = parseFloat(document.getElementById("mstar").value);
-            const zscale = parseFloat(document.getElementById("zstar").value);
+            const zscale = parseFloat(document.getElementById("zscale").value);
             const email = document.getElementById("email").value;
         
             const abundances = {};
@@ -352,7 +352,7 @@
                     luminosity: luminosity,
                     teff: teff,
                     mstar: mstar,
-                    zstar: zscale,
+                    zscale: zscale,
                     email: email,
                     abundances: abundances
                 })
