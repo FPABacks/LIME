@@ -1,9 +1,22 @@
-PROGRAM main
-   USE f90getopt
-   USE LTE_Line_module
-   USE CGS_constants
+
+subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_norm,X_mass,Z_mass,N_tt,N_lgT,N_lgD, ver, DIR)
+
+!   use f90getopt
+   use LTE_Line_module
+   use CGS_constants
+
    IMPLICIT NONE
 
+!   real, intent(in) :: dummy1
+
+   REAL(DP), intent(in) :: lgTmin,lgTmax,lgDmin, lgDmax, lgttmin, lgttmax
+   REAL(DP), intent(in) :: Ke_norm, X_mass, Z_mass
+   INTEGER(I4B), intent(in) :: N_tt, N_lgT, N_lgD
+   CHARACTER(100), intent(in) :: DIR
+   LOGICAL, intent(in) :: ver
+
+   ! Removed from input:
+   REAL(DP) :: Y_mass
 
    ! setup Fortran IO variables 
    INTEGER, PARAMETER :: stdin  = 5
@@ -13,7 +26,7 @@ PROGRAM main
    ! seting up the computationsl variables 
    REAL(DP), DIMENSION(:), ALLOCATABLE :: W_i
    REAL(DP), DIMENSION(:), ALLOCATABLE :: q_i
-   REAL(DP), DIMENSION(:), ALLOCATABLE :: nu_i0
+   REAL(DP), DIMENSION(:), ALLOCATABLE, save :: nu_i0
 
    REAL(DP), DIMENSION(:), ALLOCATABLE :: tt_list
    REAL(DP), DIMENSION(:), ALLOCATABLE :: lgT_list
@@ -23,12 +36,6 @@ PROGRAM main
    REAL(DP), DIMENSION(:), ALLOCATABLE :: barQ_list
    ! REAL(DP), DIMENSION(:), ALLOCATABLE :: notQ_list
 
-   CHARACTER(20) PAR_File
-   REAL(DP) :: lgTmin,lgTmax,lgDmin, lgDmax, lgttmin, lgttmax
-   REAL(DP) :: Ke_norm, X_mass, Y_mass, Z_mass 
-   INTEGER(I4B) :: N_tt, N_lgT, N_lgD
-   CHARACTER(32) DIR
-   LOGICAL :: ver
 
    INTEGER(I4B) :: T_gird_counter,D_gird_counter
 
@@ -53,48 +60,14 @@ PROGRAM main
    ! Mass of hydrogen
    REAL(DP) :: mH = 1.67372360d-24
 
-   TYPE(ATOMIC_DATA_TYPE) :: ATOM_DATA
-   TYPE(LINE_DATA_TYPE)   :: LINE_DATA
-   TYPE(OCCUPATION_NUMBER_TYPE):: NUMB_DENS !(30)
+   ! Note the "save" here to remember the values of these parameters between calls of the
+   ! subroutine. This is here to make sure the line data does not need to be read in again
+   ! in later calls.
+   logical, save                :: first_run=.True.
+   TYPE(ATOMIC_DATA_TYPE)       :: ATOM_DATA
+   TYPE(LINE_DATA_TYPE), save   :: LINE_DATA
+   TYPE(OCCUPATION_NUMBER_TYPE) :: NUMB_DENS !(30)
 
-   ! Input argument type
-   TYPE(option_s):: opts(2)
-
-   ! ... namelist
-   NAMELIST / init_param / lgTmin, lgTmax, N_lgT, &
-                           lgDmin, lgDmax, N_lgD, &
-                           lgttmin, lgttmax, N_tt, &
-                           Ke_norm, X_mass, Z_mass, &
-                           ver, DIR
-   !
-
-   CALL LoGo()
-
-   ! Parse the input argument
-   opts(1) = option_s( "input", .TRUE., 'i' )
-
-   ! If no options were committed
-   IF (command_argument_count() .eq. 0 ) THEN
-      STOP 'Please use option --input or -i Input_Parameter_file_name !'
-   END IF
-
-   ! Process options one by one
-   DO 
-      SELECT CASE( getopt( "i:", opts ) ) ! opts is optional (for longopts only)
-      CASE( char(0) )
-         EXIT
-      CASE( 'i' )
-         read (optarg, '(A)') PAR_File
-         WRITE(*,*) 'Using input parameter file: ',TRIM(PAR_File)
-         WRITE(*,*) " "
-         CALL  flush(stdout) 
-      END SELECT
-   END DO
-
-
-   OPEN(ID_NameList, FILE=TRIM(PAR_File), STATUS='OLD', FORM='FORMATTED')
-   READ(ID_NameList, NML=init_param)
-   CLOSE(ID_NameList)
 
    WRITE(*,*) "----- Input Setup -----"
    !WRITE(*,*)'Setting Chemical composition to X=',X_mass,'Z=',Z_mass
@@ -138,7 +111,7 @@ PROGRAM main
    CALL  flush(stdout) 
   
    
-   WRITE(*,*)'Creating output destionation - ./',TRIM(DIR)
+   WRITE(*,*)'Creating output destionation - ',TRIM(DIR)
    CALL EXECUTE_COMMAND_LINE('mkdir -p '//TRIM(DIR), WAIT=.TRUE.)
 
    ! ! create Q_0 outpute file
@@ -146,11 +119,12 @@ PROGRAM main
    ! WRITE(ID_notQ,*) 0.0d0, lgT_list
 
    ! create Qbar outpute file
-   OPEN (unit = ID_barQ, file = './'//TRIM(DIR)//'/Qb_TD', FORM='formatted',STATUS='unknown', ACTION='write')
+   WRITE(*,*) TRIM(DIR)//'/Qb_TD'
+   OPEN (unit = ID_barQ, file = TRIM(DIR)//'/Qb_TD', FORM='formatted',STATUS='unknown', ACTION='write')
    WRITE(ID_barQ,*) 0.0d0, lgT_list
 
    ! create Ke outpute file
-   OPEN (unit = ID_Ke, file = './'//TRIM(DIR)//'/Ke_TD', FORM='formatted',STATUS='unknown', ACTION='write')
+   OPEN (unit = ID_Ke, file = TRIM(DIR)//'/Ke_TD', FORM='formatted',STATUS='unknown', ACTION='write')
    WRITE(ID_Ke,*) 0.0d0, lgT_list
 
    WRITE(*,*)'Creating output destionation - done'
@@ -173,20 +147,22 @@ PROGRAM main
    WRITE(*,*) " "
    CALL  flush(stdout) 
 
+   ! Get Line data, but only the first time the subroutine is called.
+   WRITE(*,*) first_run
+   if (first_run) then
+      WRITE(*,*)'Initialise Line Data'
+      CALL LINE_DATA%Initialise(verbose  = ver)
+      WRITE(*,*)'  > Number of lines =',LINE_DATA%Total_line_numb
 
-   ! Get Line data
-   WRITE(*,*)'Initialise Line Data'
-   CALL LINE_DATA%Initialise(verbose  = ver)
-   WRITE(*,*)'  > Number of lines =',LINE_DATA%Total_line_numb
+      ALLOCATE(nu_i0(LINE_DATA%Total_line_numb))
+      nu_i0(:) = lght_speed /(LINE_DATA%Lambda(:) * Aa2cgs)
+
+      first_run = .False.
+   end if
 
    ALLOCATE(q_i(LINE_DATA%Total_line_numb))
-   ALLOCATE(nu_i0(LINE_DATA%Total_line_numb))
    ALLOCATE(W_i(LINE_DATA%Total_line_numb))
 
-   nu_i0(:) = lght_speed /(LINE_DATA%Lambda(:) * Aa2cgs)
-
-   WRITE(*,*)'Line Data - dine'
-   WRITE(*,*) " "
    CALL  flush(stdout) 
 
 
@@ -266,7 +242,7 @@ PROGRAM main
          WRITE(str_2,'(F5.1)') LOG10(D)
 
          !create MT_logT_logD outpute file
-         OPEN (unit = ID_Mt, file = './'//TRIM(DIR)//'/Mt_'//TRIM(str_1)//'_'//TRIM(str_2),& 
+         OPEN (unit = ID_Mt, file = TRIM(DIR)//'/Mt_'//TRIM(str_1)//'_'//TRIM(str_2),&
             FORM='formatted',STATUS='unknown', ACTION='write')
 
          ! fore each tt
@@ -375,41 +351,4 @@ CONTAINS
       END DO
    END SUBROUTINE linspace
 
-   SUBROUTINE LoGo()
-   
-      !CALL EXECUTE_COMMAND_LINE('clear')
-      !WRITE(*,*) " "
-      !WRITE(*,*) "     ___           ___           ___           ___           ___           ___       &
-      !&.             ___       ___           ___     "
-      !WRITE(*,*) "    /\__\         /\  \         /\  \         /\  \         /\  \         /\  \      &
-      !&.            /\__\     /\  \         /\  \    "
-      !WRITE(*,*) "   /::|  |       /::\  \       /::\  \       /::\  \       /::\  \       /::\  \     &
-      !&.           /:/  /     \:\  \       /::\  \   "
-      !WRITE(*,*) "  /:|:|  |      /:/\:\  \     /:/\:\  \     /:/\:\  \     /:/\:\  \     /:/\:\  \    &
-      !&.          /:/  /       \:\  \     /:/\:\  \  "
-      !WRITE(*,*) " /:/|:|__|__   /::\~\:\  \   /:/  \:\  \   /::\~\:\  \   /:/  \:\  \   /::\~\:\  \   &
-      !&.         /:/  /        /::\  \   /::\~\:\  \ "
-      !WRITE(*,*) "/:/ |::::\__\ /:/\:\ \:\__\ /:/__/ \:\__\ /:/\:\ \:\__\ /:/__/ \:\__\ /:/\:\ \:\__\  &
-      !&.        /:/__/        /:/\:\__\ /:/\:\ \:\__\"
-      !WRITE(*,*) "\/__/~~/:/  / \/__\:\ \/__/ \:\  \ /:/  / \/_|::\/:/  / \:\  \  \/__/ \:\~\:\ \/__/  &
-      !&.        \:\  \       /:/  \/__/ \:\~\:\ \/__/"
-      !WRITE(*,*) "      /:/  /       \:\__\    \:\  /:/  /     |:|::/  /   \:\  \        \:\ \:\__\    &
-      !&.         \:\  \     /:/  /       \:\ \:\__\  "
-      !WRITE(*,*) "     /:/  /         \/__/     \:\/:/  /      |:|\/__/     \:\  \        \:\ \/__/    &
-      !&.          \:\  \    \/__/         \:\ \/__/  "
-      !WRITE(*,*) "    /:/  /                     \::/  /       |:|  |        \:\__\        \:\__\      &
-      !&.           \:\__\                  \:\__\    "
-      !WRITE(*,*) "    \/__/                       \/__/         \|__|         \/__/         \/__/      &
-      !&.            \/__/                   \/__/    "
-       WRITE(*,*) " "
-       WRITE(*,*) ",_       _  .______                                     ,__    ,_________ ,_______ " 
-       WRITE(*,*) "| \     / | | _____|                                    | |    |___  ,___||  _____|"
-       WRITE(*,*) "|  \   /  | | |       ____   _  ___.  ____   _____      | |        | |    | |      "  
-       WRITE(*,*) "| \ \ /   | | '--,   / __ \ | |/ __| / ___\ / ___ \ === | |        | |    | '---,  "
-       WRITE(*,*) "| |\ / /| | | ,--'  | /  \ || / /   | /    | /__/_/     | |        | |    | ,---'  "
-       WRITE(*,*) "| | v_/ | | | |     | \__/ ||  /    | \___ | \___       | |____    | |    | |_____ "
-       WRITE(*,*) "|_|     |_| |_|      \____/ |_|      \____/ \____/      |,_____    |_|    |_______|"
-       WRITE(*,*) " "
-      CALL  flush(stdout) 
-   END SUBROUTINE LoGo
-END PROGRAM main
+end subroutine get_force_multiplier

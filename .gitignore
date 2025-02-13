@@ -1,8 +1,10 @@
-/M_reconstructed_0.txt
-/M_reconstructed_1.txt
-/M_reconstructed_2.txt
-/M_reconstructed_3.txt
+/M_reconstructed_*.txt
 /Mt_fit.png
 /results.txt
 /sim_log.png
 /simlog.txt
+/mforce.*.so
+/tmp
+/.DS_Store
+/.idea
+/__pycache__

@@ -5,6 +5,7 @@ import os
 import threading
 import shutil
 import re
+from mcak_explore import main as mcak_main
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -84,16 +85,19 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
 
         # Run computation
-        result = subprocess.run(
-            ["python3", "mcak_explore.py", str(lum), str(teff), str(mstar), str(zstar), str(zscale), str(helium_abundance)],stdout=subprocess.PIPE, stderr=subprocess.PIPE)         
-        output = result.stdout.decode().strip()
+        # result = subprocess.run(
+        #     ["python3", "mcak_explore.py", str(lum), str(teff), str(mstar), str(zstar), str(zscale), str(helium_abundance)])#,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # output = result.stdout.decode().strip()
 
-        output_lines = output.splitlines() 
-        generated_file = output_lines[-1] 
+        generated_file = mcak_main(lum, teff, mstar,zstar, zscale, helium_abundance)
+
+        # output_lines = output.splitlines()
+        # generated_file = output_lines[-1]
         print(generated_file)
 
-        if result.returncode != 0:
-            print(f"Computation error: {result.stderr}")
+        if generated_file is None:
+            print("Failed somewhere! Sorry!")
+            # print(f"Computation error: {result.stderr}")
             return  
         
         # Get the directory from the generated file

@@ -1,6 +1,7 @@
 import numpy as np
 import subprocess
-import os
+import matplotlib
+matplotlib.use('Agg') # Use this backend, as it is not interactive.
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import sys
@@ -10,8 +11,8 @@ plt.rcParams.update({ 'axes.linewidth':1.2, 'xtick.direction': 'in', 'ytick.dire
 plt.rcParams.update({'font.size': 15}) 
 import os
 import tempfile
-import random
-import shutil
+from mforce import get_force_multiplier
+
 
 # Atomic masses of elements (in atomic mass units, amu)
 atomic_masses = { 'H': 1.008,'HE': 4.003, 'LI': 6.941,'BE': 9.012,'B': 10.811,'C': 12.011,'N': 14.007,'O': 16.000,'F': 18.998,'NE': 20.180,'NA': 22.990,'MG': 24.305,'AL': 26.982,'SI': 28.085,'P': 30.974,'S': 32.066,'CL': 35.453,'AR': 39.948,'K': 39.098,'CA': 40.078,'SC': 44.956,'TI': 47.880,'V': 50.941,'CR': 51.996,'MN': 54.938,'FE': 55.847,'CO': 58.933,'NI': 58.690,'CU': 63.546,'ZN': 65.390 }
@@ -107,9 +108,7 @@ def fit_data(file_path, t_cri):
     lgt_filtered = lgt[indices]
     Mt_filtered = Mt[indices]
     fit_max = max(lgt_filtered)
-    #log_print(f"Fitted until: log t = {fit_max}")    
     print('lgt Fitted until:',fit_max)
-    #log_print(f"Running simulation with Luminosity={lum}, T_eff={T_eff}, M_star={M_star}, Yhe={Yhel}")
 
     lgMt_filtered = np.log10(Mt_filtered / Qb)
 
@@ -146,7 +145,7 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     
     M_reconstructed = Qb * 10**lgM(lgt_filtered, alpha, Q0)
     
-    output_file = f"./{random_subdir}/M_reconstructed_{iteration}.txt"
+    output_file = f"{random_subdir}/M_reconstructed_{iteration}.txt"
     np.savetxt(output_file, np.column_stack((lgt_filtered, M_reconstructed)), 
                header='lgt_filtered\tM_reconstructed', fmt='%.6e', comments='')
     
@@ -169,7 +168,7 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     plt.legend(fontsize=16, ncol=2)
     plt.tight_layout()
 
-    plt.savefig(f'./{random_subdir}/Mt_fit_{iteration}.png')
+    plt.savefig(f'{random_subdir}/Mt_fit_{iteration}.png')
     plt.close()
 
 def cak_massloss(lum, qbar, q0, alpha, gamma_e, rat): 
@@ -278,16 +277,43 @@ def read_kappa(file_path):
   data = np.loadtxt(file_path + '/' + 'Ke_TD' , unpack=True)
   kappa_e = data[1,1]
   return kappa_e
-  
-  
+
+
+def run_mforce(parameters):
+    """
+    Translates the dictionary of parameters to the input of the get_force_multiplier function and calls the function.
+    Note that the order can be confusing, do not assume what it would be, check it if you feel the need to change things
+    """
+
+    print("THE RANDOM DIRECTORY IS: ", parameters["DIR"])
+
+    get_force_multiplier(parameters["lgTmin"],
+                         parameters["lgTmax"],
+                         parameters["lgDmin"],
+                         parameters["lgDmax"],
+                         parameters["lgttmin"],
+                         parameters["lgttmax"],
+                         parameters["Ke_norm"],
+                         parameters["X_mass"],
+                         parameters["Z_mass"],
+                         parameters["N_tt"],
+                         parameters["N_lgT"],
+                         parameters["N_lgD"],
+                         parameters["ver"],
+                         parameters["DIR"])
+
+
 # Integrating the functionality into the main workflow
 def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
-    
 
     # Making a temporary file 
-    base_tmp_dir = "./tmp"
+    base_tmp_dir = f"{os.path.abspath(os.getcwd())}/tmp"
+    print(base_tmp_dir)
     os.makedirs(base_tmp_dir, exist_ok=True)
-    random_subdir = tempfile.mkdtemp(dir=base_tmp_dir) 
+    random_subdir = tempfile.mkdtemp(dir=base_tmp_dir).strip("''")
+    print("THE RANDOM DIRECTORY IS: ", random_subdir)
+    print(random_subdir)
+
     os.makedirs(random_subdir, exist_ok=True) 
     log_file = os.path.join(random_subdir, "simlog.txt") 
     
@@ -354,25 +380,25 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
         
         lgTeff = np.log10(T_eff)
         lgrho_ini = np.log10(rho_initial)
-        
+
+
         parameters = {
-           "DIR": f"'{random_subdir}/output'",
+           "DIR": f"{random_subdir}/output",
            "lgTmin": f"{lgTeff:.3E}",
            "lgTmax": f"{lgTeff:.3E}",
            "N_lgT": "1",
            "lgDmin": f"{lgrho_ini:.5E}",
            "lgDmax": f"{lgrho_ini:.5E}",
            "N_lgD": "1",
-           "lgttmin": "-8.0d0",
-           "lgttmax": "1.0d1",
+           "lgttmin": "-8.0",
+           "lgttmax": "10",
            "N_tt": "50",
-           "Ke_norm": "-1.d1",
-           "X_mass": "0.7d0",
+           "Ke_norm": "-10",
+           "X_mass": "0.7",
            "Z_mass": f"{Z_star:.5E}",
            "ver": ".FALSE."
            }
         input_file = os.path.join(random_subdir, "in")
-        executable = "./run"
         
             
         #log_print(f"Gamma={gamma_e}, kappa={kap_e}, mu={mu}, cgas={cgas}, vesc={v_esc}")
@@ -413,8 +439,9 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
 
             # Write updated parameters and rerun the Fortran executable
             write_input_file(input_file, parameters)
-            run_fortran_program(executable, input_file)
-            
+            # run_fortran_program(executable, input_file)
+            run_mforce(parameters)
+
             "kappa_e is read from the data provided by Mforce or can also be calculated"
             kappa_fm_mforce = True
             kappa_mf = read_kappa(parameters["DIR"].strip("'"))
@@ -536,7 +563,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
                 ax.ticklabel_format(useOffset=False, style='plain', axis='both') 
             #axes[2].set_xlabel("iteration")
             plt.tight_layout()
-            plt.savefig(f"./{random_subdir}/sim_log.png")
+            plt.savefig(f"{random_subdir}/sim_log.png")
 
             
             #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
