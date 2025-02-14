@@ -15,6 +15,9 @@ from reportlab.lib.utils import simpleSplit
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 from PIL import Image
+import pandas as pd
+import tempfile
+import random
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -87,22 +90,29 @@ def load_email_body(filename):
     with open(filename, 'r') as file:
         return file.read()
 
-def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email):
+def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name):
     """Runs mcak_explore and emails the results"""
+    # Making a temporary file 
+    base_tmp_dir = "./tmp"
+    os.makedirs(base_tmp_dir, exist_ok=True)
+    random_subdir = tempfile.mkdtemp(dir=base_tmp_dir) 
+    os.makedirs(random_subdir, exist_ok=True) 
+    massabun_loc = os.path.join(random_subdir, "output")
+    os.makedirs(massabun_loc, exist_ok=True)
     try:
-        abundance_filename = os.path.join(DATA_DIR, "mass_abundance")
+        abundance_filename = os.path.join(massabun_loc, "mass_abundance")
         with open(abundance_filename, "w") as f:
             for i, (element, value) in enumerate(abundances.items(), start=1):
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
 
         # Run computation
         result = subprocess.run(
-            ["python3", "mcak_explore.py", str(lum), str(teff), str(mstar), str(zstar), str(zscale), str(helium_abundance)],stdout=subprocess.PIPE, stderr=subprocess.PIPE)         
+            ["python3", "mcak_explore.py", str(lum), str(teff), str(mstar), str(zstar), str(zscale), str(helium_abundance), str(random_subdir)],stdout=subprocess.PIPE, stderr=subprocess.PIPE)         
         output = result.stdout.decode().strip()
-
+        
         output_lines = output.splitlines() 
         generated_file = output_lines[-1] 
-        print(generated_file)
+        #print(generated_file)
 
         if result.returncode != 0:
             print(f"Computation error: {result.stderr}")
@@ -112,9 +122,8 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         output_dir = generated_file.strip()
         output_filename = os.path.basename(output_dir)
         
-        tmp_dir = './tmp'
         
-        pdf_filename = f"./{output_dir}/report.pdf"
+        pdf_filename = f"./{output_dir}/{pdf_name}"
         figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith(".png")]
         simlog_path = os.path.join(output_dir, "simlog.txt")
 
@@ -148,7 +157,6 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                     wrq0 = float(last_values[3].strip("'"))
                     table_data.append((f"{wrmdot:.3e}", f"{wrqbar:.2e}",f"{wralp:.2e}",f"{wrq0:.2e}"))
         
-        print(table_data)
         # Draw the table (Ensure it's horizontal)
         c.setFont("Helvetica", 16)
         table = Table(table_data)
@@ -292,15 +300,92 @@ def process_data():
         helium_abundance = He_number_abundance(abundances)
         print('helium',helium_abundance)
 
+        pdf_name = 'result'
+
         computation_thread = threading.Thread(
             target=process_computation,
-            args=(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email)
+            args=(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name)
         )
         computation_thread.start()
 
         return jsonify({"message": "Data submitted successfully. You will receive an email when the computation is complete."}), 200
     except ValueError as e:
         return jsonify({"error": f"Invalid numerical input: {str(e)}"}), 400
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
+
+@app.route('/upload_csv', methods=['POST'])
+def upload_csv():
+    """Handles CSV file upload and batch computation"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No file provided"}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+        
+        # Read CSV file into a pandas DataFrame
+        df = pd.read_csv(file)
+
+        # Validate necessary columns
+        required_columns = {"name", "luminosity", "teff", "mstar", "zscale", "HE"}
+
+        if not required_columns.issubset(df.columns):
+            return jsonify({"error": f"CSV must contain columns: {', '.join(required_columns)}"}), 400
+
+        # Identify abundance columns (all except required ones)
+        abundance_columns = [col for col in df.columns if col not in required_columns]
+
+        # Extract email from request
+        user_email = request.form.get("email", "").strip()
+        if not user_email:
+            return jsonify({"error": "Email is required"}), 400
+        
+    
+        # Define default abundances inside the function
+        default_abundances = {
+            "H": 0.7374078505762753, "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
+            "B": 3.9638342804111373e-9, "C": 2.3649741118292409e-3, "N": 6.927752331287037e-4, "O": 5.7328054948662952e-3,  
+            "F": 5.0460905860356957e-7, "NE": 1.2565170515587217e-3, "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
+            "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4, "P": 5.8243105278933166e-6, "S": 3.0923740022022601e-4,  
+            "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5, "K": 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
+            "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6, "V": 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
+            "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3, "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
+            "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
+        }
+
+        for _, row in df.iterrows():
+            pdf_name = str(row["name"])
+            lum = float(row["luminosity"])
+            teff = float(row["teff"])
+            mstar = float(row["mstar"])
+            zscale = float(row["zscale"])
+            
+            # Read or default abundances
+
+            abundances = {}
+            for element, default_value in default_abundances.items():
+                if element in ["H", "HE"]:
+                    abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value
+                else:
+                    abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value * zscale
+
+                
+            
+            zstar = calculate_metallicity_massb(abundances)
+            helium_abundance = He_number_abundance(abundances)
+
+            # Run computation in a separate thread to avoid blocking
+            computation_thread = threading.Thread(
+                target=process_computation,
+                args=(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name)
+            )
+            computation_thread.start()
+
+        return jsonify({"message": "CSV processed successfully. You will receive an email when computations are complete."}), 200
+
     except Exception as e:
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 

@@ -163,10 +163,10 @@ PROGRAM main
    IF (X_mass.GT.-1) THEN
       WRITE(*,*) "  >Using input composition"
       Y_mass = (1.0d0 - X_mass - Z_mass)
-      CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac = Y_mass, verbose  = ver)
+      CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac = Y_mass, DIR=DIR, verbose  = ver)
    ELSE 
       WRITE(*,*) "  >Using Solar composition"
-      CALL NUMB_DENS%Initialise(ATOM_DATA, verbose  = ver)
+      CALL NUMB_DENS%Initialise(ATOM_DATA, DIR=DIR, verbose  = ver)
    END IF
    WRITE(*,*) 'X=',NUMB_DENS%X_frac,'Y=',NUMB_DENS%Y_frac,'Z=',1.0d0 - NUMB_DENS%x_frac - NUMB_DENS%Y_frac
    WRITE(*,*)'ATOM and NUMB  - done'
