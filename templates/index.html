@@ -159,6 +159,34 @@
             height: auto;
         }
 
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 300px;
+        background-color: #b6b7b8;
+        color: #2e2c2c;
+        text-align: center;
+        padding: 10px;
+        border-radius: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -150px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
     </style>
     <script type="text/javascript" async
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
@@ -266,7 +294,10 @@
                 <button onclick="runCalculation()">Run</button>
             </div>
 
-            <h2>Mass fractions</h2>
+            <h2>Mass fractions <span class="tooltip" style="font-size: 14px; vertical-align: super; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 2px solid gray; border-radius: 50%; color: gray;">?
+                <span class="tooltiptext">Mass fractions represent the relative abundance of each element in a star's composition. The total of all mass fractions (including H and He) should add up to 1. While number abundances are traditionally used in stellar atmospheric studies, they are often non-intuitive and require scaling (typically by H or He). Since our tool supports arbitrary abundances, mass fractions provide a more intuitive and flexible input format.</span>
+            </span></h2>
+                                    
             <div id="abundances"></div>
         </div>
         
@@ -283,7 +314,7 @@
             <h2>Upload CSV File</h2>
             <p>Please upload a CSV file containing stellar parameters. The first row should include the column names as follows:</p>
             <ul>
-                <li><strong>Required columns:</strong> name, luminosity, teff, mstar, zscale, He</li>
+                <li><strong>Required columns:</strong> name, luminosity \(L_\star\), effective temeparture (\(T_{\rm eff}\)), mass of the star \(M_\star\), scaling metallicity (\(Z_{\rm scale}\)), and mass fraction of helium</li>
                 <li><strong>Optional columns:</strong> Individual element abundances (e.g., H, C, N, O, Fe)</li>
             </ul>
             <p>Example CSV format:</p>
