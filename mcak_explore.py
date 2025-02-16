@@ -539,6 +539,7 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
             # Plotting some stuffs
 
             fig, axes = plt.subplots(3, 2, figsize=(8, 8), sharex=True)
+            # Flatten axes for easy indexing
             axes = axes.flatten()
             axes[0].plot(it_num, np.log10([mdot * cgs.year / cgs.Msun for mdot in mdot_num]), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
             axes[1].plot(it_num, qbar_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
@@ -566,43 +567,42 @@ def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
             plt.savefig(f"{random_subdir}/sim_log.png")
 
             
-            #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
-            if 3 <= iteration:
-                if mdot_lim < 1:
-                    log_print("gamma_e*(1+qbar)<1")
-                    log_print("line-driven mass-loss rate not possible")
-                    log_print("Try to increase gamma_e or qbar")
-                    log_print("e.g. by higher L/M or higher Z")
-                    log_print(gamma_e,qbar,mdot_lim)
-                    log_print("----------x----------x----------x----------x----------")
-                    sys.exit(0)         
-                    
-            if alpha > 0.95:
-                log_print('WARNING!!, alpha very high, approaching diverging limit')
-                log_print(str(random_subdir))
-                return str(random_subdir)                
-            elif iteration < 3:
+           #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
+            if iteration < 3:
                 continue
-            elif 3 <= iteration < 8 and np.abs(rel_rho) <= tolerance and np.abs(rel_mdot) <= tolerance:
-                log_print('final values (mdot,Qbar,alpha,q0):')
-                log_print(mdot*cgs.year/cgs.Msun, qbar, alpha, q0)
+            
+            if iteration >= 3 and mdot_lim < 1:
+                log_print("gamma_e*(1+qbar)<1")
+                log_print("line-driven mass-loss rate not possible")
+                log_print("Try to increase gamma_e or qbar (e.g. by higher L/M or higher Z)")
+                log_print(f"{gamma_e}, {qbar}, {mdot_lim}")
+                log_print("----------x----------x----------x----------x----------")
+                return str(random_subdir) 
+                       
+            if alpha > 0.95:
+                log_print("WARNING!! Alpha very high, approaching diverging limit")
                 log_print(str(random_subdir))
                 return str(random_subdir)
-                #return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho, os.path.abspath(zip_filename)
-            elif iteration >= 8 and np.abs(rel_rho) < 1.e-2 and np.abs(rel_mdot)  < 1.e-2:
-                log_print('final values (mdot,Qbar,alpha,Q0):')
-                log_print(mdot*cgs.year/cgs.Msun, qbar, alpha, q0)
+            
+            if 3 <= iteration < 8 and np.abs(rel_rho) <= tolerance and np.abs(rel_mdot) <= tolerance:
+                log_print("Final values (mdot, Qbar, alpha, q0):")
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0)
                 log_print(str(random_subdir))
-                return str(random_subdir) 
-                #return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho, os.path.abspath(zip_filename)
-            else :
-                #return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho
-                #print("Convergence not possible, values should not be trusted")
+                # return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho,
+                return str(random_subdir)
+            
+            if iteration >= 8 and np.abs(rel_rho) < 1.e-2 and np.abs(rel_mdot) < 1.e-2:
+                log_print("Final values (mdot, Qbar, alpha, Q0):")
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0)
+                log_print(str(random_subdir))
+                return str(random_subdir)
+            
+            if iteration == max_iterations and  np.abs(rel_rho) > 1.e-2 and np.abs(rel_mdot) > 1.e-2:
                 log_print("Not yet converged")
                 log_print(str(random_subdir))
                 return str(random_subdir)
 
-    
+
 if __name__ == "__main__":
 
     lum = float(sys.argv[1])
