@@ -166,6 +166,9 @@ MODULE LTE_Line_module
       ! Mass fractions of H and He
       REAL(DP) :: X_frac
       REAL(DP) :: Y_frac
+
+      !Directory 
+      CHARACTER(32) DIR
  
       ! Temperature assigned to the type
       REAL(DP) :: T
@@ -813,7 +816,7 @@ MODULE LTE_Line_module
  
  
  
-   SUBROUTINE Read_Composition(OBJ,ATOMIC_DATA,X_frac,Y_frac,verbose)
+   SUBROUTINE Read_Composition(OBJ,ATOMIC_DATA,X_frac,Y_frac,DIR,verbose)
      ! In-Out and optional variables
      CLASS(OCCUPATION_NUMBER_TYPE), INTENT(INOUT) :: OBJ
      CLASS(ATOMIC_DATA_TYPE),TARGET, INTENT(IN)   :: ATOMIC_DATA
@@ -826,6 +829,7 @@ MODULE LTE_Line_module
      REAL(DP), DIMENSION(:) ,ALLOCATABLE :: Aboundance
      REAL(DP) :: Z_frac  = 0.0d0
      INTEGER(I4B) :: MaxZ = 0, MaxI = 0, MaxL = 0, Z = 0, ind = 0, IO_status = 0
+     CHARACTER(32) :: DIR
  
  
      INTEGER(I4B) :: idum, i
@@ -913,10 +917,10 @@ MODULE LTE_Line_module
  
      ! Open the line list info file
      !OPEN (UNIT=100, FILE=TRIM(DATA_DIR)//'/asplund_numabun_2009', STATUS='OLD',IOSTAT=IO_status)
-     OPEN (UNIT=100, FILE=TRIM(DATA_DIR)//'/mass_abundance', STATUS='OLD',IOSTAT=IO_status)
+     OPEN (UNIT=100, FILE=TRIM(DIR)//'/mass_abundance', STATUS='OLD',IOSTAT=IO_status)
      ! Check if opening was sucssesful
      IF(IO_status .NE. 0) THEN
-        PRINT*,'---- Error Opening the '//TRIM(DATA_DIR)//'/mass_abundance file STATUS ', &
+        PRINT*,'---- Error Opening the '//TRIM(DIR)//'/mass_abundance file STATUS ', &
              IO_status, ' ----'
         STOP
      ENDIF

@@ -159,6 +159,34 @@
             height: auto;
         }
 
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 300px;
+        background-color: #b6b7b8;
+        color: #2e2c2c;
+        text-align: center;
+        padding: 10px;
+        border-radius: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -150px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
     </style>
     <script type="text/javascript" async
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
@@ -179,6 +207,7 @@
             <button class="tab active-tab" onclick="showTab('info')">Tool Info</button>
             <button class="tab" onclick="showTab('example')">Example</button>
             <button class="tab" onclick="showTab('calculator')">Calculator</button>
+            <button class="tab" onclick="showTab('grid')">Grid</button>
         </div>
 
         <!-- Tab contents -->
@@ -265,8 +294,43 @@
                 <button onclick="runCalculation()">Run</button>
             </div>
 
-            <h2>Mass fractions</h2>
+            <h2>Mass fractions <span class="tooltip" style="font-size: 14px; vertical-align: super; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 2px solid gray; border-radius: 50%; color: gray;">?
+                <span class="tooltiptext">Mass fractions represent the relative abundance of each element in a star's composition. The total of all mass fractions (including H and He) should add up to 1. While number abundances are traditionally used in stellar atmospheric studies, they are often non-intuitive and require scaling (typically by H or He). Since our tool supports arbitrary abundances, mass fractions provide a more intuitive and flexible input format.</span>
+            </span></h2>
+                                    
             <div id="abundances"></div>
+        </div>
+        
+        <div id="grid" class="tab-content">
+            <p>You can submit a comma-separated variable (.csv) file with the stellar inputs and abundances.
+                The outputs will be emailed back when done.</p>
+            
+            <h2>User Info</h2>
+            <div class="input-container">
+                <label for="email-grid">Enter your email id:</label>
+                <input type="email" id="email-grid" name="email" required>
+            </div>
+            
+            <h2>Upload CSV File</h2>
+            <p>Please upload a CSV file containing stellar parameters. The first row should include the column names as follows:</p>
+            <ul>
+                <li><strong>Required columns:</strong> name, luminosity \(L_\star\), effective temeparture (\(T_{\rm eff}\)), mass of the star \(M_\star\), scaling metallicity (\(Z_{\rm scale}\)), and mass fraction of helium</li>
+                <li><strong>Optional columns:</strong> Individual element abundances (e.g., H, C, N, O, Fe)</li>
+            </ul>
+            <p>Example CSV format:</p>
+            <pre>
+            name,luminosity,teff,mstar,zscale,He,C,N,FE
+            Star1,500000,40000,52,1.0,0.243,0.0002,0.0000065, 0.00000045
+            Star2,200000,21000,20,0.2,0.280,0.00005,0.000000007,0.0000000013
+            </pre>
+            <div class="input-container">
+                <input type="file" id="csvFile" accept=".csv">
+            </div>
+            
+            <div class="button-container">
+                <button onclick="uploadCSV()">Submit</button>
+            </div>
+        </div>
         </div>
     </div>
 
@@ -371,6 +435,34 @@
                 alert("There was an error processing the data.");
             });
         }
+
+        function uploadCSV() {
+        const email = document.getElementById('email-grid').value;
+        const fileInput = document.getElementById('csvFile');
+        const file = fileInput.files[0];
+
+        if (!email || !file) {
+            alert("Please enter an email and upload a CSV file.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("file", file);
+
+        fetch("/upload_csv", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            alert("File uploaded successfully! You will receive results via email.");
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("There was an issue uploading the file.");
+        });
+    }
 
         createAbundanceInputs();
     </script>

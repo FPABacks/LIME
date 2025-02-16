@@ -8,10 +8,13 @@ import sys
 import cgs_constants as cgs
 from scipy.optimize import curve_fit
 plt.rcParams.update({ 'axes.linewidth':1.2, 'xtick.direction': 'in', 'ytick.direction': 'in','xtick.top': True, 'ytick.right': True, 'xtick.minor.visible':True, 'ytick.minor.visible':True, 'xtick.major.size' : 6, 'xtick.major.width' : 1, 'ytick.major.size' : 8, 'ytick.major.width' : 1, 'xtick.minor.size' : 3.5, 'xtick.minor.width' : 0.6, 'ytick.minor.size' : 3.5, 'ytick.minor.width' : 0.6})
-plt.rcParams.update({'font.size': 15}) 
+plt.rcParams.update({'font.size': 15})
 import os
 import tempfile
 from mforce import get_force_multiplier
+
+import random
+import shutil
 
 
 # Atomic masses of elements (in atomic mass units, amu)
@@ -304,17 +307,12 @@ def run_mforce(parameters):
 
 
 # Integrating the functionality into the main workflow
-def main(lum, T_eff, M_star,Z_star, Z_scale, Yhel):
 
-    # Making a temporary file 
-    base_tmp_dir = f"{os.path.abspath(os.getcwd())}/tmp"
-    print(base_tmp_dir)
-    os.makedirs(base_tmp_dir, exist_ok=True)
-    random_subdir = tempfile.mkdtemp(dir=base_tmp_dir).strip("''")
-    print("THE RANDOM DIRECTORY IS: ", random_subdir)
-    print(random_subdir)
+def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
 
+    # Making a temporary file
     os.makedirs(random_subdir, exist_ok=True) 
+
     log_file = os.path.join(random_subdir, "simlog.txt") 
     
     # scaling metallicity to solar
@@ -611,5 +609,6 @@ if __name__ == "__main__":
     Z_star = float(sys.argv[4])
     Z_scale = float(sys.argv[5])
     Yhel = float(sys.argv[6])
-
-    main(lum, T_eff, M_star, Z_star, Z_scale, Yhel)
+    random_subdir = str(sys.argv[7])
+    
+    main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir)
