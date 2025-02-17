@@ -124,6 +124,27 @@
             background-color: #5f6d7e;
         }
 
+         /* Loading animation styles */
+        .loading-container {
+            display: none; /* Initially hidden */
+            text-align: center;
+            font-size: 20px;
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+    
+        .loading-container img {
+            width: 50px;
+            height: 50px;
+            margin-top: 10px;
+            animation: spin 1s linear infinite;
+        }
+    
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .input-container {
             margin-right: 20px;
         }
@@ -202,6 +223,11 @@
             <img src="{{ url_for('static', filename='logo.png') }}" alt="MCAK-Mforce Logo" class="logo">
         </div>
 
+        <div id="loading" class="loading-container">
+            <p>Processing... Please wait.</p>
+            <img src="{{ url_for('static', filename='loading.gif') }}" alt="Loading">
+        </div>
+
         <!-- Tab navigation -->
         <div class="tabs">
             <button class="tab active-tab" onclick="showTab('info')">Tool Info</button>
@@ -270,12 +296,7 @@
 
         </div>                   
         <div id="calculator" class="tab-content">
-            <h2>User info</h2>
-            <div class="input-container">
-                <label for="email">Enter your email id:</label>
-                <input type="email" id="email" name="email" required>
-            </div>    
-
+            
             <h2>Enter Stellar Parameters</h2>
             <div class="input-container">
                 <label for="luminosity">Luminosity (\(L_\star\)):</label>
@@ -394,19 +415,23 @@
         }
 
         function runCalculation() {
+            // Get input values
             const luminosity = parseFloat(document.getElementById("luminosity").value);
             const teff = parseFloat(document.getElementById("teff").value);
             const mstar = parseFloat(document.getElementById("mstar").value);
             const zscale = parseFloat(document.getElementById("zscale").value);
-            const email = document.getElementById("email").value;
-        
+            
+            // Collect abundances
             const abundances = {};
             for (const element of Object.keys(defaultAbundances)) {
                 const value = parseFloat(document.getElementById(`abundance-${element}`).value);
                 abundances[element] = value;
             }
-        
-            // Send data to Python backend using fetch
+    
+            // Show loading message and disable button
+            document.getElementById("loading").style.display = "block";
+            document.querySelector(".button-container button").disabled = true;
+    
             fetch('/process_data', {
                 method: 'POST',
                 headers: {
@@ -417,53 +442,62 @@
                     teff: teff,
                     mstar: mstar,
                     zscale: zscale,
-                    email: email,
                     abundances: abundances
                 })
             })
             .then(response => response.json())
             .then(data => {
-                if (data.message) {
+                // Hide loading message and enable button
+                document.getElementById("loading").style.display = "none";
+                document.querySelector(".button-container button").disabled = false;
+    
+                if (data.download_url) {
+                    window.open(data.download_url, '_blank');  
+                } else if (data.message) {
                     alert(data.message);
                 } else if (data.error) {
                     alert(data.error);
                 }
-                console.log(data);
             })
             .catch(error => {
                 console.error("Error:", error);
                 alert("There was an error processing the data.");
+                
+                // Hide loading message and enable button
+                document.getElementById("loading").style.display = "none";
+                document.querySelector(".button-container button").disabled = false;
             });
         }
 
+
         function uploadCSV() {
-        const email = document.getElementById('email-grid').value;
-        const fileInput = document.getElementById('csvFile');
-        const file = fileInput.files[0];
+            const email = document.getElementById('email-grid').value;
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+        
+            if (!email || !file) {
+                alert("Please enter an email and upload a CSV file.");
+                return;
+            }
+        
+            const formData = new FormData();
+            formData.append("email", email);
+            formData.append("file", file);
 
-        if (!email || !file) {
-            alert("Please enter an email and upload a CSV file.");
-            return;
+            
+            fetch("/upload_csv", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert("Sucess:" + data.message);
+                } else if (data.error) {
+                    alert("Error: " + data.error);
+                }
+            })
         }
-
-        const formData = new FormData();
-        formData.append("email", email);
-        formData.append("file", file);
-
-        fetch("/upload_csv", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-            alert("File uploaded successfully! You will receive results via email.");
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("There was an issue uploading the file.");
-        });
-    }
-
         createAbundanceInputs();
     </script>
     <!-- Footer -->

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_file, url_for
 import subprocess
 import numpy as np
 import json
@@ -20,6 +20,8 @@ from PIL import Image
 import pandas as pd
 import tempfile
 import random
+import zipfile
+import time
 
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -93,7 +95,7 @@ def load_email_body(filename):
     with open(filename, 'r') as file:
         return file.read()
 
-def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name):
+def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, pointer, batch_output_dir):
     """Runs mcak_explore and emails the results"""
     # Making a temporary file
     base_tmp_dir = f"{os.path.abspath(os.getcwd())}/tmp"
@@ -125,8 +127,9 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             return  
         
         # Get the directory from the generated file
-        output_dir = generated_file.strip()
-        output_filename = os.path.basename(output_dir)
+        #output_dir = generated_file.strip()
+        #output_filename = os.path.basename(output_dir)
+        pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
         
         
         pdf_filename = f"{output_dir}/{pdf_name}"
@@ -265,11 +268,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 y_position -= 12  # Move down
         
         c.save()
-
-        body = load_email_body('./mailing/mail_template.j2')
         
-        subprocess.run(["python3", "./mailing/mailer.py", "--t", recipient_email, "--s", "LIME Computation Results", "--b", body, "--a", pdf_filename])
-
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
 
@@ -282,44 +281,77 @@ def process_data():
     """Handles the communication with index.html"""
     try:
         data = request.json
-        print("Received data:", data)  
+        print("Received data:", data)
 
-        # Ensure required parameters exist and are valid
+        # Extract parameters
         luminosity = float(data.get("luminosity", 0.0))
         teff = float(data.get("teff", 0.0))
         mstar = float(data.get("mstar", 0.0))
         zscale = float(data.get("zscale", 0.0))
-        abundances = data.get("abundances", {})    
-        user_email = data.get("email", "").strip()
-
-        if not user_email:
-            return jsonify({"error": "Email is required"}), 400
+        abundances = data.get("abundances", {})
 
         if not abundances:
             return jsonify({"error": "Abundances data is missing"}), 400
 
-        # Calculate Zstar correctly from mass abundances
+        # Calculate values
         zstar = calculate_metallicity_massb(abundances)
-        
-        
-        # calculating the number abundance of helium from the mass abundance
         helium_abundance = He_number_abundance(abundances)
-        print('helium',helium_abundance)
 
-        pdf_name = 'result'
+        # Create a temporary directory
+        base_tmp_dir = "./tmp"
+        os.makedirs(base_tmp_dir, exist_ok=True)
+        session_tmp_dir = tempfile.mkdtemp(dir=base_tmp_dir)
 
+        pdf_name = "result"
+        output_dir = os.path.join(session_tmp_dir, pdf_name)  
+        os.makedirs(output_dir, exist_ok=True)  
+        pdf_path = os.path.join(output_dir, f"{pdf_name}.pdf")  
+
+        # Run computation in a separate thread
         computation_thread = threading.Thread(
             target=process_computation,
-            args=(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name)
+            args=(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, "", pdf_name, -1, session_tmp_dir)
         )
         computation_thread.start()
+        computation_thread.join()  # Wait for completion before proceeding
 
-        return jsonify({"message": "Data submitted successfully. You will receive an email when the computation is complete."}), 200
+        # Check if the PDF exists at the correct path
+        if not os.path.exists(pdf_path):
+            return jsonify({"error": f"PDF generation failed. Expected at {pdf_path}"}), 500
+
+        # Schedule cleanup
+        threading.Timer(600, shutil.rmtree, args=[session_tmp_dir], kwargs={"ignore_errors": True}).start()
+
+        # Generate a downloadable link
+        relative_session_id = os.path.relpath(session_tmp_dir, base_tmp_dir)
+
+        pdf_url = url_for("download_temp_file", session_id=relative_session_id, filename=f"{pdf_name}/result.pdf", _external=True)
+        
+        print(pdf_url)
+        return jsonify({"message": "Computation complete", "download_url": pdf_url}), 200
+
     except ValueError as e:
         return jsonify({"error": f"Invalid numerical input: {str(e)}"}), 400
     except Exception as e:
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
+@app.route('/tmp/<session_id>/<path:filename>')
+def download_temp_file(session_id, filename):
+    session_tmp_dir = os.path.join("./tmp", session_id)  
+    file_path = os.path.abspath(os.path.join(session_tmp_dir, filename))  
+
+    # Security check: Prevent directory traversal
+    if not file_path.startswith(os.path.abspath(session_tmp_dir)):
+        return jsonify({"error": "Invalid file path."}), 403
+
+    # Debugging: Print expected path
+    print(f"Looking for file at: {file_path}")
+
+    if not os.path.exists(file_path):
+        print(f"File NOT FOUND: {file_path}")  # Debugging output
+        return jsonify({"error": f"File {filename} not found"}), 404
+
+    return send_file(file_path, mimetype='application/pdf')
 
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():
@@ -332,68 +364,154 @@ def upload_csv():
         if file.filename == '':
             return jsonify({"error": "No selected file"}), 400
         
-        # Read CSV file into a pandas DataFrame
         df = pd.read_csv(file)
+        num_rows = len(df)
 
-        # Validate necessary columns
-        required_columns = {"name", "luminosity", "teff", "mstar", "zscale", "HE"}
+        # **Check the number of rows in CSV**
+        if num_rows > 100:
+            return jsonify({
+                "error": "Too many entries! Please reduce the number of stars to 100 or split the CSV into smaller parts."
+            }), 400
 
-        if not required_columns.issubset(df.columns):
-            return jsonify({"error": f"CSV must contain columns: {', '.join(required_columns)}"}), 400
+        # Create a single batch directory for all results
+        base_dir = "./tmp"
+        os.makedirs(base_dir, exist_ok=True)
+        batch_output_dir = tempfile.mkdtemp(dir=base_dir)
+        os.makedirs(batch_output_dir, exist_ok=True)
 
-        # Identify abundance columns (all except required ones)
-        abundance_columns = [col for col in df.columns if col not in required_columns]
-
-        # Extract email from request
+        print(f"Batch directory created: {batch_output_dir}")  # Debugging
+        
         user_email = request.form.get("email", "").strip()
         if not user_email:
             return jsonify({"error": "Email is required"}), 400
-        
-    
-        # Define default abundances inside the function
-        default_abundances = {
-            "H": 0.7374078505762753, "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
-            "B": 3.9638342804111373e-9, "C": 2.3649741118292409e-3, "N": 6.927752331287037e-4, "O": 5.7328054948662952e-3,  
-            "F": 5.0460905860356957e-7, "NE": 1.2565170515587217e-3, "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
-            "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4, "P": 5.8243105278933166e-6, "S": 3.0923740022022601e-4,  
-            "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5, "K": 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
-            "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6, "V": 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
-            "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3, "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
-            "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
+
+        # **Return success response immediately**
+        response_message = {
+            "message": "CSV uploaded successfully. Your calculations will be processed and emailed to you shortly."
         }
 
-        for _, row in df.iterrows():
-            pdf_name = str(row["name"])
-            lum = float(row["luminosity"])
-            teff = float(row["teff"])
-            mstar = float(row["mstar"])
-            zscale = float(row["zscale"])
-            
-            # Read or default abundances
+        def process_batch():
+            """Function to process the batch asynchronously"""
+            try:
+                default_abundances = {
+                    "H": 0.7374078505762753, "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
+                    "B": 3.9638342804111373e-9, "C": 2.3649741118292409e-3, "N": 6.927752331287037e-4, "O": 5.7328054948662952e-3,  
+                    "F": 5.0460905860356957e-7, "NE": 1.2565170515587217e-3, "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
+                    "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4, "P": 5.8243105278933166e-6, "S": 3.0923740022022601e-4,  
+                    "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5, "K": 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
+                    "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6, "V": 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
+                    "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3, "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
+                    "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
+                }
 
-            abundances = {}
-            for element, default_value in default_abundances.items():
-                if element in ["H", "HE"]:
-                    abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value
-                else:
-                    abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value * zscale
+                computation_threads = []
+                pdf_paths = []
+                results_data = []  
 
-                
-            
-            zstar = calculate_metallicity_massb(abundances)
-            helium_abundance = He_number_abundance(abundances)
+                for index, row in df.iterrows():
+                    pdf_name = str(row["name"])
+                    lum = float(row["luminosity"])
+                    teff = float(row["teff"])
+                    mstar = float(row["mstar"])
+                    zscale = float(row["zscale"])
 
-            # Run computation in a separate thread to avoid blocking
-            computation_thread = threading.Thread(
-                target=process_computation,
-                args=(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name)
-            )
-            computation_thread.start()
+                    # Create subdirectory inside batch directory
+                    result_dir = os.path.join(batch_output_dir, pdf_name)
+                    os.makedirs(result_dir, exist_ok=True)
+                    pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
+                    pdf_paths.append(pdf_path)
 
-        return jsonify({"message": "CSV processed successfully. You will receive an email when computations are complete."}), 200
+                    abundances = {}
+                    for element, default_value in default_abundances.items():
+                        if element in ["H", "HE"]:
+                            abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value
+                        else:
+                            abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value * zscale
+
+                    zstar = calculate_metallicity_massb(abundances)
+                    helium_abundance = He_number_abundance(abundances)
+
+                    pointer = -1
+
+                    computation_thread = threading.Thread(
+                        target=process_computation,
+                        args=(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir)
+                    )
+                    computation_threads.append(computation_thread)
+                    computation_thread.start()
+
+                # Wait for all threads to finish
+                for thread in computation_threads:
+                    thread.join()
+
+                # Collect results from each computation
+                for index, row in df.iterrows():
+                    pdf_name = str(row["name"])
+                    result_dir = os.path.join(batch_output_dir, pdf_name)
+                    simlog_path = os.path.join(result_dir, "simlog.txt")
+
+                    if os.path.exists(simlog_path):
+                        with open(simlog_path, "r") as f:
+                            lines = f.readlines()
+                            if len(lines) >= 2:
+                                last_values = lines[-2].split()
+                                if len(last_values) >= 4:
+                                    wrmdot = float(last_values[0].strip("'"))
+                                    wrqbar = float(last_values[1].strip("'"))
+                                    wralp = float(last_values[2].strip("'"))
+                                    wrq0 = float(last_values[3].strip("'"))
+                                else:
+                                    wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
+                            else:
+                                wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
+                    else:
+                        wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
+
+                    results_data.append({
+                        "Name": pdf_name,
+                        "Luminosity": row["luminosity"],
+                        "Teff": row["teff"],
+                        "Mstar": row["mstar"],
+                        "Zscale": row["zscale"],
+                        "Mass Loss Rate": wrmdot,
+                        "Qbar": wrqbar,
+                        "Alpha": wralp,
+                        "Q0": wrq0
+                    })
+
+                # Save results to CSV file
+                results_csv_path = os.path.join(batch_output_dir, "results.csv")
+                results_df = pd.DataFrame(results_data)
+                results_df.to_csv(results_csv_path, index=False)
+
+                # **Create ZIP file with results**
+                final_zip_path = os.path.join(batch_output_dir, "final_results.zip")
+                with zipfile.ZipFile(final_zip_path, 'w') as zipf:
+                    if num_rows > 20:
+                        # **Only add CSV for large files**
+                        zipf.write(results_csv_path, os.path.basename(results_csv_path))
+                    else:
+                        # **Include both CSV and PDFs for small files**
+                        for pdf_path in pdf_paths:
+                            if os.path.exists(pdf_path):
+                                zipf.write(pdf_path, os.path.relpath(pdf_path, batch_output_dir))
+                        zipf.write(results_csv_path, os.path.basename(results_csv_path))
+
+                # Send email with ZIP
+                body = load_email_body('./mailing/mail_template.j2')
+                subprocess.run(["python3", "./mailing/mailer.py", "--t", user_email, "--s", "LIME Computation Results", "--b", body, "--a", final_zip_path])
+
+            except Exception as e:
+                print(f"Unexpected error in batch processing: {str(e)}")
+
+        # **Start computation in a new thread**
+        batch_thread = threading.Thread(target=process_batch)
+        batch_thread.start()
+
+        return jsonify(response_message), 200
 
     except Exception as e:
-        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+        return jsonify({"error": f"Unexpected error in upload_csv: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
