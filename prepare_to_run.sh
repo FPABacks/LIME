@@ -6,6 +6,6 @@ CodeDir="${MFORCE_DIR:-$PWD/MFORCE-LTE/}"
 # compilation then get rid of those again.
 ln -s $CodeDir/src/CGS_constants.f90 .
 ln -s $CodeDir/src/LTE_Line_module.f90 .
-python -m numpy.f2py -c CGS_constants.f90 LTE_Line_module.f90 Run_module.f90 only: get_force_multiplier -m mforce
+python3 -m numpy.f2py -c CGS_constants.f90 LTE_Line_module.f90 Run_module.f90 only: get_force_multiplier -m mforce
 rm CGS_constants.f90
 rm LTE_Line_module.f90

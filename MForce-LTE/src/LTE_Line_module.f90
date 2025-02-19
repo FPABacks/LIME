@@ -829,7 +829,7 @@ MODULE LTE_Line_module
      REAL(DP), DIMENSION(:) ,ALLOCATABLE :: Aboundance
      REAL(DP) :: Z_frac  = 0.0d0
      INTEGER(I4B) :: MaxZ = 0, MaxI = 0, MaxL = 0, Z = 0, ind = 0, IO_status = 0
-     CHARACTER(32) :: DIR
+     CHARACTER(100) :: DIR
  
  
      INTEGER(I4B) :: idum, i

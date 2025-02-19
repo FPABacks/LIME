@@ -1,4 +1,3 @@
-
 subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_norm,X_mass,Z_mass,N_tt,N_lgT,N_lgD, ver, DIR)
 
 !   use f90getopt
@@ -36,12 +35,7 @@ subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_n
    REAL(DP), DIMENSION(:), ALLOCATABLE :: barQ_list
    ! REAL(DP), DIMENSION(:), ALLOCATABLE :: notQ_list
 
-   CHARACTER(32) PAR_File
-   REAL(DP) :: lgTmin,lgTmax,lgDmin, lgDmax, lgttmin, lgttmax
-   REAL(DP) :: Ke_norm, X_mass, Y_mass, Z_mass 
-   INTEGER(I4B) :: N_tt, N_lgT, N_lgD
-   CHARACTER(32) DIR
-   LOGICAL :: ver
+   CHARACTER(100) PAR_File
 
    INTEGER(I4B) :: T_gird_counter,D_gird_counter
 

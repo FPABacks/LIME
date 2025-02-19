@@ -7,7 +7,6 @@ import threading
 import shutil
 import re
 from mcak_explore import main as mcak_main
-
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -98,13 +97,18 @@ def load_email_body(filename):
 def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, pointer, batch_output_dir):
     """Runs mcak_explore and emails the results"""
     # Making a temporary file
-    base_tmp_dir = f"{os.path.abspath(os.getcwd())}/tmp"
-    os.makedirs(base_tmp_dir, exist_ok=True)
-    random_subdir = tempfile.mkdtemp(dir=base_tmp_dir)
-    os.makedirs(random_subdir, exist_ok=True) 
-    massabun_loc = os.path.join(random_subdir, "output")
-    os.makedirs(massabun_loc, exist_ok=True)
+    #base_tmp_dir = f"{os.path.abspath(os.getcwd())}/tmp"
+    #os.makedirs(base_tmp_dir, exist_ok=True)
+    #random_subdir = tempfile.mkdtemp(dir=base_tmp_dir)
+    #os.makedirs(random_subdir, exist_ok=True) 
+    #massabun_loc = os.path.join(random_subdir, "output")
+    #os.makedirs(massabun_loc, exist_ok=True)
+
     try:
+        output_dir = os.path.join(batch_output_dir, pdf_name)
+        os.makedirs(output_dir, exist_ok=True)
+        massabun_loc = os.path.join(output_dir, "output")
+        os.makedirs(massabun_loc, exist_ok=True)
         abundance_filename = os.path.join(massabun_loc, "mass_abundance")
         with open(abundance_filename, "w") as f:
             for i, (element, value) in enumerate(abundances.items(), start=1):
@@ -115,7 +119,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         #     ["python3", "mcak_explore.py", str(lum), str(teff), str(mstar), str(zstar), str(zscale), str(helium_abundance)])#,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # output = result.stdout.decode().strip()
 
-        generated_file = mcak_main(lum, teff, mstar,zstar, zscale, helium_abundance, random_subdir)
+        generated_file = mcak_main(lum, teff, mstar,zstar, zscale, helium_abundance, ouptut_subdir)
 
         # output_lines = output.splitlines()
         # generated_file = output_lines[-1]
