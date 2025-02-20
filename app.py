@@ -193,13 +193,14 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
 
         table_data = [
             ("Parameter", "Quantity"),
-            ("Luminosity", f"{lum:.1f}"),
-            ("Stellar Mass", f"{mstar:.1f}"),
+            ("Luminosity [solar luminosity]", f"{lum:.1f}"),
+            ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
             ("Eddington Ratio ", f"{gammae_itr:.2f}"),
-            ("Effective Temperature", f"{teff:.1f}"),
+            ("Effective Temperature [K]", f"{teff:.1f}"),
             ("Z scale (scaled to solar)", f"{zscale:.2f}"),
             ("Z star (Calculated)", f"{zstar:.3e}"),
             ("Electron scattering opacity ", f"{kappae_itr:.2f}"),
+            ("Critical Sobolev optical depth", f"{tcrit_itr:.2f}"),
         ]
         
         with open(simlog_path, "r") as f:
@@ -212,18 +213,11 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                     wralp = float(last_values[2].strip("'"))
                     wrq0 = float(last_values[3].strip("'"))
                     table_data.extend([
-                        ("Mass loss rate", f"{wrmdot:.3e}"),
+                        ("Mass loss rate [solar mass/year]", f"{wrmdot:.3e}"),
                         ("Q bar", f"{wrqbar:.2f}"),
                         ("alpha", f"{wralp:.2f}"),
-                        ("Q0", f"{wrq0:.2f}")
+                        ("Q0", f"{wrq0:.2f}"),
                     ])
-        vink_itr,bjor_itr,krt_itr,gammae_itr,kappae_itr,tcrit_itr
-        table_data.extend([
-            ("Critical Sobolev optical depth", f"{tcrit_itr:.2f}"),
-            ("Vink mass loss rate", f"{vink_itr:.3e}"),
-            ("Bjorklund mass loss rate", f"{bjor_itr:.3e}"),
-            ("Kriticka mass loss rate", f"{krt_itr:.3e}"),
-        ])
         c.setFont("Helvetica", 16)
         table = Table(table_data)
         table.setStyle(TableStyle([
