@@ -1,1 +1,0 @@
-/home/dwaipayand/Mforce_MCAK/web/CAK/MForce-LTE/src/CGS_constants.f90

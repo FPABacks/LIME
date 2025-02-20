@@ -12,7 +12,6 @@ plt.rcParams.update({'font.size': 15})
 import os
 import tempfile
 from mforce import get_force_multiplier
-
 import random
 import shutil
 
@@ -381,7 +380,6 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
 
 
         parameters = {
-           "DIR": f"{random_subdir}/output",
            "lgTmin": f"{lgTeff:.3E}",
            "lgTmax": f"{lgTeff:.3E}",
            "N_lgT": "1",
@@ -394,8 +392,10 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
            "Ke_norm": "-10",
            "X_mass": "0.7",
            "Z_mass": f"{Z_star:.5E}",
-           "ver": ".FALSE."
+           "ver": False,
+           "DIR": f"{random_subdir}/output",
            }
+        
         input_file = os.path.join(random_subdir, "in")
         
             
@@ -438,6 +438,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             # Write updated parameters and rerun the Fortran executable
             write_input_file(input_file, parameters)
             # run_fortran_program(executable, input_file)
+
             run_mforce(parameters)
 
             "kappa_e is read from the data provided by Mforce or can also be calculated"
@@ -570,36 +571,34 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
                 continue
             
             if iteration >= 3 and mdot_lim < 1:
-                log_print("gamma_e*(1+qbar)<1")
-                log_print("line-driven mass-loss rate not possible")
-                log_print("Try to increase gamma_e or qbar (e.g. by higher L/M or higher Z)")
-                log_print(f"{gamma_e}, {qbar}, {mdot_lim}")
-                log_print("----------x----------x----------x----------x----------")
-                return str(random_subdir) 
-                       
+                failure_reason = "Line-driven mass loss is not possible. Consider increasing luminosity/mass ratio or metallicity."
+                log_print(f"Failure: {failure_reason}")
+                log_print(np.nan,np.nan,np.nan,np.nan)
+                return f"FAILURE: {failure_reason}"
+
             if alpha > 0.95:
-                log_print("WARNING!! Alpha very high, approaching diverging limit")
-                log_print(str(random_subdir))
-                return str(random_subdir)
-            
-            if 3 <= iteration < 8 and np.abs(rel_rho) <= tolerance and np.abs(rel_mdot) <= tolerance:
-                log_print("Final values (mdot, Qbar, alpha, q0):")
+                failure_reason = "Alpha parameter too high, approaching theoretical divergence."
+                log_print(f"Failure: {failure_reason}")
+                log_print(np.nan,np.nan,np.nan,np.nan)
+                return f"FAILURE: {failure_reason}"
+
+            # Convergence Criteria
+            if iteration >= 3 and abs(rel_rho) <= tolerance and abs(rel_mdot) <= tolerance:
+                log_print("Converged final values (mdot, Qbar, alpha, Q0):")
                 log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0)
-                log_print(str(random_subdir))
-                # return mdot*cgs.year/cgs.Msun, qbar, alpha, q0, t_cri, v_cri*cgas/1.e5, rho,
-                return str(random_subdir)
-            
-            if iteration >= 8 and np.abs(rel_rho) < 1.e-2 and np.abs(rel_mdot) < 1.e-2:
-                log_print("Final values (mdot, Qbar, alpha, Q0):")
-                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0)
-                log_print(str(random_subdir))
-                return str(random_subdir)
-            
-            if iteration == max_iterations and  np.abs(rel_rho) > 1.e-2 and np.abs(rel_mdot) > 1.e-2:
-                log_print("Not yet converged")
-                log_print(str(random_subdir))
                 return str(random_subdir)
 
+            if iteration == max_iterations - 1 and (abs(rel_rho) > 1.e-2 or abs(rel_mdot) > 1.e-2):
+                failure_reason = "The model did not converge after the maximum allowed iterations."
+                log_print(f"Failure: {failure_reason}")
+                log_print(np.nan,np.nan,np.nan,np.nan)
+                return f"FAILURE: {failure_reason}"
+
+            # Update values for the next iteration
+            mdot_old = mdot
+            rho = rho_target
+
+        return str(random_subdir)
 
 if __name__ == "__main__":
 

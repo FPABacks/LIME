@@ -15,13 +15,14 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import simpleSplit
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
 from PIL import Image
 import pandas as pd
 import tempfile
 import random
 import zipfile
 import time
-
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -90,87 +91,139 @@ def He_number_abundance(mass_abundances):
 
     return NHe
 
+def extract_data_from_file(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    last_iteration_data = {
+        "Vink": None,
+        "Bjoklund": None,
+        "Kriticka": None,
+        "kappa_e": None,
+        "gamma_e": None,
+        "t_crit" : None,
+    }
+
+    for line in lines:                
+                  
+        if "Iteration" in line:
+            last_iteration_data = {key: None for key in last_iteration_data}
+
+        if "Vink =" in line:
+            match = re.search(r"Vink = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["Vink"] = float(match.group(1))
+        if "Bjoklund =" in line:
+            match = re.search(r"Bjoklund = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["Bjoklund"] = float(match.group(1))
+        if "Kriticka =" in line:
+            match = re.search(r"Kriticka = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["Kriticka"] = float(match.group(1))                
+        if "kappa_e =" in line:
+            match = re.search(r"kappa_e = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["kappa_e"] = float(match.group(1))
+        if "Gamma_e =" in line:
+            match = re.search(r"Gamma_e = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["Gamma_e"] = float(match.group(1))
+        if "t_crit =" in line:
+            match = re.search(r"t_crit = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["t_crit"] = float(match.group(1))
+    return last_iteration_data
+
+
 def load_email_body(filename):
     with open(filename, 'r') as file:
         return file.read()
 
 def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, pointer, batch_output_dir):
     """Runs mcak_explore and emails the results"""
-    # Making a temporary file
-    #base_tmp_dir = f"{os.path.abspath(os.getcwd())}/tmp"
-    #os.makedirs(base_tmp_dir, exist_ok=True)
-    #random_subdir = tempfile.mkdtemp(dir=base_tmp_dir)
-    #os.makedirs(random_subdir, exist_ok=True) 
-    #massabun_loc = os.path.join(random_subdir, "output")
-    #os.makedirs(massabun_loc, exist_ok=True)
-
     try:
         output_dir = os.path.join(batch_output_dir, pdf_name)
         os.makedirs(output_dir, exist_ok=True)
         massabun_loc = os.path.join(output_dir, "output")
         os.makedirs(massabun_loc, exist_ok=True)
         abundance_filename = os.path.join(massabun_loc, "mass_abundance")
+        
         with open(abundance_filename, "w") as f:
             for i, (element, value) in enumerate(abundances.items(), start=1):
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
 
-        # Run computation
-        # result = subprocess.run(
-        #     ["python3", "mcak_explore.py", str(lum), str(teff), str(mstar), str(zstar), str(zscale), str(helium_abundance)])#,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # output = result.stdout.decode().strip()
+        generated_file = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir)
 
-        generated_file = mcak_main(lum, teff, mstar,zstar, zscale, helium_abundance, ouptut_subdir)
-
-        # output_lines = output.splitlines()
-        # generated_file = output_lines[-1]
-        print(generated_file)
-
-        if generated_file is None:
-            print("Failed somewhere! Sorry!")
-            # print(f"Computation error: {result.stderr}")
-            return  
+        if generated_file.startswith("FAILURE:"):
+            failure_reason = generated_file.replace("FAILURE: ", "").strip()
+            print(f"Simulation failed: {failure_reason}")
+            pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
+            c = canvas.Canvas(pdf_filename, pagesize=letter)
+            c.setFont("Helvetica-Bold", 18)
+            c.drawString(220, 700, "Simulation Failed")
+            c.setFont("Helvetica", 14)
+            c.drawString(100, 650, "Reason for failure:")
+            wrapped_text = simpleSplit(failure_reason, "Helvetica", 12, 400)
+            y_pos = 620
+            for line in wrapped_text:
+                c.drawString(120, y_pos, line)
+                y_pos -= 20
+            c.save()
+            return
         
-        # Get the directory from the generated file
-        #output_dir = generated_file.strip()
-        #output_filename = os.path.basename(output_dir)
         pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
-        
-        
-        pdf_filename = f"{output_dir}/{pdf_name}"
         figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith(".png")]
         simlog_path = os.path.join(output_dir, "simlog.txt")
-
-        c = canvas.Canvas(pdf_filename, pagesize=letter)
-        page_width, page_height = letter  # Letter page size (8.5 x 11 inches)
+        #extracting the last iteration data for various quantities
+        iteration_data = extract_data_from_file(simlog_path)
+        vink_itr,bjor_itr,krt_itr,gammae_itr,kappae_itr,tcrit_itr = iteration_data["Vink"], iteration_data["Bjoklund"], iteration_data["Kriticka"], iteration_data["Gamma_e"], iteration_data["kappa_e"], iteration_data["t_crit"]
         
-        # --- Add Logo and Title on First Page ---
-        logo_path = "./static/logo_2.png"  # Adjust path as needed
+        c = canvas.Canvas(pdf_filename, pagesize=letter)
+        page_width, page_height = letter
+
+        logo_path = "./static/logo_2.png"
         title = "LIME Results"
         
         if os.path.exists(logo_path):
-            c.drawImage(logo_path, 50, page_height - 150, width=120, height=120)
+            c.drawImage(logo_path, 50, page_height - 150, width=120, height=120, preserveAspectRatio=True, anchor='c')
         
         c.setFont("Helvetica-Bold", 30)
         c.drawString(220, page_height - 150, title)
 
-        # Update table_data to a transposed format
         table_data = [
-            ("Mass Loss Rate", "Qbar", "Alpha", "Q0"),  # Column headers
+            ("Parameter", "Quantity"),
+            ("Luminosity", f"{lum:.1f}"),
+            ("Stellar Mass", f"{mstar:.1f}"),
+            ("Eddington Ratio ", f"{gammae_itr:.2f}"),
+            ("Effective Temperature", f"{teff:.1f}"),
+            ("Z scale (scaled to solar)", f"{zscale:.2f}"),
+            ("Z star (Calculated)", f"{zstar:.3e}"),
+            ("Electron scattering opacity ", f"{kappae_itr:.2f}"),
         ]
         
-        # Read values from the simlog.txt and ensure the correct number of elements are available
         with open(simlog_path, "r") as f:
             lines = f.readlines()
             if len(lines) >= 2:
-                last_values = lines[-2].split()
-                if len(last_values) < 5:
+                last_values = lines[-1].split()
+                if len(last_values) >= 4:
                     wrmdot = float(last_values[0].strip("'"))
                     wrqbar = float(last_values[1].strip("'"))
                     wralp = float(last_values[2].strip("'"))
                     wrq0 = float(last_values[3].strip("'"))
-                    table_data.append((f"{wrmdot:.3e}", f"{wrqbar:.2e}",f"{wralp:.2e}",f"{wrq0:.2e}"))
-        
-        # Draw the table (Ensure it's horizontal)
+                    table_data.extend([
+                        ("Mass loss rate", f"{wrmdot:.3e}"),
+                        ("Q bar", f"{wrqbar:.2f}"),
+                        ("alpha", f"{wralp:.2f}"),
+                        ("Q0", f"{wrq0:.2f}")
+                    ])
+        vink_itr,bjor_itr,krt_itr,gammae_itr,kappae_itr,tcrit_itr
+        table_data.extend([
+            ("Critical Sobolev optical depth", f"{tcrit_itr:.2f}"),
+            ("Vink mass loss rate", f"{vink_itr:.3e}"),
+            ("Bjorklund mass loss rate", f"{bjor_itr:.3e}"),
+            ("Kriticka mass loss rate", f"{krt_itr:.3e}"),
+        ])
         c.setFont("Helvetica", 16)
         table = Table(table_data)
         table.setStyle(TableStyle([
@@ -182,97 +235,112 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             ('BACKGROUND', (0, 1), (-1, -1), colors.lavender),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ]))
-        
-        # Wrap and draw the table on the PDF
         table.wrapOn(c, page_width, page_height)
-        table.drawOn(c, 70, page_height - 250)
+        table.drawOn(c, 70, page_height - 500)
+
+        # Abundances Table
+        abundance_table_data = [("Element", "Abundance")] + [(el, f"{abundances[el]:.4e}") for el in abundances]
+        abundance_table = Table(abundance_table_data, colWidths=[100, 150])
+        abundance_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
         
-        # --- 1. Display "sim_log.png" on its own full page ---
+        abundance_table.wrapOn(c, page_width, page_height)
+        abundance_table.drawOn(c, 300, page_height - 760)
+
+        # --- 1. Display "sim_log.png" with a title ---
         sim_log_image_path = os.path.join(output_dir, "sim_log.png")
         if sim_log_image_path in figures_list:
-            c.showPage()  # Ensure a new page
-            img = Image.open(sim_log_image_path)
+            c.showPage()
+            c.setFont("Helvetica-Bold", 30)
+            c.drawString(150, page_height - 50, "Simulation Log Figures")
             
-            # Scale the image to fit the full page
+            img = Image.open(sim_log_image_path)
             img_width, img_height = img.size
             aspect_ratio = img_width / img_height
-            new_width = page_width - 50  # Leave some margin
-            new_height = new_width / aspect_ratio  # Keep aspect ratio
-        
-            if new_height > page_height - 50:  # If it exceeds page height, scale differently
+            new_width = page_width - 100 
+            new_height = new_width / aspect_ratio  
+
+            if new_height > page_height - 100:
                 new_height = page_height - 50
                 new_width = new_height * aspect_ratio
-        
-            x_position = (page_width - new_width) / 2  # Center horizontally
-            y_position = (page_height - new_height) / 2  # Center vertically
-        
-            c.drawImage(sim_log_image_path, x_position, y_position, width=new_width, height=new_height)
-        
-            # Add label
-            c.setFont("Helvetica", 14)
-            des = "Different quantities (check legends) as function of iteration number until convergence has been reached. The bottom panels show relative differences in mass loss and density between two successive iterations."
-            
-            text_x = 50
-            text_y = 60 
 
-            # Wrap text if it's too long
-            wrapped_text = simpleSplit(des, "Helvetica", 14, page_width - 100)
-            
-            # Draw wrapped text
+            x_position = (page_width - new_width) / 2  
+            y_position = (page_height - new_height) / 2  
+
+            c.drawImage(sim_log_image_path, x_position, y_position, width=new_width, height=new_height)
+
+            c.setFont("Helvetica", 14)
+            description = "This figure shows the evolution of various physical parameters over the iterations until convergence."
+            text_x, text_y = 50, 80
+
+            wrapped_text = simpleSplit(description, "Helvetica", 14, page_width - 100)
             for line in wrapped_text:
                 c.drawString(text_x, text_y, line)
-                text_y -= 16  # Move down for next line
+                text_y -= 16  
 
-            # Remove it from the list to avoid duplication
             figures_list.remove(sim_log_image_path)
         
-        # --- 2. Arrange Remaining Figures in a 2x2 Grid (4 per page) ---
-        images_per_row = 2
-        images_per_col = 2
+        # --- 2. Arrange Remaining Figures in Pages with Titles ---
+        images_per_row, images_per_col = 2, 3
         images_per_page = images_per_row * images_per_col
-        
-        image_width = (page_width - 100) / images_per_row  # Leave margin
-        image_height = (page_height - 400) / images_per_col  # Leave margin
-        
-        x_start = 50  # Margin from left
-        y_start = page_height - 300  # Start from the top (leave space for labels)
+        max_width = (page_width - 100) / images_per_row
+        max_height = (page_height - 150) / images_per_col
+        x_start, y_start = 50, page_height - 300 
         
         for i, fig_path in enumerate(figures_list):
             if i % images_per_page == 0:
-                c.showPage()  # New page for every 4 images
+                c.showPage()  
+        
+            c.setFont("Helvetica-Bold", 20)
+            c.drawString(100, page_height - 50, "Line force multiplier v Sobolev optical depth")
             
             row = (i % images_per_page) // images_per_row
             col = (i % images_per_page) % images_per_row
+            x_position = x_start + col * max_width
+            y_position = y_start - row * max_height
         
-            x_position = x_start + col * image_width
-            y_position = y_start - row * image_height
+            # Load image to get actual dimensions
+            with Image.open(fig_path) as img:
+                img_width, img_height = img.size
         
-            c.drawImage(fig_path, x_position, y_position, width=image_width, height=image_height)
+            # Compute scaling factor while maintaining aspect ratio
+            scale_factor = min(max_width / img_width, max_height / img_height)
+            new_width = img_width * scale_factor
+            new_height = img_height * scale_factor
         
-            # Add label below each image
+            # Center the image within its allocated space
+            x_adjusted = x_position + (max_width - new_width) / 2
+            y_adjusted = y_position + (max_height - new_height) / 2
+        
+            c.drawImage(fig_path, x_adjusted, y_adjusted, width=new_width, height=new_height)
+        
             c.setFont("Helvetica", 10)
-            c.drawString(x_position, y_position - 15, f"Figure {i + 2}: {os.path.basename(fig_path)}")
-        
+            
         # --- 3. Add Simulation Log (simlog.txt) on a New Page ---
-        if os.path.exists(simlog_path):
-            c.showPage()  # New page for text
-            c.setFont("Helvetica", 12)
-            y_position = page_height - 50  # Start from the top
+        #if os.path.exists(simlog_path):
+        #    c.showPage()  # New page for text
+        #    c.setFont("Helvetica", 12)
+        #    y_position = page_height - 50  # Start from the top
         
-            with open(simlog_path, "r") as f:
-                log_text = f.readlines()
+        #    with open(simlog_path, "r") as f:
+        #        log_text = f.readlines()
         
-            for line in log_text:
-                if y_position < 50:  # If out of space, start a new page
-                    c.showPage()
-                    c.setFont("Helvetica", 12)
-                    y_position = page_height - 50
+        #    for line in log_text:
+        #        if y_position < 50:  # If out of space, start a new page
+        #            c.showPage()
+        #            c.setFont("Helvetica", 12)
+        #            y_position = page_height - 50
         
-                c.drawString(50, y_position, line.strip())  # Add text line
-                y_position -= 12  # Move down
-        
-        c.save()
-        
+        #        c.drawString(50, y_position, line.strip())  # Add text line
+        #        y_position -= 12  # Move down        
+
+        c.save()    
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
 
@@ -331,7 +399,6 @@ def process_data():
 
         pdf_url = url_for("download_temp_file", session_id=relative_session_id, filename=f"{pdf_name}/result.pdf", _external=True)
         
-        print(pdf_url)
         return jsonify({"message": "Computation complete", "download_url": pdf_url}), 200
 
     except ValueError as e:
@@ -425,6 +492,8 @@ def upload_csv():
                     pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
                     pdf_paths.append(pdf_path)
 
+                    print('428', result_dir)
+
                     abundances = {}
                     for element, default_value in default_abundances.items():
                         if element in ["H", "HE"]:
@@ -437,16 +506,17 @@ def upload_csv():
 
                     pointer = -1
 
-                    computation_thread = threading.Thread(
-                        target=process_computation,
-                        args=(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir)
-                    )
-                    computation_threads.append(computation_thread)
-                    computation_thread.start()
+                    #computation_thread = threading.Thread(
+                    #    target=process_computation,
+                    #    args=(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir)
+                    #)
+                    #computation_threads.append(computation_thread)
+                    #computation_thread.start()
+                    process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir)
 
                 # Wait for all threads to finish
-                for thread in computation_threads:
-                    thread.join()
+                #for thread in computation_threads:
+                #    thread.join()
 
                 # Collect results from each computation
                 for index, row in df.iterrows():
@@ -458,7 +528,7 @@ def upload_csv():
                         with open(simlog_path, "r") as f:
                             lines = f.readlines()
                             if len(lines) >= 2:
-                                last_values = lines[-2].split()
+                                last_values = lines[-1].split()
                                 if len(last_values) >= 4:
                                     wrmdot = float(last_values[0].strip("'"))
                                     wrqbar = float(last_values[1].strip("'"))
@@ -471,16 +541,17 @@ def upload_csv():
                     else:
                         wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
 
+                   
                     results_data.append({
                         "Name": pdf_name,
                         "Luminosity": row["luminosity"],
                         "Teff": row["teff"],
                         "Mstar": row["mstar"],
                         "Zscale": row["zscale"],
-                        "Mass Loss Rate": wrmdot,
-                        "Qbar": wrqbar,
-                        "Alpha": wralp,
-                        "Q0": wrq0
+                        "Mass Loss Rate": f"{wrmdot:.3e}",
+                        "Qbar": f"{wrqbar:.2e}",
+                        "Alpha": f"{wralp:.2e}",
+                        "Q0": f"{wrq0:.2e}"
                     })
 
                 # Save results to CSV file

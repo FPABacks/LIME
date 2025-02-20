@@ -1,4 +1,5 @@
-subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_norm,X_mass,Z_mass,N_tt,N_lgT,N_lgD, ver, DIR)
+subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_norm,&
+X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
 
 !   use f90getopt
    use LTE_Line_module
@@ -133,14 +134,14 @@ subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_n
 
    ! Step 1) Get atomic data [done], aboundence data [done], Line data [done] (use X = 1 for H no Y|=0 !!)
    WRITE(*,*)'Initialise ATOM and NUMB'
-   CALL ATOM_DATA%Initialise(verbose  = ver)
+   CALL ATOM_DATA%Initialise(verbose=ver)
    IF (X_mass.GT.-1) THEN
       WRITE(*,*) "  >Using input composition"
       Y_mass = (1.0d0 - X_mass - Z_mass)
-      CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac = Y_mass, DIR=DIR, verbose  = ver)
+      CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac=Y_mass, DIR=DIR, verbose=ver)
    ELSE 
       WRITE(*,*) "  >Using Solar composition"
-      CALL NUMB_DENS%Initialise(ATOM_DATA, DIR=DIR, verbose  = ver)
+      CALL NUMB_DENS%Initialise(ATOM_DATA, DIR=DIR, verbose=ver)
    END IF
    WRITE(*,*) 'X=',NUMB_DENS%X_frac,'Y=',NUMB_DENS%Y_frac,'Z=',1.0d0 - NUMB_DENS%x_frac - NUMB_DENS%Y_frac
    WRITE(*,*)'ATOM and NUMB  - done'
@@ -180,7 +181,7 @@ subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_n
          IF(ANY(ISNAN(W_i))) STOP '---- Wi is nan ----'
          
          CALL NUMB_DENS%Clear()
-         CALL NUMB_DENS%Set(rho = D, T = T, verbose = ver)
+         CALL NUMB_DENS%Set(rho=D, T=T, verbose=ver)
          ! Dec 17 - test - DD
          kape_list(T_gird_counter) = NUMB_DENS%Electron * sigma_Thom / D
          WRITE(*,*)' > Kappa_e =', kape_list(T_gird_counter)
