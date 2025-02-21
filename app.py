@@ -23,6 +23,7 @@ import tempfile
 import random
 import zipfile
 import time
+from jinja2 import Template
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -133,12 +134,34 @@ def extract_data_from_file(file_path):
             match = re.search(r"t_crit = ([\d.e+-]+)", line)
             if match:
                 last_iteration_data["t_crit"] = float(match.group(1))
+        if "Mass loss rate =" in line:
+            match = re.search(r"Mass loss rate = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["Mass loss rate"] = float(match.group(1))
+        if "Qbar =" in line:
+            match = re.search(r"Qbar = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["Qbar"] = float(match.group(1))  
+        if "alpha =" in line:
+            match = re.search(r"alpha = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["alpha"] = float(match.group(1))
+        if "Q0 =" in line:
+            match = re.search(r"Q0 = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["Q0"] = float(match.group(1))                                     
     return last_iteration_data
 
 
 def load_email_body(filename):
     with open(filename, 'r') as file:
         return file.read()
+
+def load_dyn_email(filename, context):
+    """Load and render email body from Jinja2 template."""
+    with open(filename, 'r') as file:
+        template = Template(file.read())
+    return template.render(context)
 
 def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, pointer, batch_output_dir):
     """Runs mcak_explore and emails the results"""
@@ -334,7 +357,10 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         #        c.drawString(50, y_position, line.strip())  # Add text line
         #        y_position -= 12  # Move down        
 
-        c.save()    
+        c.save()  
+
+        
+   
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
 
@@ -362,7 +388,9 @@ def process_data():
 
         if not abundances:
             return jsonify({"error": "Abundances data is missing"}), 400
-
+        
+        recipient_email = data.get("email", "").strip()
+        
         # Calculate values
         zstar = calculate_metallicity_massb(abundances)
         helium_abundance = He_number_abundance(abundances)
@@ -378,12 +406,15 @@ def process_data():
         pdf_path = os.path.join(output_dir, f"{pdf_name}.pdf")  
 
         # Run computation in a separate thread
-        computation_thread = threading.Thread(
-            target=process_computation,
-            args=(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, "", pdf_name, -1, session_tmp_dir)
-        )
-        computation_thread.start()
-        computation_thread.join()  # Wait for completion before proceeding
+
+        process_computation(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, -1, session_tmp_dir)
+        
+        #computation_thread = threading.Thread(
+        #    target=process_computation,
+        #    args=(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, -1, session_tmp_dir)
+        #)
+        #computation_thread.start()
+        #computation_thread.join()  # Wait for completion before proceeding
 
         # Check if the PDF exists at the correct path
         if not os.path.exists(pdf_path):
@@ -397,8 +428,44 @@ def process_data():
 
         pdf_url = url_for("download_temp_file", session_id=relative_session_id, filename=f"{pdf_name}/result.pdf", _external=True)
         
-        return jsonify({"message": "Computation complete", "download_url": pdf_url}), 200
+        
+        # Extract the computed values from simlog.txt
+        simlog_path = os.path.join(output_dir, "simlog.txt")
+        if os.path.exists(simlog_path):
+            iteration_data = extract_data_from_file(simlog_path)
+            wrmdot = iteration_data.get("Mass loss rate", None)
+            wrqbar = iteration_data.get("Qbar", None)
+            wralp = iteration_data.get("alpha", None)
+            wrq0 = iteration_data.get("Q0", None)
+        else:
+            wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
 
+        # **Send Email if recipient email is provided**
+        if recipient_email:
+            email_context = {
+                "luminosity": f"{luminosity:.1f}",
+                "teff": f"{teff:.1f}",
+                "mstar": f"{mstar:.1f}",
+                "zscale": f"{zscale:.2f}",
+                "zstar": f"{zstar:.3e}",
+                "mass_loss_rate": f"{wrmdot:.3e}",
+                "qbar": f"{wrqbar:.0f}",
+                "alpha": f"{wralp:.2f}",
+                "q0": f"{wrq0:.0f}"
+            }
+
+            email_body = load_dyn_email('./mailing/mail_dyn.j2', email_context)
+
+            # Send the email using mailer.py
+            subprocess.run([
+                "python3", "./mailing/mailer.py",
+                "--t", recipient_email,
+                "--s", "LIME Computation Results",
+                "--b", email_body
+            ])
+
+        return jsonify({"message": "Computation complete", "download_url": pdf_url}), 200
+    
     except ValueError as e:
         return jsonify({"error": f"Invalid numerical input: {str(e)}"}), 400
     except Exception as e:
@@ -519,7 +586,19 @@ def upload_csv():
                     pdf_name = str(row["name"])
                     result_dir = os.path.join(batch_output_dir, pdf_name)
                     simlog_path = os.path.join(result_dir, "simlog.txt")
-
+                    mass_abundance_path = os.path.join(result_dir, "output", "mass_abundance")
+ 
+                    # Read abundances from the mass_abundance file
+                    abundances_data = {}
+                    if os.path.exists(mass_abundance_path):
+                        with open(mass_abundance_path, "r") as f:
+                            for line in f:
+                                parts = line.strip().split()
+                                if len(parts) >= 3:  
+                                    element_symbol = " ".join(parts[1:-1]).replace("'", "").strip()  
+                                    abundance_value = float(parts[-1])  
+                                    abundances_data[element_symbol] = abundance_value
+                    
                     if os.path.exists(simlog_path):
                         with open(simlog_path, "r") as f:
                             lines = f.readlines()
@@ -537,7 +616,6 @@ def upload_csv():
                     else:
                         wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
 
-                   
                     results_data.append({
                         "Name": pdf_name,
                         "Luminosity": row["luminosity"],
@@ -547,9 +625,10 @@ def upload_csv():
                         "Mass Loss Rate": f"{wrmdot:.3e}",
                         "Qbar": f"{wrqbar:.2e}",
                         "Alpha": f"{wralp:.2e}",
-                        "Q0": f"{wrq0:.2e}"
+                        "Q0": f"{wrq0:.2e}",
+                        **abundances_data
                     })
-
+                 
                 # Save results to CSV file
                 results_csv_path = os.path.join(batch_output_dir, "results.csv")
                 results_df = pd.DataFrame(results_data)

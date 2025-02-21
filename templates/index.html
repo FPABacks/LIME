@@ -322,6 +322,19 @@
                 <button onclick="runCalculation()">Run</button>
             </div>
 
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px;">
+                <label class="switch">
+                    <input type="checkbox" id="email-toggle" onchange="toggleEmailInput()">
+                    <span class="slider"></span>
+                </label>
+                <label for="email-toggle" style="font-size: 22px; color: #333;">Receive a copy via email</label>
+            </div>
+            
+            <div id="email-input-container" style="display: none; margin-top: 10px;">
+                <label for="user-email">Enter your email:</label>
+                <input type="email" id="user-email" placeholder="example@example.com">
+            </div>
+            
             <h2>Mass fractions <span class="tooltip" style="font-size: 14px; vertical-align: super; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 2px solid gray; border-radius: 50%; color: gray;">?
                 <span class="tooltiptext">Mass fractions represent the relative abundance of each element in a star's composition. The total of all mass fractions (including H and He) should add up to 1. While number abundances are traditionally used in stellar atmospheric studies, they are often non-intuitive and require scaling (typically by H or He). Since our tool supports arbitrary abundances, mass fractions provide a more intuitive and flexible input format.</span>
             </span></h2>
@@ -340,7 +353,7 @@
             <h2>User Info</h2>
             <div class="input-container">
                 <label for="email-grid">Enter your email id:</label>
-                <input type="email" id="email-grid" name="email" required>
+                <input type="email" id="email-grid", placeholder="example@example.com", name="email" required>
             </div>
             
             <h2>Upload CSV File</h2>
@@ -389,19 +402,50 @@
 
         function createAbundanceInputs() {
             const abundancesDiv = document.getElementById("abundances");
+            abundancesDiv.style.display = "flex";
+            abundancesDiv.style.flexWrap = "wrap";
+            abundancesDiv.style.gap = "20px";
+        
+            let count = 0;
+            let rowDiv = document.createElement("div");
+            rowDiv.style.display = "flex";
+            rowDiv.style.justifyContent = "space-between";
+            rowDiv.style.width = "100%";
+        
             for (const [element, value] of Object.entries(defaultAbundances)) {
+                const container = document.createElement("div");
+                container.style.display = "flex";
+                container.style.flexDirection = "column";
+                container.style.width = "30%"; 
+        
                 const label = document.createElement("label");
                 label.textContent = element;
+        
                 const input = document.createElement("input");
                 input.type = "number";
                 input.step = "any";
                 input.value = value;
                 input.id = `abundance-${element}`;
-                abundancesDiv.appendChild(label);
-                abundancesDiv.appendChild(input);
+        
+                container.appendChild(label);
+                container.appendChild(input);
+                rowDiv.appendChild(container);
+        
+                count++;
+                if (count % 3 === 0) {
+                    abundancesDiv.appendChild(rowDiv);
+                    rowDiv = document.createElement("div");
+                    rowDiv.style.display = "flex";
+                    rowDiv.style.justifyContent = "space-between";
+                    rowDiv.style.width = "100%";
+                }
+            }
+        
+            if (count % 3 !== 0) {
+                abundancesDiv.appendChild(rowDiv); // Append the last row if it has only one element
             }
         }
-
+        
         function updateAbundances() {
             const zscale = parseFloat(document.getElementById("zscale").value);
             if (!isNaN(zscale)) {
@@ -413,6 +457,15 @@
                 }
             }
         }
+
+        function toggleEmailInput() {
+            const emailContainer = document.getElementById("email-input-container");
+            if (emailContainer.style.display === "none" || emailContainer.style.display === "") {
+                emailContainer.style.display = "block";
+            } else {
+                emailContainer.style.display = "none";
+            }
+        }        
 
         function showTab(tabId) {
             const tabs = document.querySelectorAll('.tab');
@@ -438,7 +491,15 @@
                 const value = parseFloat(document.getElementById(`abundance-${element}`).value);
                 abundances[element] = value;
             }
-    
+            let email = "";
+            if (document.getElementById("email-toggle").checked) {
+                email = document.getElementById("user-email").value.trim();
+                if (!email) {
+                    alert("Please enter a valid email address.");
+                    return;
+                }
+            }
+               
             // Show loading message and disable button
             document.getElementById("loading").style.display = "block";
             document.querySelector(".button-container button").disabled = true;
@@ -453,7 +514,8 @@
                     teff: teff,
                     mstar: mstar,
                     zscale: zscale,
-                    abundances: abundances
+                    abundances: abundances,
+                    email : email
                 })
             })
             .then(response => response.json())
