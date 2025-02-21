@@ -352,6 +352,10 @@ def process_data():
         # Extract parameters
         luminosity = float(data.get("luminosity", 0.0))
         teff = float(data.get("teff", 0.0))
+      
+        if teff > 70000 or teff < 18000:
+            return jsonify ({"error": "Temparature beyond current coverage"}), 400
+ 
         mstar = float(data.get("mstar", 0.0))
         zscale = float(data.get("zscale", 0.0))
         abundances = data.get("abundances", {})
@@ -485,8 +489,6 @@ def upload_csv():
                     os.makedirs(result_dir, exist_ok=True)
                     pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
                     pdf_paths.append(pdf_path)
-
-                    print('428', result_dir)
 
                     abundances = {}
                     for element, default_value in default_abundances.items():
