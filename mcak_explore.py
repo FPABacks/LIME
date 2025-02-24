@@ -564,6 +564,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             #axes[2].set_xlabel("iteration")
             plt.tight_layout()
             plt.savefig(f"{random_subdir}/sim_log.png")
+            plt.close()
 
             
            #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
