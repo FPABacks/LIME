@@ -469,16 +469,14 @@ MODULE LTE_Line_module
    !=============================================================================
    !=============================================================================
  
- 
- 
-   SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
+SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      ! In-Out and optional variables
      CLASS(LINE_DATA_TYPE), INTENT(INOUT) :: OBJ
      LOGICAL, OPTIONAL :: verbose
      LOGICAL :: ver
  
      ! Temproraly variables
-     INTEGER(I4B) :: Total_line_numb = 0, IO_status = 0, ind = 0, ind1 = 0, ind2 = 0, ind3 = 0
+     INTEGER(I4B) :: Total_line_numb, IO_status = 0
      INTEGER(I4B),  DIMENSION(:), ALLOCATABLE ::  Line_ID
      REAL(SP),  DIMENSION(:), ALLOCATABLE :: Lambda
      REAL(SP),  DIMENSION(:), ALLOCATABLE :: gf_val
@@ -525,143 +523,55 @@ MODULE LTE_Line_module
  
      IF(ver)PRINT*,'  - General info read'
      IF(ver)PRINT*,'    > Total number of available transition', OBJ%Total_line_numb
+
+
+     ! Allocate memory for binary read
+     ALLOCATE(Line_ID(Total_line_numb), Lambda(Total_line_numb), gf_val(Total_line_numb))
+     ALLOCATE(OBJ%ID(Total_line_numb, 4), OBJ%Lambda(Total_line_numb), OBJ%gf_val(Total_line_numb))
  
-     ! Allocating the variables
-     ALLOCATE(Line_ID(Total_line_numb))
-     Line_ID = 0
-     ALLOCATE(Lambda(Total_line_numb))
-     Lambda = 0.0d0
-     ALLOCATE(gf_val(Total_line_numb))
-     gf_val = 0.0d0
-     ALLOCATE(OBJ%ID(Total_line_numb,4))
-     OBJ%ID = 0
-     ALLOCATE(OBJ%Lambda(Total_line_numb))
-     OBJ%Lambda = 0.0d0
-     ALLOCATE(OBJ%gf_val(Total_line_numb))
-     OBJ%gf_val = 0.0d0
- 
-     ! OPEN line identifiers
-     OPEN (UNIT=100, FILE=TRIM(DATA_DIR)//'/nl3i_all_ascii', FORM='formatted', STATUS='OLD',IOSTAT=IO_status)
-     ! Check if opening was sucssesful
+     ! Open the binary files
+     OPEN (UNIT=100, FILE=TRIM(DATA_DIR)//'/nl3i_all_bin', FORM='UNFORMATTED', STATUS='OLD', IOSTAT=IO_status)     
      IF(IO_status .NE. 0) THEN
-        PRINT*,'---- Error Opening the '//TRIM(DATA_DIR)//'/nl3i_all_ascii file STATUS ', &
-             IO_status, ' ----'
-        STOP
-     ENDIF
- 
-     ! OPEN Transition wavelength
-     OPEN (UNIT=101, FILE=TRIM(DATA_DIR)//'/nl3a_all_ascii', FORM='formatted', STATUS='OLD',IOSTAT=IO_status)
-     ! Check if opening was sucssesful
+         PRINT*,'---- Error Opening the binary file: ', TRIM(DATA_DIR)//'/nl3i_all_bin', ' ----'
+         STOP
+      ENDIF   
+     
+     OPEN (UNIT=101, FILE=TRIM(DATA_DIR)//'/nl3a_all_bin', FORM='UNFORMATTED', STATUS='OLD', IOSTAT=IO_status)     
      IF(IO_status .NE. 0) THEN
-        PRINT*,'---- Error Opening the '//TRIM(DATA_DIR)//'/nl3a_all_ascii file STATUS ', &
-             IO_status, ' ----'
-        STOP
-     ENDIF
- 
-     ! OPEN Transition wavelength
-     OPEN (UNIT=102, FILE=TRIM(DATA_DIR)//'/nl3g_all_ascii', FORM='formatted', STATUS='OLD',IOSTAT=IO_status)
-     ! Check if opening was sucssesful
+         PRINT*,'---- Error Opening the binary file: ', TRIM(DATA_DIR)//'/nl3a_all_bin', ' ----'
+         STOP
+      ENDIF
+
+     OPEN (UNIT=102, FILE=TRIM(DATA_DIR)//'/nl3g_all_bin', FORM='UNFORMATTED', STATUS='OLD', IOSTAT=IO_status)     
      IF(IO_status .NE. 0) THEN
-        PRINT*,'---- Error Opening the '//TRIM(DATA_DIR)//'/nl3g_all_ascii file STATUS ', &
-             IO_status, ' ----'
-        STOP
-     ENDIF
- 
-     !READ
-     ! DO ind = 1,83
-     !   ind2 = (ind-1)*50000 + 1
-     !   ind3 = ind2 + 50000 - 1
-     !
-     !   READ(100)(Line_ID(ind1),ind1=ind2,ind3)
-     !   READ(101)(Lambda(ind1),ind1=ind2,ind3)
-     !   READ(102)(gf_val(ind1),ind1=ind2,ind3)
-     ! END DO
-     ! PRINT*,ind3,Total_line_numb - 7108
-     ! READ(100)(Line_ID(ind1),ind1=ind3+1,Total_line_numb)
-     ! READ(101)(Lambda(ind1),ind1=ind3+1,Total_line_numb)
-     ! READ(102)(gf_val(ind1),ind1=ind3+1,Total_line_numb)
- 
-     READ(100,*)(Line_ID(ind),ind=1,Total_line_numb)
-     READ(101,*)(Lambda(ind),ind=1,Total_line_numb)
-     READ(102,*)(gf_val(ind),ind=1,Total_line_numb)
+         PRINT*,'---- Error Opening the binary file: ', TRIM(DATA_DIR)//'/nl3g_all_bin', ' ----'
+         STOP
+      ENDIF
+      
+     READ(100) Line_ID
+     READ(101) Lambda
+     READ(102) gf_val
+
      CLOSE(100)
      CLOSE(101)
      CLOSE(102)
+
  
- 
-     ! PARSE The Line ID of following format:
-     ! zZI0LlLu  (z - is not fixed and can appear or disapperar
-     ! depending on length,  0-has a fixd location and is not used)
-     ! zZ - Nuclear charge Z
-     ! I  - ionisation
-     ! 0  - Not used
-     ! Ll - Lower level
-     ! Lu - Upper level
-     ! Examples:
-     !  1100102: Z = 1(Hydrogen), I = 1 (Neutral), 0, 01 = ground level, 02 = First excited
-     ! 19500317: Z = 19(K), I = 5(4x Ionised), 0, 03 = 3rd excited, 17 = 17th excited
-     ! indexis for storing  Z_ = 1, I_ = 2, Ll_ = 3, Lu = 4
-     ! for testinf
-     !Total_line_numb = 1
-     ! ZZIILiLu
-     
-     !DO ind = 1,Total_line_numb
-        ! bunch of integer arithmetics to parts the IDs
-     !   OBJ%ID(ind,1) = Line_ID(ind)/1000000
-     !   OBJ%ID(ind,2) = (Line_ID(ind) - OBJ%ID(ind,1)*1000000)/100000
-     !   OBJ%ID(ind,3) = MOD(Line_ID(ind),10000)/100
-     !   OBJ%ID(ind,4) = MOD(Line_ID(ind),100)
- 
-        ! check each translation
-     !   IF( (OBJ%ID(ind,1)*1000000 + OBJ%ID(ind,2)*100000 + OBJ%ID(ind,3)*100 &
-     !        + OBJ%ID(ind,4)).NE.Line_ID(ind) ) &
-     !        STOP '---- InconsistencyIn reading the line ID ----'
-     !END DO
-     
-     DO ind = 1,Total_line_numb
-        ! bunch of integer arithmetics to parts the IDs
-        OBJ%ID(ind,1) = Line_ID(ind)/1000000
-        OBJ%ID(ind,2) = (Line_ID(ind) - OBJ%ID(ind,1)*1000000)/100000
-        OBJ%ID(ind,3) = MOD(Line_ID(ind),10000)/100
-        OBJ%ID(ind,4) = MOD(Line_ID(ind),100)
- 
-        ! check each translation
-        IF( (OBJ%ID(ind,1)*1000000 + OBJ%ID(ind,2)*100000 + OBJ%ID(ind,3)*100 &
-             + OBJ%ID(ind,4)).NE.Line_ID(ind) ) &
-             STOP '---- InconsistencyIn reading the line ID ----'
-     END DO
+     ! Store the read data
+     OBJ%ID(:,1) = Line_ID / 1000000
+     OBJ%ID(:,2) = (Line_ID - OBJ%ID(:,1) * 1000000) / 100000
+     OBJ%ID(:,3) = MOD(Line_ID, 10000) / 100
+     OBJ%ID(:,4) = MOD(Line_ID, 100)
      IF(ver)PRINT*,'  - Line IDs read'
- 
-     ! Thech that the last entry of the file is correctly read
-     !  by comparing it to manually enterd value (Mast be changed id the list is changed)
-     !IF((Lambda(Total_line_numb)/3.7174720d+07 - 1.0d0).GT.1.0d-8) THEN
-     !   PRINT*,'---- Inconsistency in the last wavelength of the list ----'
-     !   PRINT*,'  > Expected value:',3.7174720d+07
-     !   PRINT*,'  > Read value:    ',Lambda(Total_line_numb)
-     !   STOP
-     !END IF
- 
-     ! If read was sucssesful store the wavelength array
-     OBJ%Lambda(:) = Lambda(:)
+   
+     OBJ%Lambda = Lambda
      IF(ver)PRINT*,'  - Line wavelength read'
+     OBJ%gf_val = gf_val
+     IF(ver)PRINT*,'  - Line oscilator strength read'
+   
+     IF(ver) PRINT*, '  - Line Data Successfully Read from Binary Files'
  
- 
-     ! Thech that the last entry of the file is correctly read
-     !  by comparing it to manually enterd value (Mast be changed id the list is changed)
-     !IF((gf_val(Total_line_numb)/1000.0 - 1.0d0).GT.1.0d-8) THEN
-     !   PRINT*,'---- Inconsistency in the last wavelength of the list ----'
-     !   PRINT*,'  > Expected value:',1000.0
-     !   PRINT*,'  > Read value:    ',gf_val(Total_line_numb)
-     !   STOP
-     !END IF
- 
-     ! If read was sucssesful store the gf values array
-     OBJ%gf_val(:) = gf_val(:)
-     IF(ver)PRINT*,'  - Line oscilator strength read' 
- 
-     IF(ver)PRINT*,'  - Line Data Type READY'
    END SUBROUTINE Read_Line_Data_ascii
-   !=============================================================================
  
    SUBROUTINE Find_line_index(OBJ,Z,I,Ll,Lu,Lambda,Toler,verbose)
      ! In-Out and optional variables

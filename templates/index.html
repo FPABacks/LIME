@@ -296,14 +296,13 @@
 
         </div>                   
         <div id="calculator" class="tab-content">
-                <p> The data should only be trusted for effective temperature (\(T_{\rm eff}\)) between 18000 to 70000 K. 
-                    Beyond this limit, the underlying Munich Atomic Database either lacks ionization stages or has limited data.
-                    We are currently working on an extension to the Munich Atomic Database, and in a future update we will also extend to such parameter spaces.
-                <p>
-                <p>     
-                    Also, kindly make sure that you allow the pop-up option in your browser for the results to show up.
-                </p>
-            
+            <p>The data is reliable only for effective temperatures (\(T_{\rm eff}\)) between 18,000 K and 70,000 K. 
+                Beyond this range, the underlying Munich Atomic Database either lacks ionization stages or has limited data.</p>
+             
+            <p>We are actively working on expanding the Munich Atomic Database, and future updates will extend coverage to these parameter spaces.</p>
+             
+            <p>Additionally, please ensure that pop-ups are enabled in your browser for the results to display correctly.</p>
+             
             <h2>Enter Stellar Parameters</h2>
             <div class="input-container">
                 <label for="luminosity">Luminosity (\(L_\star\)):</label>
@@ -347,9 +346,11 @@
                 Beyond this limit, the underlying Munich Atomic Database either lacks ionization stages or has limited data.
                 We are currently working on an extension to the Munich Atomic Database, and in a future update we will also extend to such parameter spaces.
             <p>
-            <p>You can submit a comma-separated variable (.csv) file with the stellar inputs and abundances.
-                The outputs will be emailed back when done.</p>
-            
+            <p>You can submit a CSV (comma-separated values) file containing the stellar inputs and abundances.</p>
+            <ul>
+                <li>If the file contains more than 20 entries, only the final output CSV file will be sent; iteration details will not be included.</li>
+                <li>The processed results will be emailed back once completed.</li>
+            </ul>
             <h2>User Info</h2>
             <div class="input-container">
                 <label for="email-grid">Enter your email id:</label>
