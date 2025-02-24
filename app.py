@@ -25,6 +25,26 @@ import zipfile
 import time
 from jinja2 import Template
 
+# time and memory resources 
+#import psutil
+#import time
+#import logging
+
+#logging.basicConfig(filename="resource_usage.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+
+#def log_resource_usage():
+#    """Logs memory and CPU usage periodically."""
+#    process = psutil.Process()
+#    while True:
+#        memory_usage = process.memory_info().rss / (1024 * 1024)  
+#        cpu_usage = process.cpu_percent(interval=1)  
+#        logging.info(f"CPU Usage: {cpu_usage:.2f}%, Memory Usage: {memory_usage:.2f} MB")
+#        time.sleep(10) 
+
+# Start the resource monitoring thread
+#monitoring_thread = threading.Thread(target=log_resource_usage, daemon=True)
+#monitoring_thread.start()
+
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
 MFORCE_DIR = os.getenv("MFORCE_DIR", ".")
