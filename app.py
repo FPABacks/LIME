@@ -398,7 +398,7 @@ def process_data():
         luminosity = float(data.get("luminosity", 0.0))
         teff = float(data.get("teff", 0.0))
       
-        if teff > 70000 or teff < 18000:
+        if teff > 60000 or teff < 15000:
             return jsonify ({"error": "Temparature beyond current coverage"}), 400
  
         mstar = float(data.get("mstar", 0.0))

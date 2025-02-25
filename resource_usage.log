@@ -3664,3 +3664,13 @@
 2025-02-25 09:59:48,452 -  * Restarting with watchdog (inotify)
 2025-02-25 09:59:49,145 -  * Debugger is active!
 2025-02-25 09:59:49,145 -  * Debugger PIN: 141-055-472
+2025-02-25 11:20:40,998 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2025-02-25 11:20:41,001 -  * Restarting with watchdog (inotify)
+2025-02-25 11:20:41,751 -  * Debugger is active!
+2025-02-25 11:20:41,751 -  * Debugger PIN: 128-643-947
+2025-02-25 11:20:46,907 - 127.0.0.1 - - [25/Feb/2025 11:20:46] "[31m[1mPOST /process_data HTTP/1.1[0m" 400 -
+2025-02-25 11:22:31,262 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-25 11:22:31,271 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-25 11:22:32,408 -  * Restarting with watchdog (inotify)
+2025-02-25 11:22:33,156 -  * Debugger is active!
+2025-02-25 11:22:33,156 -  * Debugger PIN: 136-571-348
