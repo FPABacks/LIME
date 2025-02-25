@@ -14,6 +14,7 @@ import tempfile
 from mforce import get_force_multiplier
 import random
 import shutil
+import gc
 
 
 # Atomic masses of elements (in atomic mass units, amu)
@@ -564,6 +565,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             #axes[2].set_xlabel("iteration")
             plt.tight_layout()
             plt.savefig(f"{random_subdir}/sim_log.png")
+            plt.close()
 
             
            #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
@@ -598,6 +600,18 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             mdot_old = mdot
             rho = rho_target
 
+            it_num.clear()
+            mdot_num.clear()
+            qbar_num.clear()
+            alpha_num.clear()
+            q0_num.clear()
+            eps_num.clear()
+            delrho_num.clear()
+            gc.collect()
+            
+        del rho_initial, mdot, qbar, alpha, q0, parameters
+        gc.collect()
+        
         return str(random_subdir)
 
 if __name__ == "__main__":

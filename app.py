@@ -24,26 +24,25 @@ import random
 import zipfile
 import time
 from jinja2 import Template
+import csv
+import gc
 
-# time and memory resources 
-#import psutil
-#import time
-#import logging
+# this just debug resources purpose
+import psutil
+import threading
+import logging
 
-#logging.basicConfig(filename="resource_usage.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+logging.basicConfig(filename="resource_usage.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 
-#def log_resource_usage():
-#    """Logs memory and CPU usage periodically."""
-#    process = psutil.Process()
-#    while True:
-#        memory_usage = process.memory_info().rss / (1024 * 1024)  
-#        cpu_usage = process.cpu_percent(interval=1)  
-#        logging.info(f"CPU Usage: {cpu_usage:.2f}%, Memory Usage: {memory_usage:.2f} MB")
-#        time.sleep(10) 
+def log_resource_usage():
+    """Logs memory and CPU usage periodically."""
+    process = psutil.Process()
+    while True:
+        memory_usage = process.memory_info().rss / (1024 * 1024)  
+        cpu_usage = process.cpu_percent(interval=1)  
+        logging.info(f"CPU Usage: {cpu_usage:.2f}%, Memory Usage: {memory_usage:.2f} MB")
+        #time.sleep(10) 
 
-# Start the resource monitoring thread
-#monitoring_thread = threading.Thread(target=log_resource_usage, daemon=True)
-#monitoring_thread.start()
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -560,9 +559,18 @@ def upload_csv():
                     "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
                 }
 
-                computation_threads = []
+                #computation_threads = []
+                #results_data = []  
+
+                results_csv_path = os.path.join(batch_output_dir, "results.csv")
+                csv_header_written = False  
+                final_zip_path = os.path.join(batch_output_dir, "final_results.zip")
+
                 pdf_paths = []
-                results_data = []  
+
+                # Start the resource monitoring thread
+                monitoring_thread = threading.Thread(target=log_resource_usage, daemon=True)
+                monitoring_thread.start()
 
                 for index, row in df.iterrows():
                     pdf_name = str(row["name"])
@@ -575,7 +583,7 @@ def upload_csv():
                     result_dir = os.path.join(batch_output_dir, pdf_name)
                     os.makedirs(result_dir, exist_ok=True)
                     pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
-                    pdf_paths.append(pdf_path)
+                    
 
                     abundances = {}
                     for element, default_value in default_abundances.items():
@@ -595,19 +603,24 @@ def upload_csv():
                     #)
                     #computation_threads.append(computation_thread)
                     #computation_thread.start()
+                    
                     process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir)
+                    pdf_paths.append(pdf_path)
+                    
 
                 # Wait for all threads to finish
                 #for thread in computation_threads:
                 #    thread.join()
 
                 # Collect results from each computation
+
+                
                 for index, row in df.iterrows():
                     pdf_name = str(row["name"])
                     result_dir = os.path.join(batch_output_dir, pdf_name)
                     simlog_path = os.path.join(result_dir, "simlog.txt")
                     mass_abundance_path = os.path.join(result_dir, "output", "mass_abundance")
- 
+
                     # Read abundances from the mass_abundance file
                     abundances_data = {}
                     if os.path.exists(mass_abundance_path):
@@ -636,23 +649,17 @@ def upload_csv():
                     else:
                         wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
 
-                    results_data.append({
-                        "Name": pdf_name,
-                        "Luminosity": row["luminosity"],
-                        "Teff": row["teff"],
-                        "Mstar": row["mstar"],
-                        "Zscale": row["zscale"],
-                        "Mass Loss Rate": f"{wrmdot:.3e}",
-                        "Qbar": f"{wrqbar:.2e}",
-                        "Alpha": f"{wralp:.2e}",
-                        "Q0": f"{wrq0:.2e}",
-                        **abundances_data
-                    })
+                    with open(results_csv_path, mode='a', newline='') as f:
+                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Zscale", "Mass Loss Rate", "Qbar", "Alpha", "Q0", *abundances_data.keys()])
+                        if not csv_header_written:
+                            writer.writeheader()
+                            csv_header_written = True
+                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Zscale": row["zscale"], "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", **abundances_data})
                  
                 # Save results to CSV file
-                results_csv_path = os.path.join(batch_output_dir, "results.csv")
-                results_df = pd.DataFrame(results_data)
-                results_df.to_csv(results_csv_path, index=False)
+                #results_csv_path = os.path.join(batch_output_dir, "results.csv")
+                #results_df = pd.DataFrame(results_data)
+                #results_df.to_csv(results_csv_path, index=False)
 
                 # **Create ZIP file with results**
                 final_zip_path = os.path.join(batch_output_dir, "final_results.zip")
