@@ -586,14 +586,28 @@ def upload_csv():
                     
 
                     abundances = {}
+                    total_metal_mass = 0
                     for element, default_value in default_abundances.items():
                         if element in ["H", "HE"]:
                             abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value
                         else:
-                            abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value * zscale
-
+                            scaled_value = (float(row[element]) if element in row and not pd.isna(row[element]) else default_value) * zscale
+                            abundances[element] = scaled_value
+                            total_metal_mass += scaled_value
+                            
                     zstar = calculate_metallicity_massb(abundances)
-                    helium_abundance = He_number_abundance(abundances)
+                    
+                    #Keep He fixed and adjust H so the total remains 1
+                    helium_abundance = abundances["HE"]
+                    hydrogen_abundance = 1.0 - (total_metal_mass + helium_abundance)
+
+                    remark = ""
+
+                    if hydrogen_abundance >= 0:
+                        abundances["H"] = hydrogen_abundance
+                    else:
+                        remark = "WARNING: Abundances exceed 1. Check input values."
+                        hydrogen_abundance = max(0, hydrogen_abundance)    
 
                     pointer = -1
 
@@ -650,11 +664,11 @@ def upload_csv():
                         wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
 
                     with open(results_csv_path, mode='a', newline='') as f:
-                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Zscale", "Mass Loss Rate", "Qbar", "Alpha", "Q0", *abundances_data.keys()])
+                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Zscale", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Remark", *abundances_data.keys()])
                         if not csv_header_written:
                             writer.writeheader()
                             csv_header_written = True
-                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Zscale": row["zscale"], "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", **abundances_data})
+                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Zscale": row["zscale"], "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", "Remark":remark, **abundances_data})
                  
                 # Save results to CSV file
                 #results_csv_path = os.path.join(batch_output_dir, "results.csv")

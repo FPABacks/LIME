@@ -107,12 +107,12 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    IF(SIZE(tt_list).NE.N_tt) STOP '---- tt Length mismatch ----'
    IF(SIZE(lgT_list).NE.N_lgT) STOP '---- lgT Length mismatch ----'
    IF(SIZE(lgD_list).NE.N_lgD) STOP '---- lgD Length mismatch ----'
-   WRITE(*,*)'Grid - dine'
-   WRITE(*,*) " "
+   !WRITE(*,*)'Grid - dine'
+   !WRITE(*,*) " "
    CALL  flush(stdout) 
   
    
-   WRITE(*,*)'Creating output destionation - ',TRIM(DIR)
+   !WRITE(*,*)'Creating output destionation - ',TRIM(DIR)
    CALL EXECUTE_COMMAND_LINE('mkdir -p '//TRIM(DIR), WAIT=.TRUE.)
 
    ! ! create Q_0 outpute file
@@ -120,7 +120,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    ! WRITE(ID_notQ,*) 0.0d0, lgT_list
 
    ! create Qbar outpute file
-   WRITE(*,*) TRIM(DIR)//'/Qb_TD'
+   !WRITE(*,*) TRIM(DIR)//'/Qb_TD'
    OPEN (unit = ID_barQ, file = TRIM(DIR)//'/Qb_TD', FORM='formatted',STATUS='unknown', ACTION='write')
    WRITE(ID_barQ,*) 0.0d0, lgT_list
 
@@ -128,24 +128,26 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    OPEN (unit = ID_Ke, file = TRIM(DIR)//'/Ke_TD', FORM='formatted',STATUS='unknown', ACTION='write')
    WRITE(ID_Ke,*) 0.0d0, lgT_list
 
-   WRITE(*,*)'Creating output destionation - done'
-   WRITE(*,*) " "
+   !WRITE(*,*)'Creating output destionation - done'
+   !WRITE(*,*) " "
    CALL  flush(stdout) 
 
    ! Step 1) Get atomic data [done], aboundence data [done], Line data [done] (use X = 1 for H no Y|=0 !!)
-   WRITE(*,*)'Initialise ATOM and NUMB'
+   !WRITE(*,*)'Initialise ATOM and NUMB'
    CALL ATOM_DATA%Initialise(verbose=ver)
-   IF (X_mass.GT.-1) THEN
-      WRITE(*,*) "  >Using input composition"
-      Y_mass = (1.0d0 - X_mass - Z_mass)
-      CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac=Y_mass, DIR=DIR, verbose=ver)
-   ELSE 
-      WRITE(*,*) "  >Using Solar composition"
-      CALL NUMB_DENS%Initialise(ATOM_DATA, DIR=DIR, verbose=ver)
-   END IF
+   CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac=Y_mass, DIR=DIR, verbose=ver)
    WRITE(*,*) 'X=',NUMB_DENS%X_frac,'Y=',NUMB_DENS%Y_frac,'Z=',1.0d0 - NUMB_DENS%x_frac - NUMB_DENS%Y_frac
-   WRITE(*,*)'ATOM and NUMB  - done'
-   WRITE(*,*) " "
+   !IF (X_mass.GT.-1) THEN
+   !   WRITE(*,*) "  >Using input composition"
+   !   Y_mass = (1.0d0 - X_mass - Z_mass)
+   !   CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac=Y_mass, DIR=DIR, verbose=ver)
+   !ELSE 
+   !   WRITE(*,*) "  >Using Solar composition"
+   !   CALL NUMB_DENS%Initialise(ATOM_DATA, DIR=DIR, verbose=ver)
+   !END IF
+   !WRITE(*,*) 'X=',NUMB_DENS%X_frac,'Y=',NUMB_DENS%Y_frac,'Z=',1.0d0 - NUMB_DENS%x_frac - NUMB_DENS%Y_frac
+   !WRITE(*,*)'ATOM and NUMB  - done'
+   !WRITE(*,*) " "
    CALL  flush(stdout) 
 
    ! Get Line data, but only the first time the subroutine is called.

@@ -447,15 +447,61 @@
             }
         }
         
+        function adjustAbundances() {
+            let totalMassFraction = 0;
+            let nonHydrogenElements = [];
+        
+            for (const element of Object.keys(defaultAbundances)) {
+                if (element !== "H") {
+                    const input = document.getElementById(`abundance-${element}`);
+                    const value = parseFloat(input.value) || 0;
+                    totalMassFraction += value;
+                    nonHydrogenElements.push({ element, value });
+                }
+            }
+        
+            const newHydrogenFraction = 1 - totalMassFraction;
+            if (newHydrogenFraction >= 0) {
+                document.getElementById("abundance-H").value = newHydrogenFraction.toExponential(8);
+            } else {
+                alert("Error: The sum of abundances exceeds 1. Please adjust values.");
+            }
+        }
+        
+        // Attach event listeners to all abundance inputs except hydrogen
+        function attachAbundanceListeners() {
+            for (const element of Object.keys(defaultAbundances)) {
+                if (element !== "H") {
+                    const input = document.getElementById(`abundance-${element}`);
+                    input.addEventListener("input", adjustAbundances);
+                }
+            }
+        }
+        
         function updateAbundances() {
             const zscale = parseFloat(document.getElementById("zscale").value);
-            if (!isNaN(zscale)) {
-                for (const element of Object.keys(defaultAbundances)) {
-                    if (element !== "H" && element !== "HE") {
-                        const input = document.getElementById(`abundance-${element}`);
-                        input.value = (defaultAbundances[element] * zscale).toExponential(8);
-                    }
+            if (isNaN(zscale)) return;
+        
+            let totalMetallicity = 0;
+        
+            // Scale all elements except H and He
+            for (const element of Object.keys(defaultAbundances)) {
+                if (element !== "H" && element !== "HE") {
+                    const input = document.getElementById(`abundance-${element}`);
+                    const newValue = defaultAbundances[element] * zscale;
+                    input.value = newValue.toExponential(8);
+                    totalMetallicity += newValue;
                 }
+            }
+        
+            // Keep Helium fixed and calculate new Hydrogen fraction
+            const heliumFraction = parseFloat(document.getElementById("abundance-HE").value) || defaultAbundances["HE"];
+            const newHydrogenFraction = 1 - (totalMetallicity + heliumFraction);
+        
+            if (newHydrogenFraction >= 0) {
+                document.getElementById("abundance-H").value = newHydrogenFraction.toExponential(8);
+            } else {
+                alert("Error: The sum of abundances exceeds 1. Please adjust values.");
             }
         }
 
@@ -479,6 +525,10 @@
             document.getElementById(tabId).classList.add('active-content');
         }
 
+        // Call after creating the abundance inputs
+        createAbundanceInputs();
+        attachAbundanceListeners();
+        
         function runCalculation() {
             // Get input values
             const luminosity = parseFloat(document.getElementById("luminosity").value);

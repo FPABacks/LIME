@@ -419,6 +419,15 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
         eps_num = []
         delrho_num = [] 
 
+        it_num.clear()
+        mdot_num.clear()
+        qbar_num.clear()
+        alpha_num.clear()
+        q0_num.clear()
+        eps_num.clear()
+        delrho_num.clear()
+
+        gc.collect()
         #Using start guess also for t_cri 
         #t_cri = None
         for iteration in range(max_iterations):
@@ -566,7 +575,6 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             plt.tight_layout()
             plt.savefig(f"{random_subdir}/sim_log.png")
             plt.close()
-
             
            #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
             if iteration < 3:
@@ -600,18 +608,17 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             mdot_old = mdot
             rho = rho_target
 
-            it_num.clear()
-            mdot_num.clear()
-            qbar_num.clear()
-            alpha_num.clear()
-            q0_num.clear()
-            eps_num.clear()
-            delrho_num.clear()
-            gc.collect()
-            
+        it_num.clear()
+        mdot_num.clear()
+        qbar_num.clear()
+        alpha_num.clear()
+        q0_num.clear()
+        eps_num.clear()
+        delrho_num.clear()
+        gc.collect()
+        del it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num
         del rho_initial, mdot, qbar, alpha, q0, parameters
         gc.collect()
-        
         return str(random_subdir)
 
 if __name__ == "__main__":
