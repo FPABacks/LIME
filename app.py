@@ -168,7 +168,15 @@ def extract_data_from_file(file_path):
         if "Q0 =" in line:
             match = re.search(r"Q0 = ([\d.e+-]+)", line)
             if match:
-                last_iteration_data["Q0"] = float(match.group(1))                                     
+                last_iteration_data["Q0"] = float(match.group(1)) 
+        if "vinf =" in line:
+            match = re.search(r"vinf = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["vinf"] = float(match.group(1))
+        if "Zmass =" in line:
+            match = re.search(r"Zmass = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["Zmass"] = float(match.group(1))                                                                                        
     return last_iteration_data
 
 
@@ -254,11 +262,13 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                     wrqbar = float(last_values[1].strip("'"))
                     wralp = float(last_values[2].strip("'"))
                     wrq0 = float(last_values[3].strip("'"))
+                    wrvinf = float(last_values[4].strip("'"))
                     table_data.extend([
                         ("Mass loss rate [solar mass/year]", f"{wrmdot:.3e}"),
                         ("Q bar", f"{wrqbar:.2f}"),
                         ("alpha", f"{wralp:.2f}"),
                         ("Q0", f"{wrq0:.2f}"),
+                        ("vinf [km/s]", f"{wrvinf:.2f}"),
                     ])
         c.setFont("Helvetica", 16)
         table = Table(table_data)
@@ -456,8 +466,10 @@ def process_data():
             wrqbar = iteration_data.get("Qbar", None)
             wralp = iteration_data.get("alpha", None)
             wrq0 = iteration_data.get("Q0", None)
+            wrvinf = iteration_data.get("vinf", None)
+            wrzstar = iteration_data.get("vinf", None)
         else:
-            wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
+            wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar = None, None, None, None, None
 
         # **Send Email if recipient email is provided**
         if recipient_email:
@@ -466,11 +478,12 @@ def process_data():
                 "teff": f"{teff:.1f}",
                 "mstar": f"{mstar:.1f}",
                 "zscale": f"{zscale:.2f}",
-                "zstar": f"{zstar:.3e}",
+                "zstar": f"{wrzstar:.3e}",
                 "mass_loss_rate": f"{wrmdot:.3e}",
                 "qbar": f"{wrqbar:.0f}",
                 "alpha": f"{wralp:.2f}",
-                "q0": f"{wrq0:.0f}"
+                "q0": f"{wrq0:.0f}",
+                "vinf": f"{wrvinf:.2e}" 
             }
 
             email_body = load_dyn_email('./mailing/mail_dyn.j2', email_context)
@@ -656,19 +669,22 @@ def upload_csv():
                                     wrqbar = float(last_values[1].strip("'"))
                                     wralp = float(last_values[2].strip("'"))
                                     wrq0 = float(last_values[3].strip("'"))
+                                    wrvinf = float(last_values[4].strip("'"))
+                                    wrzstar = float(last_values[5].strip("'"))
                                 else:
-                                    wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
+                                    wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar  = None, None, None, None, None
                             else:
-                                wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
+                                wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar = None, None, None, None, None
                     else:
-                        wrmdot, wrqbar, wralp, wrq0 = None, None, None, None
+                        wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar = None, None, None, None, None
 
+                    
                     with open(results_csv_path, mode='a', newline='') as f:
-                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Zscale", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Remark", *abundances_data.keys()])
+                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Zscale", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
                         if not csv_header_written:
                             writer.writeheader()
                             csv_header_written = True
-                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Zscale": row["zscale"], "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", "Remark":remark, **abundances_data})
+                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Zscale": row["zscale"], "Zstar": f"{wrzstar:.3e}", "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", "Vinf": f"{wrvinf:.2e}", "Remark":remark, **abundances_data})
                  
                 # Save results to CSV file
                 #results_csv_path = os.path.join(batch_output_dir, "results.csv")

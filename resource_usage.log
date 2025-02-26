@@ -6719,3 +6719,1483 @@
 2025-02-26 14:23:06,228 -  * Restarting with watchdog (inotify)
 2025-02-26 14:23:06,930 -  * Debugger is active!
 2025-02-26 14:23:06,931 -  * Debugger PIN: 932-791-716
+2025-02-26 14:31:47,230 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2025-02-26 14:31:47,233 -  * Restarting with watchdog (inotify)
+2025-02-26 14:31:47,967 -  * Debugger is active!
+2025-02-26 14:31:47,967 -  * Debugger PIN: 108-976-217
+2025-02-26 14:31:50,600 - 127.0.0.1 - - [26/Feb/2025 14:31:50] "[31m[1mPOST /process_data HTTP/1.1[0m" 400 -
+2025-02-26 14:32:06,279 - 127.0.0.1 - - [26/Feb/2025 14:32:06] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:32:06,296 - 127.0.0.1 - - [26/Feb/2025 14:32:06] "GET /tmp/tmpdrxdfqk4/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:32:28,198 - 127.0.0.1 - - [26/Feb/2025 14:32:28] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:32:28,213 - 127.0.0.1 - - [26/Feb/2025 14:32:28] "GET /tmp/tmpqguicw5x/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:32:46,891 - 127.0.0.1 - - [26/Feb/2025 14:32:46] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:32:46,906 - 127.0.0.1 - - [26/Feb/2025 14:32:46] "GET /tmp/tmp3tab3i5r/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:33:02,601 - 127.0.0.1 - - [26/Feb/2025 14:33:02] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:33:02,618 - 127.0.0.1 - - [26/Feb/2025 14:33:02] "GET /tmp/tmp5oomtl60/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:34:27,551 - 127.0.0.1 - - [26/Feb/2025 14:34:27] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:34:27,565 - 127.0.0.1 - - [26/Feb/2025 14:34:27] "GET /tmp/tmp3suuucob/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:34:58,965 - 127.0.0.1 - - [26/Feb/2025 14:34:58] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:34:58,979 - 127.0.0.1 - - [26/Feb/2025 14:34:58] "GET /tmp/tmpujsbxrps/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:36:07,865 - 127.0.0.1 - - [26/Feb/2025 14:36:07] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:36:07,879 - 127.0.0.1 - - [26/Feb/2025 14:36:07] "GET /tmp/tmpawcihuc0/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:36:52,634 - 127.0.0.1 - - [26/Feb/2025 14:36:52] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:36:52,650 - 127.0.0.1 - - [26/Feb/2025 14:36:52] "GET /tmp/tmp4jj0114g/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:37:32,237 - 127.0.0.1 - - [26/Feb/2025 14:37:32] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:37:32,253 - 127.0.0.1 - - [26/Feb/2025 14:37:32] "GET /tmp/tmpb_jie6fo/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:38:09,752 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET / HTTP/1.1" 200 -
+2025-02-26 14:38:09,844 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/loading.gif HTTP/1.1" 200 -
+2025-02-26 14:38:09,844 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/itr.png HTTP/1.1" 200 -
+2025-02-26 14:38:09,845 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/logo.png HTTP/1.1" 200 -
+2025-02-26 14:38:09,846 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/massloss.png HTTP/1.1" 200 -
+2025-02-26 14:38:09,846 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/Mf.png HTTP/1.1" 200 -
+2025-02-26 14:38:09,847 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/lineparameters.png HTTP/1.1" 200 -
+2025-02-26 14:38:09,855 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/logo1.png HTTP/1.1" 200 -
+2025-02-26 14:38:09,856 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/logo3.png HTTP/1.1" 200 -
+2025-02-26 14:38:09,856 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "GET /static/logo2.png HTTP/1.1" 200 -
+2025-02-26 14:38:09,914 - 127.0.0.1 - - [26/Feb/2025 14:38:09] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-02-26 14:38:42,608 - 127.0.0.1 - - [26/Feb/2025 14:38:42] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:38:42,625 - 127.0.0.1 - - [26/Feb/2025 14:38:42] "GET /tmp/tmpo19nlr2h/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:39:23,212 - 127.0.0.1 - - [26/Feb/2025 14:39:23] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:39:23,226 - 127.0.0.1 - - [26/Feb/2025 14:39:23] "GET /tmp/tmpwg5i4tme/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:39:55,223 - 127.0.0.1 - - [26/Feb/2025 14:39:55] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:39:55,241 - 127.0.0.1 - - [26/Feb/2025 14:39:55] "GET /tmp/tmp87whddew/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:50:21,964 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:50:21,965 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:50:21,983 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:50:23,273 -  * Restarting with watchdog (inotify)
+2025-02-26 14:50:24,009 -  * Debugger is active!
+2025-02-26 14:50:24,010 -  * Debugger PIN: 135-465-718
+2025-02-26 14:51:39,243 - 127.0.0.1 - - [26/Feb/2025 14:51:39] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 14:51:39,259 - 127.0.0.1 - - [26/Feb/2025 14:51:39] "GET /tmp/tmpkpjcp1wz/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 14:54:50,321 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:54:50,339 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:54:51,540 -  * Restarting with watchdog (inotify)
+2025-02-26 14:54:52,270 -  * Debugger is active!
+2025-02-26 14:54:52,270 -  * Debugger PIN: 128-150-017
+2025-02-26 14:55:10,158 - 127.0.0.1 - - [26/Feb/2025 14:55:10] "[35m[1mPOST /process_data HTTP/1.1[0m" 500 -
+2025-02-26 14:56:25,671 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:56:25,671 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:56:25,689 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:56:26,849 -  * Restarting with watchdog (inotify)
+2025-02-26 14:56:27,585 -  * Debugger is active!
+2025-02-26 14:56:27,586 -  * Debugger PIN: 519-531-005
+2025-02-26 14:56:31,482 - 127.0.0.1 - - [26/Feb/2025 14:56:31] "[35m[1mPOST /process_data HTTP/1.1[0m" 500 -
+2025-02-26 14:56:58,606 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:56:58,624 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:56:59,792 -  * Restarting with watchdog (inotify)
+2025-02-26 14:57:00,549 -  * Debugger is active!
+2025-02-26 14:57:00,549 -  * Debugger PIN: 442-826-548
+2025-02-26 14:57:09,470 - 127.0.0.1 - - [26/Feb/2025 14:57:09] "[35m[1mPOST /process_data HTTP/1.1[0m" 500 -
+2025-02-26 14:58:22,668 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:58:22,686 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 14:58:23,848 -  * Restarting with watchdog (inotify)
+2025-02-26 14:58:24,569 -  * Debugger is active!
+2025-02-26 14:58:24,569 -  * Debugger PIN: 670-454-669
+2025-02-26 15:23:09,674 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:23:09,675 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:23:09,693 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:23:10,856 -  * Restarting with watchdog (inotify)
+2025-02-26 15:23:11,641 -  * Debugger is active!
+2025-02-26 15:23:11,641 -  * Debugger PIN: 138-210-951
+2025-02-26 15:25:07,313 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:25:07,313 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:25:07,332 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:25:08,496 -  * Restarting with watchdog (inotify)
+2025-02-26 15:25:09,229 -  * Debugger is active!
+2025-02-26 15:25:09,230 -  * Debugger PIN: 109-033-725
+2025-02-26 15:26:58,470 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:26:58,470 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:26:58,489 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:26:59,636 -  * Restarting with watchdog (inotify)
+2025-02-26 15:27:00,400 -  * Debugger is active!
+2025-02-26 15:27:00,401 -  * Debugger PIN: 227-395-794
+2025-02-26 15:27:47,394 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:27:47,394 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:27:47,412 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:27:48,559 -  * Restarting with watchdog (inotify)
+2025-02-26 15:27:49,287 -  * Debugger is active!
+2025-02-26 15:27:49,287 -  * Debugger PIN: 832-591-508
+2025-02-26 15:29:38,885 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:29:38,885 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:29:38,903 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:29:40,052 -  * Restarting with watchdog (inotify)
+2025-02-26 15:29:40,815 -  * Debugger is active!
+2025-02-26 15:29:40,815 -  * Debugger PIN: 131-200-635
+2025-02-26 15:31:04,400 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:31:04,400 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:31:04,419 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:31:05,565 -  * Restarting with watchdog (inotify)
+2025-02-26 15:31:06,304 -  * Debugger is active!
+2025-02-26 15:31:06,304 -  * Debugger PIN: 313-206-736
+2025-02-26 15:31:36,251 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:31:36,251 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:31:36,269 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:31:37,423 -  * Restarting with watchdog (inotify)
+2025-02-26 15:31:38,162 -  * Debugger is active!
+2025-02-26 15:31:38,163 -  * Debugger PIN: 271-972-582
+2025-02-26 15:32:19,013 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:32:19,014 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:32:19,033 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:32:20,227 -  * Restarting with watchdog (inotify)
+2025-02-26 15:32:20,956 -  * Debugger is active!
+2025-02-26 15:32:20,956 -  * Debugger PIN: 413-072-376
+2025-02-26 15:33:02,896 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:33:02,896 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:33:02,914 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:33:04,058 -  * Restarting with watchdog (inotify)
+2025-02-26 15:33:04,791 -  * Debugger is active!
+2025-02-26 15:33:04,791 -  * Debugger PIN: 104-301-673
+2025-02-26 15:34:28,695 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:34:28,695 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:34:28,713 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:34:29,855 -  * Restarting with watchdog (inotify)
+2025-02-26 15:34:30,588 -  * Debugger is active!
+2025-02-26 15:34:30,588 -  * Debugger PIN: 644-095-293
+2025-02-26 15:34:58,694 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2025-02-26 15:34:58,696 -  * Restarting with watchdog (inotify)
+2025-02-26 15:34:59,437 -  * Debugger is active!
+2025-02-26 15:34:59,437 -  * Debugger PIN: 859-871-138
+2025-02-26 15:35:00,848 - 127.0.0.1 - - [26/Feb/2025 15:35:00] "GET / HTTP/1.1" 200 -
+2025-02-26 15:35:01,038 - 127.0.0.1 - - [26/Feb/2025 15:35:01] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-02-26 15:35:40,847 - 127.0.0.1 - - [26/Feb/2025 15:35:40] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 15:35:40,864 - 127.0.0.1 - - [26/Feb/2025 15:35:40] "GET /tmp/tmpci4dt9la/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 15:36:33,404 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:36:33,404 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:36:33,414 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 15:36:34,616 -  * Restarting with watchdog (inotify)
+2025-02-26 15:36:35,319 -  * Debugger is active!
+2025-02-26 15:36:35,319 -  * Debugger PIN: 119-059-349
+2025-02-26 15:36:52,642 - 127.0.0.1 - - [26/Feb/2025 15:36:52] "POST /process_data HTTP/1.1" 200 -
+2025-02-26 15:36:52,657 - 127.0.0.1 - - [26/Feb/2025 15:36:52] "GET /tmp/tmpdzpfco73/result/result.pdf HTTP/1.1" 200 -
+2025-02-26 15:38:08,018 - 127.0.0.1 - - [26/Feb/2025 15:38:08] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 15:38:09,363 - CPU Usage: 100.60%, Memory Usage: 341.57 MB
+2025-02-26 15:38:11,355 - CPU Usage: 101.80%, Memory Usage: 342.07 MB
+2025-02-26 15:38:13,373 - CPU Usage: 100.90%, Memory Usage: 342.10 MB
+2025-02-26 15:38:15,400 - CPU Usage: 101.30%, Memory Usage: 342.21 MB
+2025-02-26 15:38:17,810 - CPU Usage: 101.60%, Memory Usage: 373.84 MB
+2025-02-26 15:38:19,898 - CPU Usage: 102.10%, Memory Usage: 374.09 MB
+2025-02-26 15:38:22,114 - CPU Usage: 101.70%, Memory Usage: 374.09 MB
+2025-02-26 15:38:24,323 - CPU Usage: 101.60%, Memory Usage: 374.09 MB
+2025-02-26 15:38:25,327 - CPU Usage: 101.80%, Memory Usage: 376.50 MB
+2025-02-26 15:38:26,817 - CPU Usage: 102.20%, Memory Usage: 376.50 MB
+2025-02-26 15:38:28,996 - CPU Usage: 101.60%, Memory Usage: 376.50 MB
+2025-02-26 15:38:31,073 - CPU Usage: 102.00%, Memory Usage: 376.50 MB
+2025-02-26 15:38:33,190 - CPU Usage: 101.30%, Memory Usage: 376.50 MB
+2025-02-26 15:38:35,336 - CPU Usage: 101.30%, Memory Usage: 376.50 MB
+2025-02-26 15:38:37,451 - CPU Usage: 101.70%, Memory Usage: 379.41 MB
+2025-02-26 15:38:39,689 - CPU Usage: 101.60%, Memory Usage: 379.48 MB
+2025-02-26 15:38:41,965 - CPU Usage: 102.10%, Memory Usage: 379.38 MB
+2025-02-26 15:38:42,996 - CPU Usage: 101.60%, Memory Usage: 379.31 MB
+2025-02-26 15:38:44,425 - CPU Usage: 101.80%, Memory Usage: 379.31 MB
+2025-02-26 15:38:46,535 - CPU Usage: 101.70%, Memory Usage: 379.34 MB
+2025-02-26 15:38:48,795 - CPU Usage: 101.60%, Memory Usage: 379.34 MB
+2025-02-26 15:38:51,081 - CPU Usage: 101.70%, Memory Usage: 379.34 MB
+2025-02-26 15:38:52,089 - CPU Usage: 101.50%, Memory Usage: 379.37 MB
+2025-02-26 15:38:55,656 - CPU Usage: 60.00%, Memory Usage: 379.37 MB
+2025-02-26 15:38:57,764 - CPU Usage: 101.30%, Memory Usage: 379.33 MB
+2025-02-26 15:38:59,878 - CPU Usage: 102.00%, Memory Usage: 379.43 MB
+2025-02-26 15:39:01,999 - CPU Usage: 102.20%, Memory Usage: 379.39 MB
+2025-02-26 15:39:04,315 - CPU Usage: 101.50%, Memory Usage: 379.36 MB
+2025-02-26 15:39:06,538 - CPU Usage: 101.90%, Memory Usage: 379.35 MB
+2025-02-26 15:39:08,665 - CPU Usage: 102.20%, Memory Usage: 379.35 MB
+2025-02-26 15:39:10,772 - CPU Usage: 101.70%, Memory Usage: 379.25 MB
+2025-02-26 15:39:13,101 - CPU Usage: 101.60%, Memory Usage: 379.33 MB
+2025-02-26 15:39:15,120 - CPU Usage: 101.90%, Memory Usage: 379.39 MB
+2025-02-26 15:39:17,321 - CPU Usage: 101.60%, Memory Usage: 379.29 MB
+2025-02-26 15:39:19,389 - CPU Usage: 101.40%, Memory Usage: 379.51 MB
+2025-02-26 15:39:21,498 - CPU Usage: 102.20%, Memory Usage: 379.41 MB
+2025-02-26 15:39:23,529 - CPU Usage: 102.20%, Memory Usage: 379.45 MB
+2025-02-26 15:39:25,819 - CPU Usage: 101.50%, Memory Usage: 379.44 MB
+2025-02-26 15:39:27,901 - CPU Usage: 101.20%, Memory Usage: 379.44 MB
+2025-02-26 15:39:30,011 - CPU Usage: 101.70%, Memory Usage: 379.43 MB
+2025-02-26 15:39:32,089 - CPU Usage: 101.80%, Memory Usage: 379.14 MB
+2025-02-26 15:39:34,249 - CPU Usage: 101.60%, Memory Usage: 379.14 MB
+2025-02-26 15:39:36,324 - CPU Usage: 101.50%, Memory Usage: 379.12 MB
+2025-02-26 15:39:38,710 - CPU Usage: 102.00%, Memory Usage: 379.02 MB
+2025-02-26 15:39:40,987 - CPU Usage: 102.10%, Memory Usage: 379.15 MB
+2025-02-26 15:39:43,075 - CPU Usage: 101.40%, Memory Usage: 379.05 MB
+2025-02-26 15:39:45,172 - CPU Usage: 100.90%, Memory Usage: 379.05 MB
+2025-02-26 15:39:47,300 - CPU Usage: 101.80%, Memory Usage: 379.05 MB
+2025-02-26 15:39:49,381 - CPU Usage: 101.50%, Memory Usage: 379.05 MB
+2025-02-26 15:39:50,383 - CPU Usage: 100.90%, Memory Usage: 379.05 MB
+2025-02-26 15:39:53,795 - CPU Usage: 102.10%, Memory Usage: 379.05 MB
+2025-02-26 15:39:55,953 - CPU Usage: 101.30%, Memory Usage: 379.05 MB
+2025-02-26 15:39:58,025 - CPU Usage: 102.10%, Memory Usage: 379.05 MB
+2025-02-26 15:40:00,136 - CPU Usage: 101.70%, Memory Usage: 381.61 MB
+2025-02-26 15:40:02,394 - CPU Usage: 101.60%, Memory Usage: 381.61 MB
+2025-02-26 15:40:04,457 - CPU Usage: 102.10%, Memory Usage: 381.61 MB
+2025-02-26 15:40:06,512 - CPU Usage: 101.30%, Memory Usage: 381.61 MB
+2025-02-26 15:40:08,564 - CPU Usage: 102.10%, Memory Usage: 381.61 MB
+2025-02-26 15:40:10,825 - CPU Usage: 101.60%, Memory Usage: 381.61 MB
+2025-02-26 15:40:12,854 - CPU Usage: 101.70%, Memory Usage: 381.61 MB
+2025-02-26 15:40:14,938 - CPU Usage: 101.50%, Memory Usage: 381.61 MB
+2025-02-26 15:40:16,984 - CPU Usage: 101.30%, Memory Usage: 381.61 MB
+2025-02-26 15:40:19,256 - CPU Usage: 101.30%, Memory Usage: 381.61 MB
+2025-02-26 15:40:21,282 - CPU Usage: 101.40%, Memory Usage: 381.61 MB
+2025-02-26 15:40:23,285 - CPU Usage: 101.50%, Memory Usage: 381.61 MB
+2025-02-26 15:40:25,430 - CPU Usage: 101.40%, Memory Usage: 381.61 MB
+2025-02-26 15:40:26,435 - CPU Usage: 86.60%, Memory Usage: 381.61 MB
+2025-02-26 15:40:27,437 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:28,441 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:29,443 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:30,446 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:31,449 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:32,451 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:33,453 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:34,455 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:35,457 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:36,460 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:37,462 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:38,464 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:39,466 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:40,468 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:41,471 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:42,473 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:43,476 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:44,479 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:45,481 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:46,483 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:47,485 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:48,488 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:49,491 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:50,493 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:51,497 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:52,499 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:53,502 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:54,504 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:55,507 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:56,509 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:57,512 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:58,514 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:40:59,516 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:00,519 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:01,522 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:02,524 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:03,527 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:04,529 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:05,531 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:06,534 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:07,536 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:08,538 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:09,542 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:10,545 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:11,547 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:12,550 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:13,552 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:14,555 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:15,557 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:16,559 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:17,562 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:18,564 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:19,567 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:20,569 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:21,571 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:22,574 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:23,576 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:24,580 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:25,582 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:26,584 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:27,586 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:28,588 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:29,591 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:30,593 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:31,595 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:32,598 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:33,600 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:34,602 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:35,605 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:36,607 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:37,610 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:38,611 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:39,613 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:40,615 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:41,617 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:42,619 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:43,620 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:44,622 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:45,624 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:46,627 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:47,629 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:48,631 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:49,634 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:50,636 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:51,638 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:52,641 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:53,644 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:54,647 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:55,649 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:56,652 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:57,656 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:58,658 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:41:59,660 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:00,662 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:01,664 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:02,666 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:03,669 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:04,670 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:05,672 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:06,675 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:07,677 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:08,680 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:09,682 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:10,684 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:11,686 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:12,688 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:13,692 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:14,694 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:15,696 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:16,698 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:17,701 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:18,704 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:19,705 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:20,707 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:21,710 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:22,713 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:23,716 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:24,718 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:25,719 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:26,720 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:27,721 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:28,723 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:29,725 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:30,728 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:31,731 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:32,734 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:33,736 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:34,738 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:35,740 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:36,743 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:37,746 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:38,748 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:39,751 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:40,753 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:41,756 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:42,758 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:43,761 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:44,764 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:45,766 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:46,768 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:47,770 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:48,772 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:49,773 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:50,776 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:51,778 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:52,781 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:53,783 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:54,786 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:55,789 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:56,791 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:57,794 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:58,796 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:42:59,799 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:00,802 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:01,805 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:02,808 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:03,809 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:04,812 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:05,813 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:06,815 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:07,817 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:08,818 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:09,820 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:10,821 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:11,822 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:12,824 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:13,826 - CPU Usage: 0.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:14,829 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:15,831 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:16,834 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:17,836 - CPU Usage: 1.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:18,295 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:43:18,295 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:43:18,313 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:43:18,839 - CPU Usage: 2.00%, Memory Usage: 381.61 MB
+2025-02-26 15:43:19,499 -  * Restarting with watchdog (inotify)
+2025-02-26 15:43:20,207 -  * Debugger is active!
+2025-02-26 15:43:20,207 -  * Debugger PIN: 609-149-864
+2025-02-26 15:52:27,719 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:52:27,719 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:52:27,738 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:52:28,890 -  * Restarting with watchdog (inotify)
+2025-02-26 15:52:29,604 -  * Debugger is active!
+2025-02-26 15:52:29,604 -  * Debugger PIN: 131-429-860
+2025-02-26 15:53:29,837 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:53:29,837 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:53:29,856 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:53:30,326 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:53:30,327 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:53:30,337 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 15:53:31,466 -  * Restarting with watchdog (inotify)
+2025-02-26 15:53:32,202 -  * Debugger is active!
+2025-02-26 15:53:32,202 -  * Debugger PIN: 446-501-855
+2025-02-26 15:53:40,405 - 127.0.0.1 - - [26/Feb/2025 15:53:40] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 15:53:41,864 - CPU Usage: 99.70%, Memory Usage: 148.59 MB
+2025-02-26 15:53:44,097 - CPU Usage: 101.00%, Memory Usage: 276.78 MB
+2025-02-26 15:53:46,110 - CPU Usage: 101.50%, Memory Usage: 329.09 MB
+2025-02-26 15:53:48,147 - CPU Usage: 101.30%, Memory Usage: 332.57 MB
+2025-02-26 15:53:50,472 - CPU Usage: 101.20%, Memory Usage: 341.31 MB
+2025-02-26 15:53:52,628 - CPU Usage: 101.30%, Memory Usage: 341.95 MB
+2025-02-26 15:53:54,923 - CPU Usage: 102.10%, Memory Usage: 341.84 MB
+2025-02-26 15:53:57,261 - CPU Usage: 101.20%, Memory Usage: 341.99 MB
+2025-02-26 15:53:58,265 - CPU Usage: 101.80%, Memory Usage: 343.77 MB
+2025-02-26 15:53:59,796 - CPU Usage: 100.60%, Memory Usage: 343.77 MB
+2025-02-26 15:54:02,084 - CPU Usage: 102.00%, Memory Usage: 375.52 MB
+2025-02-26 15:54:04,234 - CPU Usage: 102.10%, Memory Usage: 375.52 MB
+2025-02-26 15:54:06,362 - CPU Usage: 101.70%, Memory Usage: 375.52 MB
+2025-02-26 15:54:08,506 - CPU Usage: 101.70%, Memory Usage: 375.52 MB
+2025-02-26 15:54:10,601 - CPU Usage: 101.50%, Memory Usage: 379.07 MB
+2025-02-26 15:54:12,852 - CPU Usage: 101.50%, Memory Usage: 379.01 MB
+2025-02-26 15:54:15,060 - CPU Usage: 101.60%, Memory Usage: 378.92 MB
+2025-02-26 15:54:16,066 - CPU Usage: 102.50%, Memory Usage: 378.91 MB
+2025-02-26 15:54:17,564 - CPU Usage: 101.70%, Memory Usage: 378.91 MB
+2025-02-26 15:54:19,652 - CPU Usage: 101.60%, Memory Usage: 378.91 MB
+2025-02-26 15:54:21,893 - CPU Usage: 101.60%, Memory Usage: 378.91 MB
+2025-02-26 15:54:23,994 - CPU Usage: 102.00%, Memory Usage: 378.91 MB
+2025-02-26 15:54:26,318 - CPU Usage: 101.80%, Memory Usage: 378.91 MB
+2025-02-26 15:54:28,394 - CPU Usage: 102.10%, Memory Usage: 378.91 MB
+2025-02-26 15:54:30,453 - CPU Usage: 101.60%, Memory Usage: 378.91 MB
+2025-02-26 15:54:32,556 - CPU Usage: 101.50%, Memory Usage: 378.91 MB
+2025-02-26 15:54:34,922 - CPU Usage: 101.50%, Memory Usage: 378.91 MB
+2025-02-26 15:54:37,449 - CPU Usage: 102.20%, Memory Usage: 378.91 MB
+2025-02-26 15:54:39,794 - CPU Usage: 101.20%, Memory Usage: 378.91 MB
+2025-02-26 15:54:41,969 - CPU Usage: 101.80%, Memory Usage: 378.91 MB
+2025-02-26 15:54:44,053 - CPU Usage: 101.40%, Memory Usage: 379.04 MB
+2025-02-26 15:54:46,407 - CPU Usage: 101.60%, Memory Usage: 379.04 MB
+2025-02-26 15:54:48,445 - CPU Usage: 101.40%, Memory Usage: 379.04 MB
+2025-02-26 15:54:50,681 - CPU Usage: 101.30%, Memory Usage: 379.04 MB
+2025-02-26 15:54:52,870 - CPU Usage: 101.70%, Memory Usage: 379.04 MB
+2025-02-26 15:54:55,002 - CPU Usage: 101.70%, Memory Usage: 379.04 MB
+2025-02-26 15:54:57,104 - CPU Usage: 102.00%, Memory Usage: 379.04 MB
+2025-02-26 15:54:59,509 - CPU Usage: 101.50%, Memory Usage: 379.04 MB
+2025-02-26 15:55:01,619 - CPU Usage: 102.20%, Memory Usage: 379.04 MB
+2025-02-26 15:55:03,744 - CPU Usage: 101.40%, Memory Usage: 379.04 MB
+2025-02-26 15:55:05,863 - CPU Usage: 102.10%, Memory Usage: 379.04 MB
+2025-02-26 15:55:08,058 - CPU Usage: 101.50%, Memory Usage: 379.04 MB
+2025-02-26 15:55:10,152 - CPU Usage: 101.40%, Memory Usage: 379.04 MB
+2025-02-26 15:55:12,485 - CPU Usage: 101.80%, Memory Usage: 379.04 MB
+2025-02-26 15:55:14,548 - CPU Usage: 101.90%, Memory Usage: 379.31 MB
+2025-02-26 15:55:16,648 - CPU Usage: 101.10%, Memory Usage: 379.29 MB
+2025-02-26 15:55:18,731 - CPU Usage: 101.00%, Memory Usage: 379.29 MB
+2025-02-26 15:55:20,870 - CPU Usage: 101.60%, Memory Usage: 379.29 MB
+2025-02-26 15:55:23,056 - CPU Usage: 101.80%, Memory Usage: 379.29 MB
+2025-02-26 15:55:24,059 - CPU Usage: 101.90%, Memory Usage: 379.29 MB
+2025-02-26 15:55:25,590 - CPU Usage: 101.40%, Memory Usage: 379.29 MB
+2025-02-26 15:55:27,583 - CPU Usage: 101.60%, Memory Usage: 379.29 MB
+2025-02-26 15:55:29,730 - CPU Usage: 102.00%, Memory Usage: 379.29 MB
+2025-02-26 15:55:31,807 - CPU Usage: 102.30%, Memory Usage: 379.29 MB
+2025-02-26 15:55:33,892 - CPU Usage: 101.90%, Memory Usage: 379.29 MB
+2025-02-26 15:55:36,127 - CPU Usage: 101.80%, Memory Usage: 379.29 MB
+2025-02-26 15:55:38,191 - CPU Usage: 101.60%, Memory Usage: 379.29 MB
+2025-02-26 15:55:40,274 - CPU Usage: 101.80%, Memory Usage: 379.29 MB
+2025-02-26 15:55:42,296 - CPU Usage: 101.20%, Memory Usage: 379.29 MB
+2025-02-26 15:55:44,546 - CPU Usage: 101.50%, Memory Usage: 379.29 MB
+2025-02-26 15:55:46,569 - CPU Usage: 101.20%, Memory Usage: 381.78 MB
+2025-02-26 15:55:48,615 - CPU Usage: 101.80%, Memory Usage: 381.91 MB
+2025-02-26 15:55:50,769 - CPU Usage: 101.30%, Memory Usage: 381.91 MB
+2025-02-26 15:55:53,153 - CPU Usage: 101.60%, Memory Usage: 381.91 MB
+2025-02-26 15:55:55,165 - CPU Usage: 102.00%, Memory Usage: 381.91 MB
+2025-02-26 15:55:57,189 - CPU Usage: 101.60%, Memory Usage: 381.91 MB
+2025-02-26 15:55:59,181 - CPU Usage: 101.20%, Memory Usage: 381.91 MB
+2025-02-26 15:56:00,187 - CPU Usage: 79.70%, Memory Usage: 381.91 MB
+2025-02-26 15:56:01,190 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:02,193 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:03,196 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:04,199 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:05,202 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:06,205 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:07,207 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:08,210 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:09,212 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:10,215 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:11,217 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:12,220 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:13,222 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:14,223 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:15,225 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:16,227 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:17,230 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:18,232 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:19,235 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:20,238 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:21,241 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:22,243 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:23,245 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:24,248 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:25,249 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:26,251 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:27,253 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:28,256 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:29,259 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:30,259 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:31,262 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:32,265 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:33,267 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:34,270 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:35,273 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:36,276 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:37,279 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:38,282 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:39,284 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:40,287 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:41,290 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:42,293 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:43,296 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:44,298 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:45,300 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:46,303 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:47,306 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:48,309 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:49,311 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:50,315 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:51,317 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:52,318 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:53,320 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:54,323 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:55,326 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:56,329 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:57,333 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:58,336 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:56:59,339 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:00,341 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:01,344 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:02,346 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:03,349 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:04,352 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:05,354 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:06,356 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:07,359 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:08,361 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:09,363 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:10,366 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:11,369 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:12,371 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:13,374 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:14,376 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:15,378 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:16,380 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:17,384 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:18,386 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:19,388 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:20,391 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:21,394 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:22,395 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:23,398 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:24,399 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:25,401 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:26,403 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:27,405 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:28,408 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:29,410 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:30,413 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:31,416 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:32,418 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:33,425 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:34,426 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:35,429 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:36,430 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:37,432 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:38,435 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:39,437 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:40,438 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:41,441 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:42,444 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:43,446 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:44,448 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:45,451 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:46,454 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:47,457 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:48,460 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:49,462 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:50,464 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:51,467 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:52,471 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:53,473 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:54,475 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:55,477 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:56,479 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:57,482 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:58,483 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:57:59,486 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:00,488 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:01,491 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:02,494 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:03,496 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:04,499 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:05,501 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:06,503 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:07,506 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:08,508 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:09,511 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:10,513 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:11,516 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:12,518 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:13,520 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:14,523 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:15,526 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:16,528 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:17,530 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:18,533 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:19,535 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:20,537 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:21,541 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:22,543 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:23,545 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:24,548 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:25,550 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:26,552 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:27,554 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:28,556 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:29,559 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:30,562 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:31,565 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:32,567 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:33,569 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:34,571 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:35,573 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:36,575 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:37,577 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:38,580 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:39,583 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:40,585 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:41,587 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:42,589 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:43,592 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:44,594 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:45,596 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:46,597 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:47,600 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:48,601 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:49,604 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:50,606 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:51,607 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:52,609 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:53,612 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:54,615 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:55,617 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:56,620 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:57,623 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:58,626 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:58:59,628 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:00,630 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:01,633 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:02,636 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:03,638 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:04,640 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:05,643 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:06,645 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:07,647 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:08,650 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:09,652 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:10,654 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:11,657 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:12,659 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:13,661 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:14,663 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:15,666 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:16,669 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:17,672 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:18,675 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:19,677 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:20,680 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:21,682 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:22,684 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:23,687 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:24,689 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:25,691 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:26,692 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:27,693 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:28,695 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:29,696 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:30,698 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:31,699 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:32,701 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:33,703 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:34,705 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:35,707 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:36,710 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:37,713 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:38,715 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:39,717 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:40,720 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:41,722 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:42,724 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:43,727 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:44,729 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:45,732 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:46,734 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:47,736 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:48,739 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:49,741 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:50,743 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:51,746 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:52,748 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:53,750 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:54,753 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:55,756 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:56,757 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:57,759 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:58,761 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 15:59:59,763 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:00,766 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:01,767 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:02,770 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:03,772 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:04,774 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:05,777 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:06,780 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:07,782 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:08,785 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:09,786 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:10,788 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:11,791 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:12,793 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:13,795 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:14,797 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:15,799 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:16,801 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:17,803 - CPU Usage: 0.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:18,805 - CPU Usage: 2.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:19,808 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:20,810 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:21,811 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:22,820 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:23,823 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:24,825 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:25,827 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:26,829 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:27,831 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:28,833 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:29,835 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:30,838 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:31,840 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:32,843 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:33,845 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:34,847 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:35,848 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:36,850 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:37,852 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:38,855 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:39,857 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:40,860 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:41,203 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:00:41,221 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:00:41,861 - CPU Usage: 1.00%, Memory Usage: 381.91 MB
+2025-02-26 16:00:43,065 -  * Restarting with watchdog (inotify)
+2025-02-26 16:00:43,780 -  * Debugger is active!
+2025-02-26 16:00:43,780 -  * Debugger PIN: 627-469-826
+2025-02-26 16:01:03,626 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2025-02-26 16:01:03,629 -  * Restarting with watchdog (inotify)
+2025-02-26 16:01:04,371 -  * Debugger is active!
+2025-02-26 16:01:04,371 -  * Debugger PIN: 101-825-359
+2025-02-26 16:01:18,183 - 127.0.0.1 - - [26/Feb/2025 16:01:18] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 16:01:21,858 - CPU Usage: 101.40%, Memory Usage: 148.92 MB
+2025-02-26 16:01:23,802 - CPU Usage: 101.60%, Memory Usage: 328.68 MB
+2025-02-26 16:01:25,802 - CPU Usage: 101.70%, Memory Usage: 336.20 MB
+2025-02-26 16:01:28,198 - CPU Usage: 101.50%, Memory Usage: 340.88 MB
+2025-02-26 16:01:30,415 - CPU Usage: 101.70%, Memory Usage: 373.38 MB
+2025-02-26 16:01:32,754 - CPU Usage: 101.70%, Memory Usage: 374.86 MB
+2025-02-26 16:01:35,164 - CPU Usage: 101.60%, Memory Usage: 374.86 MB
+2025-02-26 16:01:36,168 - CPU Usage: 102.80%, Memory Usage: 376.31 MB
+2025-02-26 16:01:37,170 - CPU Usage: 14.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:38,173 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:39,175 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:40,177 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:41,180 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:42,182 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:43,184 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:44,186 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:45,189 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:46,190 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:47,193 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:48,195 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:49,198 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:50,199 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:51,201 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:52,203 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:53,205 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:54,208 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:55,210 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:56,212 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:57,215 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:58,217 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:01:59,218 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:00,220 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:01,222 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:02,224 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:03,226 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:04,229 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:05,232 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:06,234 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:07,236 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:08,238 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:09,241 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:10,243 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:11,245 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:12,248 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:13,250 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:14,253 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:15,254 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:16,256 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:17,258 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:18,261 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:19,262 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:20,264 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:21,266 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:22,269 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:23,272 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:24,274 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:25,276 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:26,279 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:27,280 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:28,283 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:29,286 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:30,288 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:31,290 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:32,291 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:33,293 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:34,295 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:35,297 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:36,299 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:37,301 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:38,304 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:39,306 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:40,307 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:41,309 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:42,310 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:43,312 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:44,314 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:45,316 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:46,318 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:47,321 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:48,323 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:49,325 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:50,327 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:51,329 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:52,330 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:53,332 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:54,334 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:55,336 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:56,339 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:57,340 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:58,341 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:02:59,342 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:00,344 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:01,347 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:02,348 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:03,350 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:04,352 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:05,355 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:06,357 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:07,359 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:08,362 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:09,364 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:10,366 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:11,368 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:12,371 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:13,373 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:14,375 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:15,378 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:16,381 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:17,383 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:18,384 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:19,387 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:20,389 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:21,392 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:22,395 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:23,397 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:24,400 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:25,402 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:26,404 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:27,407 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:28,409 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:29,411 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:30,414 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:31,415 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:32,418 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:33,420 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:34,423 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:35,425 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:36,427 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:37,430 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:38,433 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:39,434 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:40,436 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:41,438 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:42,441 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:43,443 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:44,445 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:45,448 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:46,449 - CPU Usage: 2.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:47,451 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:48,453 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:49,455 - CPU Usage: 0.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:50,456 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:51,458 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:52,459 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:53,220 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:03:53,220 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:03:53,239 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:03:53,462 - CPU Usage: 1.00%, Memory Usage: 376.31 MB
+2025-02-26 16:03:54,649 -  * Restarting with watchdog (inotify)
+2025-02-26 16:03:55,378 -  * Debugger is active!
+2025-02-26 16:03:55,378 -  * Debugger PIN: 930-309-906
+2025-02-26 16:05:00,135 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:05:00,135 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:05:00,153 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:05:01,295 -  * Restarting with watchdog (inotify)
+2025-02-26 16:05:02,029 -  * Debugger is active!
+2025-02-26 16:05:02,029 -  * Debugger PIN: 598-938-510
+2025-02-26 16:05:58,087 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:05:58,088 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:05:58,106 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:05:59,251 -  * Restarting with watchdog (inotify)
+2025-02-26 16:05:59,957 -  * Debugger is active!
+2025-02-26 16:05:59,957 -  * Debugger PIN: 112-678-493
+2025-02-26 16:06:05,488 - 127.0.0.1 - - [26/Feb/2025 16:06:05] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 16:06:06,954 - CPU Usage: 97.80%, Memory Usage: 149.41 MB
+2025-02-26 16:06:09,174 - CPU Usage: 101.60%, Memory Usage: 277.45 MB
+2025-02-26 16:06:11,173 - CPU Usage: 101.30%, Memory Usage: 329.07 MB
+2025-02-26 16:06:13,170 - CPU Usage: 100.80%, Memory Usage: 332.64 MB
+2025-02-26 16:06:15,556 - CPU Usage: 101.60%, Memory Usage: 333.95 MB
+2025-02-26 16:06:17,723 - CPU Usage: 101.80%, Memory Usage: 334.04 MB
+2025-02-26 16:06:19,961 - CPU Usage: 101.50%, Memory Usage: 342.45 MB
+2025-02-26 16:06:22,197 - CPU Usage: 101.80%, Memory Usage: 342.48 MB
+2025-02-26 16:06:23,201 - CPU Usage: 102.70%, Memory Usage: 343.64 MB
+2025-02-26 16:06:24,204 - CPU Usage: 3.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:25,206 - CPU Usage: 1.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:26,209 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:27,210 - CPU Usage: 0.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:28,213 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:29,215 - CPU Usage: 1.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:30,217 - CPU Usage: 1.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:31,219 - CPU Usage: 1.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:32,221 - CPU Usage: 1.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:33,223 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:34,224 - CPU Usage: 0.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:35,226 - CPU Usage: 1.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:36,229 - CPU Usage: 0.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:37,231 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:38,233 - CPU Usage: 0.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:39,235 - CPU Usage: 1.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:40,237 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:41,239 - CPU Usage: 0.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:42,241 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:43,243 - CPU Usage: 0.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:44,244 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:45,247 - CPU Usage: 0.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:46,249 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:47,251 - CPU Usage: 0.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:47,392 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:06:47,393 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:06:47,411 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:06:48,252 - CPU Usage: 2.00%, Memory Usage: 343.64 MB
+2025-02-26 16:06:48,620 -  * Restarting with watchdog (inotify)
+2025-02-26 16:06:49,367 -  * Debugger is active!
+2025-02-26 16:06:49,367 -  * Debugger PIN: 750-186-681
+2025-02-26 16:06:51,301 - 127.0.0.1 - - [26/Feb/2025 16:06:51] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 16:06:55,017 - CPU Usage: 101.50%, Memory Usage: 149.30 MB
+2025-02-26 16:06:57,092 - CPU Usage: 101.90%, Memory Usage: 329.25 MB
+2025-02-26 16:06:59,126 - CPU Usage: 102.00%, Memory Usage: 332.92 MB
+2025-02-26 16:07:01,489 - CPU Usage: 101.70%, Memory Usage: 334.34 MB
+2025-02-26 16:07:03,643 - CPU Usage: 101.50%, Memory Usage: 334.37 MB
+2025-02-26 16:07:05,943 - CPU Usage: 101.10%, Memory Usage: 334.37 MB
+2025-02-26 16:07:08,266 - CPU Usage: 101.40%, Memory Usage: 334.41 MB
+2025-02-26 16:07:09,221 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,221 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,222 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,222 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,222 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,222 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,222 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,222 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,223 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,223 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,223 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,223 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,223 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,223 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,224 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,224 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,224 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,224 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,224 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,224 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,224 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,225 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,225 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,225 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,225 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,225 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,225 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,226 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,226 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,226 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,226 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,226 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,226 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,227 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,227 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,227 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,227 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,227 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,227 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,228 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,228 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,228 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,228 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,228 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,228 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,228 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,229 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,229 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,229 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,229 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,229 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,229 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,230 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,230 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,230 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,230 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,230 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,230 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,231 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,231 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,231 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,231 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,231 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,231 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,232 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,232 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,232 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,232 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,232 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,233 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,233 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,233 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,233 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp7tm04odg/final_results.zip', reloading
+2025-02-26 16:07:09,273 - CPU Usage: 99.60%, Memory Usage: 335.47 MB
+2025-02-26 16:07:10,473 -  * Restarting with watchdog (inotify)
+2025-02-26 16:07:11,174 -  * Debugger is active!
+2025-02-26 16:07:11,174 -  * Debugger PIN: 141-570-642
+2025-02-26 16:07:59,345 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:07:59,345 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:07:59,365 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:08:00,519 -  * Restarting with watchdog (inotify)
+2025-02-26 16:08:01,261 -  * Debugger is active!
+2025-02-26 16:08:01,261 -  * Debugger PIN: 100-350-488
+2025-02-26 16:08:10,959 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:08:10,960 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:08:10,980 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:08:12,140 -  * Restarting with watchdog (inotify)
+2025-02-26 16:08:12,866 -  * Debugger is active!
+2025-02-26 16:08:12,866 -  * Debugger PIN: 808-555-958
+2025-02-26 16:08:24,089 - 127.0.0.1 - - [26/Feb/2025 16:08:24] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 16:08:27,789 - CPU Usage: 61.80%, Memory Usage: 149.04 MB
+2025-02-26 16:08:29,808 - CPU Usage: 101.70%, Memory Usage: 329.22 MB
+2025-02-26 16:08:31,848 - CPU Usage: 101.20%, Memory Usage: 337.59 MB
+2025-02-26 16:08:34,215 - CPU Usage: 101.30%, Memory Usage: 338.91 MB
+2025-02-26 16:08:36,348 - CPU Usage: 101.60%, Memory Usage: 339.02 MB
+2025-02-26 16:08:38,614 - CPU Usage: 101.20%, Memory Usage: 339.09 MB
+2025-02-26 16:08:40,910 - CPU Usage: 102.10%, Memory Usage: 339.04 MB
+2025-02-26 16:08:41,867 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,867 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,868 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,868 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,868 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,868 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,869 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,869 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,869 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,869 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,869 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,869 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,870 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,871 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,871 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,871 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,871 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,871 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,871 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,871 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,872 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,872 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,872 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,872 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,872 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,872 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,873 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,873 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,873 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,873 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,873 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,873 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,873 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,874 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,874 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,874 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,874 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,874 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,874 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,874 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,875 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,875 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,875 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,875 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,875 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,876 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,876 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,876 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,876 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,876 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,876 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,876 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,876 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,877 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,877 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,877 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,877 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,877 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,877 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,878 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp19q8ta2w/final_results.zip', reloading
+2025-02-26 16:08:41,917 - CPU Usage: 100.80%, Memory Usage: 340.05 MB
+2025-02-26 16:08:43,115 -  * Restarting with watchdog (inotify)
+2025-02-26 16:08:43,809 -  * Debugger is active!
+2025-02-26 16:08:43,809 -  * Debugger PIN: 701-190-124
+2025-02-26 16:09:16,828 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:09:16,846 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:09:18,008 -  * Restarting with watchdog (inotify)
+2025-02-26 16:09:18,753 -  * Debugger is active!
+2025-02-26 16:09:18,753 -  * Debugger PIN: 756-460-118
+2025-02-26 16:09:22,461 - 127.0.0.1 - - [26/Feb/2025 16:09:22] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 16:09:23,927 - CPU Usage: 100.50%, Memory Usage: 149.29 MB
+2025-02-26 16:09:26,267 - CPU Usage: 101.40%, Memory Usage: 277.07 MB
+2025-02-26 16:09:28,535 - CPU Usage: 101.20%, Memory Usage: 329.33 MB
+2025-02-26 16:09:30,734 - CPU Usage: 101.70%, Memory Usage: 337.67 MB
+2025-02-26 16:09:33,132 - CPU Usage: 101.60%, Memory Usage: 341.99 MB
+2025-02-26 16:09:35,324 - CPU Usage: 101.40%, Memory Usage: 342.23 MB
+2025-02-26 16:09:37,663 - CPU Usage: 101.70%, Memory Usage: 342.18 MB
+2025-02-26 16:09:39,946 - CPU Usage: 101.40%, Memory Usage: 342.23 MB
+2025-02-26 16:09:40,950 - CPU Usage: 101.70%, Memory Usage: 343.38 MB
+2025-02-26 16:09:40,978 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,978 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,979 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,979 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,979 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,979 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,979 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,980 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,980 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,980 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,980 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,980 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,980 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,980 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,981 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,981 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,981 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,981 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,981 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,982 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,982 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,982 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,982 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,982 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,982 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,983 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,983 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,983 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,983 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,983 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,983 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,984 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,984 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,984 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,984 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,984 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,984 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,985 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,985 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,985 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,985 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,985 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,985 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,986 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,986 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,986 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,986 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,986 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,986 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,986 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,987 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,987 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,987 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,987 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,987 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,987 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,988 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,988 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,988 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,988 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,988 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,988 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,988 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,989 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,989 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,989 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,989 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,989 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,990 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,990 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:40,990 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmpq3i5y1ho/final_results.zip', reloading
+2025-02-26 16:09:41,952 - CPU Usage: 6.00%, Memory Usage: 343.38 MB
+2025-02-26 16:09:42,188 -  * Restarting with watchdog (inotify)
+2025-02-26 16:09:42,919 -  * Debugger is active!
+2025-02-26 16:09:42,920 -  * Debugger PIN: 912-751-714
+2025-02-26 16:17:44,200 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:17:44,200 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:17:44,218 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:17:45,359 -  * Restarting with watchdog (inotify)
+2025-02-26 16:17:46,093 -  * Debugger is active!
+2025-02-26 16:17:46,094 -  * Debugger PIN: 567-381-032
+2025-02-26 16:19:54,281 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:19:54,281 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:19:54,290 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:19:55,456 -  * Restarting with watchdog (inotify)
+2025-02-26 16:19:56,172 -  * Debugger is active!
+2025-02-26 16:19:56,172 -  * Debugger PIN: 430-421-944
+2025-02-26 16:20:06,375 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:20:06,385 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:20:07,544 -  * Restarting with watchdog (inotify)
+2025-02-26 16:20:08,252 -  * Debugger is active!
+2025-02-26 16:20:08,252 -  * Debugger PIN: 116-687-713
+2025-02-26 16:31:32,359 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 16:31:32,378 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 16:31:33,537 -  * Restarting with watchdog (inotify)
+2025-02-26 16:31:36,030 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2025-02-26 16:31:36,033 -  * Restarting with watchdog (inotify)
+2025-02-26 16:31:36,778 -  * Debugger is active!
+2025-02-26 16:31:36,778 -  * Debugger PIN: 669-673-939
+2025-02-26 16:31:46,038 - 127.0.0.1 - - [26/Feb/2025 16:31:46] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 16:31:49,725 - CPU Usage: 101.30%, Memory Usage: 149.41 MB
+2025-02-26 16:31:51,715 - CPU Usage: 101.40%, Memory Usage: 329.39 MB
+2025-02-26 16:31:53,763 - CPU Usage: 101.90%, Memory Usage: 337.71 MB
+2025-02-26 16:31:56,152 - CPU Usage: 102.20%, Memory Usage: 341.93 MB
+2025-02-26 16:31:58,351 - CPU Usage: 101.70%, Memory Usage: 341.99 MB
+2025-02-26 16:32:00,637 - CPU Usage: 101.60%, Memory Usage: 341.99 MB
+2025-02-26 16:32:02,916 - CPU Usage: 101.60%, Memory Usage: 342.12 MB
+2025-02-26 16:32:03,923 - CPU Usage: 101.60%, Memory Usage: 343.42 MB
+2025-02-26 16:32:04,926 - CPU Usage: 5.00%, Memory Usage: 343.42 MB
+2025-02-26 16:32:05,928 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:06,931 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:07,933 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:08,935 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:09,937 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:10,940 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:11,942 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:12,945 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:13,948 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:14,949 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:15,951 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:16,952 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:17,955 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:18,957 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:19,960 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:20,962 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:21,964 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:22,966 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:23,967 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:24,969 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:25,971 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:26,973 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:27,976 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:28,977 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:29,980 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:30,982 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:31,984 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:32,985 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:33,987 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:34,989 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:35,991 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:36,991 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:37,994 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:38,997 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:39,999 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:41,001 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:42,003 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:43,005 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:44,007 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:45,009 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:46,011 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:47,013 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:48,015 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:49,018 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:50,020 - CPU Usage: 0.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:51,022 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:52,024 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:53,027 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:54,029 - CPU Usage: 1.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:54,729 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 16:32:54,729 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 16:32:54,739 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/mcak_explore.py', reloading
+2025-02-26 16:32:55,031 - CPU Usage: 2.00%, Memory Usage: 343.55 MB
+2025-02-26 16:32:56,228 -  * Restarting with watchdog (inotify)
+2025-02-26 16:32:56,947 -  * Debugger is active!
+2025-02-26 16:32:56,947 -  * Debugger PIN: 201-766-152
+2025-02-26 16:33:05,544 - 127.0.0.1 - - [26/Feb/2025 16:33:05] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 16:33:06,992 - CPU Usage: 100.50%, Memory Usage: 149.30 MB
+2025-02-26 16:33:09,199 - CPU Usage: 101.60%, Memory Usage: 281.50 MB
+2025-02-26 16:33:11,164 - CPU Usage: 102.00%, Memory Usage: 328.81 MB
+2025-02-26 16:33:13,148 - CPU Usage: 101.80%, Memory Usage: 336.27 MB
+2025-02-26 16:33:15,511 - CPU Usage: 101.60%, Memory Usage: 339.48 MB
+2025-02-26 16:33:17,617 - CPU Usage: 101.80%, Memory Usage: 344.57 MB
+2025-02-26 16:33:19,850 - CPU Usage: 101.80%, Memory Usage: 344.57 MB
+2025-02-26 16:33:22,064 - CPU Usage: 101.80%, Memory Usage: 344.57 MB
+2025-02-26 16:33:23,070 - CPU Usage: 101.70%, Memory Usage: 345.88 MB
+2025-02-26 16:33:24,072 - CPU Usage: 4.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:25,074 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:26,076 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:27,080 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:28,083 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:29,085 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:30,087 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:31,090 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:32,092 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:33,099 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:34,100 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:35,102 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:36,105 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:37,107 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:38,109 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:39,113 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:40,115 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:41,116 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:42,118 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:43,121 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:44,123 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:45,125 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:46,126 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:47,129 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:48,131 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:49,133 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:50,135 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:51,138 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:52,141 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:53,142 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:54,145 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:55,147 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:56,149 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:57,150 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:58,152 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:33:59,153 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:00,155 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:01,158 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:02,159 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:03,160 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:04,162 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:05,164 - CPU Usage: 0.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:06,166 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:07,167 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:08,170 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:09,171 - CPU Usage: 1.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:09,328 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:34:09,346 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/app.py', reloading
+2025-02-26 16:34:10,173 - CPU Usage: 2.00%, Memory Usage: 345.88 MB
+2025-02-26 16:34:10,563 -  * Restarting with watchdog (inotify)
+2025-02-26 16:34:11,292 -  * Debugger is active!
+2025-02-26 16:34:11,292 -  * Debugger PIN: 508-272-675
+2025-02-26 16:34:17,979 - 127.0.0.1 - - [26/Feb/2025 16:34:17] "POST /upload_csv HTTP/1.1" 200 -
+2025-02-26 16:34:19,426 - CPU Usage: 97.60%, Memory Usage: 149.38 MB
+2025-02-26 16:34:21,676 - CPU Usage: 101.40%, Memory Usage: 281.91 MB
+2025-02-26 16:34:23,672 - CPU Usage: 102.10%, Memory Usage: 331.28 MB
+2025-02-26 16:34:25,676 - CPU Usage: 101.70%, Memory Usage: 336.89 MB
+2025-02-26 16:34:27,990 - CPU Usage: 101.80%, Memory Usage: 340.12 MB
+2025-02-26 16:34:30,086 - CPU Usage: 101.50%, Memory Usage: 342.95 MB
+2025-02-26 16:34:32,317 - CPU Usage: 101.70%, Memory Usage: 342.95 MB
+2025-02-26 16:34:34,522 - CPU Usage: 101.70%, Memory Usage: 342.90 MB
+2025-02-26 16:34:35,529 - CPU Usage: 101.40%, Memory Usage: 345.17 MB
+2025-02-26 16:34:35,557 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,557 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,558 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,558 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,558 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,558 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,558 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,558 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,559 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,559 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,559 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,559 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,559 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,559 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,560 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,560 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,560 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,560 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,560 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,560 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,561 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,561 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,561 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,561 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,561 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,561 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,561 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,562 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,562 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,562 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,562 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,562 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,562 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,563 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,563 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,563 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,563 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,563 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,563 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,563 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,564 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,564 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,564 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,564 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,564 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,564 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,564 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,565 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,565 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,565 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,565 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,565 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,565 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,566 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,566 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,566 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,566 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,566 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,566 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,566 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,567 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,567 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,567 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,567 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,567 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,567 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,567 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,568 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,568 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,568 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,568 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,568 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,568 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:35,580 -  * Detected change in '/home/dwaipayand/Mforce_MCAK/web/CAK/tmp/tmp4zf_m8u3/final_results.zip', reloading
+2025-02-26 16:34:36,531 - CPU Usage: 7.00%, Memory Usage: 345.17 MB
+2025-02-26 16:34:36,781 -  * Restarting with watchdog (inotify)
+2025-02-26 16:34:37,469 -  * Debugger is active!
+2025-02-26 16:34:37,470 -  * Debugger PIN: 103-028-446

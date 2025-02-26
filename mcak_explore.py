@@ -117,7 +117,7 @@ def fit_data(file_path, t_cri):
 
     p0 = None
     # Limits on alpha and Q0 
-    bounds = ([0.01, 1e-5], [0.98, 1e8])
+    bounds = ([0.01, 1e-5], [0.95, 1e8])
 
     try:
         popt, _ = curve_fit(lgM, lgt_filtered, lgMt_filtered, p0=p0, bounds=bounds, method='trf')
@@ -130,8 +130,8 @@ def fit_data(file_path, t_cri):
         #popt, _ = curve_fit(lgM, lgt_filtered, lgMt_filtered, p0=p0, bounds=bounds, method='lm')
         
     alpha, Q0 = popt
-    if alpha > 0.98:
-        alpha = 0.98 
+    if alpha > 0.95:
+        alpha = 0.95 
     print('Q0, alpha:',Q0,alpha)
     return Qb, alpha, Q0, lgt_filtered
 
@@ -196,6 +196,13 @@ def construct_output_filename(T, D):
 def radius_calc(lum,teff):
   radius = np.sqrt(lum/(4*np.pi*cgs.sb*teff**4))
   return radius
+
+def vinf_Kudritzki(alpha, vesc):
+    f1 = 8/5*(1-3/4*alpha)
+    f3 = 1-0.3*np.exp(-vesc/300)
+    #print(f1,f3, 2.25*alpha/(1-alpha), alpha)
+    vinf = 2.25*alpha/(1-alpha)*vesc*f1*f3
+    return vinf
 
 def Vink(teff,lum,mstar,game,z):
   "Vink et al 2001"
@@ -488,6 +495,10 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             
             rel_rho = 1. - rho_target / rho
             rel_mdot = 1. - mdot / mdot_old
+
+            vinf = vinf_Kudritzki(alpha,v_esc)
+            # in km/s
+            vinf = vinf/1.e5
            
             if np.isnan(rho_target):
                raise ValueError('NaN in rho')
@@ -508,6 +519,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             log_print(f"rel_mdot = {rel_mdot}, rel_rho = {rel_rho}")
             log_print(f"kappa_e = {kap_e}, Gamma_e = {gamma_e}, vesc = {v_esc}, rat = {rat}, phi_cook = {phi_cook}")
             log_print(f"Qbar = {qbar}, alpha = {alpha}, Q0 = {q0}")
+            log_print(f"vinf = {vinf}")
             log_print(f"t_crit = {t_cri}")
             log_print(f"density = {rho}")
             log_print(f"Mass loss rate = {mdot*cgs.year/cgs.Msun}")
@@ -583,25 +595,25 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             if iteration >= 3 and mdot_lim < 1:
                 failure_reason = "Line-driven mass loss is not possible. Consider increasing luminosity/mass ratio or metallicity."
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan)
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"FAILURE: {failure_reason}"
 
             if alpha > 0.95:
                 failure_reason = "Alpha parameter too high, approaching theoretical divergence."
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan)
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"FAILURE: {failure_reason}"
 
             # Convergence Criteria
             if iteration >= 3 and abs(rel_rho) <= tolerance and abs(rel_mdot) <= tolerance:
-                log_print("Converged final values (mdot, Qbar, alpha, Q0):")
-                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0)
+                log_print("Converged final values (mdot, Qbar, alpha, Q0, vinf, zstar):")
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star)
                 return str(random_subdir)
 
             if iteration == max_iterations - 1 and (abs(rel_rho) > 1.e-2 or abs(rel_mdot) > 1.e-2):
                 failure_reason = "The model did not converge after the maximum allowed iterations."
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan)
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"FAILURE: {failure_reason}"
 
             # Update values for the next iteration
