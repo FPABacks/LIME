@@ -79,7 +79,7 @@ def lgM(lgt, alpha, Q0):
     lgM = np.log10(1/(1-alpha)) + np.log10((1+Q0*t)**(1-alpha) - 1) - np.log10(Q0*t)
     return np.nan_to_num(lgM, nan=0.0)
 
-def fit_data(file_path, t_cri):
+def fit_data(file_path, t_cri, log_print):
     """    
     Fit the data from the output file and extract line-force parameters Qb, alpha, and Q0.
     Adjust the fitting range based on t_cri if provided; otherwise, default to 1e-3 Qb.
@@ -110,7 +110,7 @@ def fit_data(file_path, t_cri):
     lgt_filtered = lgt[indices]
     Mt_filtered = Mt[indices]
     fit_max = max(lgt_filtered)
-    print("lgt Fitted until:",fit_max)
+    log_print("lgt Fitted until:",fit_max)
     lgMt_filtered = np.log10(Mt_filtered / Qb)
     p0 = None
     # Limits on alpha and Q0
@@ -128,14 +128,14 @@ def fit_data(file_path, t_cri):
     alpha, Q0 = popt
     # global alpha
     alpha_g = alpha
-    print("Q0, alpha:",Q0,alpha)
+    log_print("Q0, alpha:",Q0,alpha)
     # Compute alternative alpha_2 as local finite-difference slope around t_cri.
     # We use the two points in lgt_filtered whose values are closest to log10(t_cri)
     target = np.log10(t_cri)
     sorted_idx = np.argsort(np.abs(lgt_filtered - target))
     if len(sorted_idx) < 2:
         alpha_2 = np.nan
-        print("Not enough data points to compute local slope alpha_2.")
+        log_print("Not enough data points to compute local slope alpha_2.")
     else:
         i1, i2 = sorted_idx[:2]
         # Ensure that the points are in increasing order of lgt
@@ -147,21 +147,21 @@ def fit_data(file_path, t_cri):
             alpha_2 = (lgMt_filtered[i2] - lgMt_filtered[i1]) / delta
         else:
             alpha_2 = np.nan
-            print("Division by zero encountered while computing alpha_2.")
+            log_print("Division by zero encountered while computing alpha_2.")
         alpha_2 = - alpha_2
-        print("alternative local finitie difference alpha =",alpha_2)
+        log_print("alternative local finitie difference alpha =",alpha_2)
     if alpha > 0.985:
         if alpha_2 <= 0.985:
-            print("global alpha too close to diverging limit, resorting")
-            print("to local alpha at t_cri:",alpha_2)
+            log_print("global alpha too close to diverging limit, resorting")
+            log_print("to local alpha at t_cri:",alpha_2)
             alpha = alpha_2
         else:
             alpha = 0.99
-            print("too close to alpha divergence limit, setting =",alpha)
-    print("final alpha, alpha-local:",alpha,alpha_2)
+            log_print("too close to alpha divergence limit, setting =",alpha)
+    log_print("final alpha, alpha-local:",alpha,alpha_2)
     return Qb, alpha, Q0, lgt_filtered, alpha_g, alpha_2
 
-def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
+def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir,lgt_filtered,log_print):
     """
     Plot original data and reconstructed curve for visual comparison.
     """
@@ -169,7 +169,7 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     data = np.loadtxt(file_path, unpack=True)
     lgt, M_original = data[0], data[1]
     
-    _, _, _, lgt_filtered, _,_  = fit_data(file_path, t_cri)
+    #_, _, _, lgt_filtered, _,_  = fit_data(file_path, t_cri,log_print)
     
     M_reconstructed = Qb * 10**lgM(lgt_filtered, alpha, Q0)
     
@@ -504,9 +504,9 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             phi_cook = 3.0 * rat**(0.3 * (0.36 + np.log10(rat)))
     
         
-            qbar, alpha, q0, lgt_filtered, alpha_g, alpha_2 = fit_data(file_path, t_cri)
+            qbar, alpha, q0, lgt_filtered, alpha_g, alpha_2 = fit_data(file_path, t_cri,log_print)
             
-            plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir)
+            plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir,lgt_filtered,log_print)
             
             mdot_old = mdot
         

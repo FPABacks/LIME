@@ -783,25 +783,26 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      END IF
  
      ! Check the input X_frac + Y_frac < 1 and Y_frac |= 0
-     IF ((PRESENT(X_frac).AND.PRESENT(Y_frac)) ) THEN
-        IF( (X_frac + Y_frac) .LE. 1.0d0) THEN
-           IF(ver) PRINT*, '  - Input mass fractions provided'
-           USE_solar_composition = .FALSE.
-           IF(X_frac.NE.0.0d0) THEN
-              IF(ver) PRINT*, '  - Scaling aboundances to H'
-              USE_H_normalisation = .TRUE.
-           ELSE
-              IF(ver) PRINT*, '  - Scaling aboundances to He'
-              USE_H_normalisation = .FALSE.
-           END IF
-        ELSE
-           STOP '---- Error in input X and Y mass fractions (X+Y > 1 or Y = 0) ----'
-        END IF
-     ELSE
-        USE_solar_composition = .TRUE.
-        USE_H_normalisation = .TRUE.
-        IF(ver) PRINT*, '  - No input mass fractions provided: Using solar values'
-     END IF
+     ! DD removed this - not necessary anymore
+     !IF ((PRESENT(X_frac).AND.PRESENT(Y_frac)) ) THEN
+     !   IF( (X_frac + Y_frac) .LE. 1.0d0) THEN
+     !      IF(ver) PRINT*, '  - Input mass fractions provided'
+     !      USE_solar_composition = .FALSE.
+     !      IF(X_frac.NE.0.0d0) THEN
+     !         IF(ver) PRINT*, '  - Scaling aboundances to H'
+     !         USE_H_normalisation = .TRUE.
+     !      ELSE
+     !         IF(ver) PRINT*, '  - Scaling aboundances to He'
+     !         USE_H_normalisation = .FALSE.
+     !      END IF
+     !   ELSE
+     !      STOP '---- Error in input X and Y mass fractions (X+Y > 1 or Y = 0) ----'
+     !   END IF
+     !ELSE
+     !   USE_solar_composition = .TRUE.
+     !   USE_H_normalisation = .TRUE.
+     !   IF(ver) PRINT*, '  - No input mass fractions provided: Using solar values'
+     !END IF
  
      ! Allocate and zero out the occupation number arraies
      ALLOCATE(OBJ%Aboundance(MaxZ))
@@ -894,6 +895,8 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      ! Allocate the input X and Y mass fractions
      OBJ%X_frac = X_frac
      OBJ%Y_frac = Y_frac
+
+     WRITE(*,*) 'X=',X_frac,'Y=',Y_frac,'Z=',Z_frac
      
 
      !OBJ%Aboundance(:) = OBJ%Aboundance(:)
@@ -1010,7 +1013,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
      ! ----- Executing 3)
      CALL Comput_Partition_Functions(OBJ,ATOMIC_DATA,T,verbose = ver)
-     IF(ANY(ISNAN(OBJ%Partition))) STOP '---- Partition functuon Is NaN ----'
+     IF(ANY(ISNAN(OBJ%Partition))) STOP '---- Partition function Is NaN ----'
      IF(ver) PRINT*, '  - Partition Functions READY'
  
  
@@ -1035,15 +1038,15 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
            ! chech if the change in the numberdencity is less then 0.1%
            ! is yes Ne is converged - exit the loop -- otherwithe continue
            IF(ABS(N_electron_old/N_electron_new - 1) .LT. 1.0d-3) THEN
-              IF(ver) PRINT*,'   > Electron Number Dencity converged',OBJ%Electron
+              IF(ver) PRINT*,'   > Electron Number Density converged',OBJ%Electron
               EXIT
            ELSE
-              IF(ver) PRINT*,'   > Iteration:',ind,' Electron Number Dencity:',OBJ%Electron
+              IF(ver) PRINT*,'   > Iteration:',ind,' Electron Number Density:',OBJ%Electron
            END IF
         END DO
  
         ! if the maximum number of iterations was reached terminate
-        IF(ind.GT.99) STOP '---- Electron Number Dencity NOT converged ----'
+        IF(ind.GT.99) STOP '---- Electron Number Density NOT converged ----'
      ELSE
  
         ! compute the ionisation structure using the input electrone number density

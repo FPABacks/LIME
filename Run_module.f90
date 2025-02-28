@@ -70,24 +70,24 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    TYPE(OCCUPATION_NUMBER_TYPE) :: NUMB_DENS !(30)
 
 
-   WRITE(*,*) "----- Input Setup -----"
+   !WRITE(*,*) "----- Input Setup -----"
    !WRITE(*,*)'Setting Chemical composition to X=',X_mass,'Z=',Z_mass
-   WRITE(*,*) " "
-   WRITE(*,*)'         Min                       Max                       N'
-   WRITE(*,*)'Lg T  ',lgTmin, lgTmax, N_lgT
-   WRITE(*,*)'Lg D  ',lgDmin, lgDmax, N_lgD
-   WRITE(*,*)'Lg t  ',lgttmin, lgttmax, N_tt
-   IF (Ke_norm .LE. 0.0d0) THEN
-      WRITE(*,*)'Normalisation set to actual Ke' ! if input is set to 0 normalize to actual value of Kappa_e
-   ELSE
-      WRITE(*,*)'Normalisation set to fiducioal Ke = ', Ke_norm
-   ENDIF
+   !WRITE(*,*) " "
+   !WRITE(*,*)'         Min                       Max                       N'
+   !WRITE(*,*)'Lg T  ',lgTmin, lgTmax, N_lgT
+   !WRITE(*,*)'Lg D  ',lgDmin, lgDmax, N_lgD
+   !WRITE(*,*)'Lg t  ',lgttmin, lgttmax, N_tt
+   !IF (Ke_norm .LE. 0.0d0) THEN
+   !   WRITE(*,*)'Normalisation set to actual Ke' ! if input is set to 0 normalize to actual value of Kappa_e
+   !ELSE
+   !   WRITE(*,*)'Normalisation set to fiducioal Ke = ', Ke_norm
+   !ENDIF
    WRITE(*,*)'Verbose = ',ver
-   WRITE(*,*)'Output destionation -',DIR
-   WRITE(*,*) " "
+   WRITE(*,*)'Output destination -',DIR
+   !WRITE(*,*) " "
    CALL  flush(stdout) 
 
-   WRITE(*,*)'Initialise Grid'
+   !WRITE(*,*)'Initialise Grid'
    CALL  flush(stdout) 
    
    ALLOCATE(barQ_list(N_lgT))
@@ -136,7 +136,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    !WRITE(*,*)'Initialise ATOM and NUMB'
    CALL ATOM_DATA%Initialise(verbose=ver)
    CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac=Y_mass, DIR=DIR, verbose=ver)
-   WRITE(*,*) 'X=',NUMB_DENS%X_frac,'Y=',NUMB_DENS%Y_frac,'Z=',1.0d0 - NUMB_DENS%x_frac - NUMB_DENS%Y_frac
+   !WRITE(*,*) 'X=',NUMB_DENS%X_frac,'Y=',NUMB_DENS%Y_frac,'Z=',1.0d0 - NUMB_DENS%x_frac - NUMB_DENS%Y_frac
    !IF (X_mass.GT.-1) THEN
    !   WRITE(*,*) "  >Using input composition"
    !   Y_mass = (1.0d0 - X_mass - Z_mass)
@@ -151,9 +151,9 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    CALL  flush(stdout) 
 
    ! Get Line data, but only the first time the subroutine is called.
-   WRITE(*,*) first_run
+   WRITE(*,*) 'first iterative loop', first_run
    if (first_run) then
-      WRITE(*,*)'Initialise Line Data'
+      !WRITE(*,*)'Initialise Line Data'
       CALL LINE_DATA%Initialise(verbose  = ver)
       WRITE(*,*)'  > Number of lines =',LINE_DATA%Total_line_numb
 
@@ -175,8 +175,8 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
       DO T_gird_counter = 1,N_lgT
          T = 10.0d0**lgT_list(T_gird_counter)
 
-         WRITE(*,*)'Step ',(D_gird_counter - 1)*N_lgD + T_gird_counter,'/',N_lgD*N_lgT
-         WRITE(*,*)'Set lgT =',lgT_list(T_gird_counter),' lgD =',lgD_list(D_gird_counter)
+         !WRITE(*,*)'Step ',(D_gird_counter - 1)*N_lgD + T_gird_counter,'/',N_lgD*N_lgT
+         !WRITE(*,*)'Set lgT =',lgT_list(T_gird_counter),' lgD =',lgD_list(D_gird_counter)
          CALL  flush(stdout)
 
          CALL Ilumination_finction(T,nu_i0,W_i)
@@ -186,9 +186,9 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
          CALL NUMB_DENS%Set(rho=D, T=T, verbose=ver)
          ! Dec 17 - test - DD
          kape_list(T_gird_counter) = NUMB_DENS%Electron * sigma_Thom / D
-         WRITE(*,*)' > Kappa_e =', kape_list(T_gird_counter)
+         !WRITE(*,*)' > Kappa_e =', kape_list(T_gird_counter)
 
-         WRITE(*,*)'Line strength'
+         !WRITE(*,*)'Line strength'
          barQ_list(T_gird_counter) = 0.0d0
          ! notQ_list(T_gird_counter) = 0.0d0
 
@@ -233,12 +233,12 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
             barQ_list(T_gird_counter) = barQ_list(T_gird_counter) + q_i(ind1)*W_i(ind1)
             ! notQ_list(T_gird_counter) = notQ_list(T_gird_counter) + q_i(ind1)*q_i(ind1)*W_i(ind1)
          END DO
-         WRITE(*,*)'  > \barQ =',barQ_list(T_gird_counter)
+         !WRITE(*,*)'  > \barQ =',barQ_list(T_gird_counter)
 
          ! notQ_list(T_gird_counter) = notQ_list(T_gird_counter)/barQ_list(T_gird_counter) ! final normalizationa Q0 = (sum wi qi^2)/Qb
          ! WRITE(*,*)'  > Q_not =',notQ_list(T_gird_counter)
 
-         WRITE(*,*)'Compute Mt'
+         !WRITE(*,*)'Compute Mt'
 
          ! Generate the  output name
          WRITE(str_1,'(F4.2)') LOG10(T)
@@ -273,8 +273,8 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
 
          CLOSE(ID_Mt)
 
-         WRITE(*,*)'WRITE Mt - done'
-         WRITE(*,*) " "
+         !WRITE(*,*)'WRITE Mt - done'
+         !WRITE(*,*) " "
          CALL  flush(stdout) 
 
       END DO !T_gird_counter
@@ -293,12 +293,12 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    ! WRITE(*,*)'Write Q not - done'
 
    CLOSE(ID_barQ)
-   WRITE(*,*)'Write bar Q - done'
+   !WRITE(*,*)'Write bar Q - done'
 
    CLOSE(ID_Ke)
-   WRITE(*,*)'Write kappa e - done'
+   !WRITE(*,*)'Write kappa e - done'
 
-   WRITE(*,*)'Program - done'
+   WRITE(*,*)'Mforce - done'
    CALL  flush(stdout) 
 
 CONTAINS
