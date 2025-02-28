@@ -80,61 +80,86 @@ def lgM(lgt, alpha, Q0):
     return np.nan_to_num(lgM, nan=0.0)
 
 def fit_data(file_path, t_cri):
-    """
+    """    
     Fit the data from the output file and extract line-force parameters Qb, alpha, and Q0.
     Adjust the fitting range based on t_cri if provided; otherwise, default to 1e-3 Qb.
+    
     """
     data = np.loadtxt(file_path, unpack=True)
-    lgt, Mt = data[0], data[1]  
-    Qb = np.max(Mt)  
-    #a factor of safety for fitting based on t_cri estimate  
+    lgt, Mt = data[0], data[1]
+    Qb = np.max(Mt)
+    #a factor of safety for fitting based on t_cri estimate
     factor = 3.
-    
+    #factor = 300000.
     min_mt = Qb / 10**3
     if t_cri is None:
-        indices = np.where(Mt >= min_mt)[0]  
+        indices = np.where(Mt >= min_mt)[0]
     else:
-        #see above 
+        #see above
         lg_tcri = np.log10(t_cri*factor)
         indices = np.where(lgt <= lg_tcri)[0]
-        #never fit to less than 0.1*Qbar 
+        #never fit to less than 0.1*Qbar
         if len(indices) > 0:
             indices = np.arange(0, indices[-1] + 3)
-        #    
-        indices2 = np.where(Mt >= min_mt*100.)[0]  
-        if len(indices2) > len(indices): 
+        #
+        indices2 = np.where(Mt >= min_mt*100.)[0]
+        if len(indices2) > len(indices):
             indices = indices2
-
     if len(indices) == 0:
-        raise ValueError("No data points remain after applying t_cri and min_mt filters.")
-     
+        raise ValueError("No data points remain after applying t_cri and min_mt filters")
     lgt_filtered = lgt[indices]
     Mt_filtered = Mt[indices]
     fit_max = max(lgt_filtered)
-    print('lgt Fitted until:',fit_max)
-
+    print("lgt Fitted until:",fit_max)
     lgMt_filtered = np.log10(Mt_filtered / Qb)
-
     p0 = None
-    # Limits on alpha and Q0 
-    bounds = ([0.01, 1e-5], [0.95, 1e8])
-
+    # Limits on alpha and Q0
+    bounds = ([0.01, 1e-5], [0.99, 1e8])
+    
     try:
-        popt, _ = curve_fit(lgM, lgt_filtered, lgMt_filtered, p0=p0, bounds=bounds, method='trf')
+        popt, _ = curve_fit(lgM, lgt_filtered, lgMt_filtered, p0=p0, bounds=bounds, method="trf")
     except RuntimeError:
-        #JS-comment: this needs to be looked at, since when resprting to this method it's typically
-        #for alpha --> 1, and finding fit alpha=1 then crashes code since that's a diverging
-        #limit in the theory. ugly hack for now. 
-        #but generally: need bounds here as well 
-        popt, _ = curve_fit(lgM, lgt_filtered, lgMt_filtered, p0=p0, method='lm')
-        #popt, _ = curve_fit(lgM, lgt_filtered, lgMt_filtered, p0=p0, bounds=bounds, method='lm')
-        
+        #JS-comment: this needs to be looked at, since when resorting to this method it’s typically
+        #for alpha --> 1, and finding fit alpha=1 then crashes code since that’s a diverging
+        #limit in the theory. ugly hack for now.
+        #but generally: need bounds here as well
+        popt, _ = curve_fit(lgM, lgt_filtered, lgMt_filtered, p0=p0, method="lm")
+        #popt, _ = curve_fit(lgM, lgt_filtered, lgMt_filtered, p0=p0, bounds=bounds, method=‘lm’)
     alpha, Q0 = popt
-    if alpha > 0.95:
-        alpha = 0.95 
-    print('Q0, alpha:',Q0,alpha)
-    return Qb, alpha, Q0, lgt_filtered
-
+    # global alpha
+    alpha_g = alpha
+    print("Q0, alpha:",Q0,alpha)
+    # Compute alternative alpha_2 as local finite-difference slope around t_cri.
+    # We use the two points in lgt_filtered whose values are closest to log10(t_cri)
+    target = np.log10(t_cri)
+    sorted_idx = np.argsort(np.abs(lgt_filtered - target))
+    if len(sorted_idx) < 2:
+        alpha_2 = np.nan
+        print("Not enough data points to compute local slope alpha_2.")
+    else:
+        i1, i2 = sorted_idx[:2]
+        # Ensure that the points are in increasing order of lgt
+        if lgt_filtered[i1] > lgt_filtered[i2]:
+            i1, i2 = i2, i1
+        # Compute the finite difference slope; check for division by zero
+        delta = lgt_filtered[i2] - lgt_filtered[i1]
+        if delta != 0:
+            alpha_2 = (lgMt_filtered[i2] - lgMt_filtered[i1]) / delta
+        else:
+            alpha_2 = np.nan
+            print("Division by zero encountered while computing alpha_2.")
+        alpha_2 = - alpha_2
+        print("alternative local finitie difference alpha =",alpha_2)
+    if alpha > 0.985:
+        if alpha_2 <= 0.985:
+            print("global alpha too close to diverging limit, resorting")
+            print("to local alpha at t_cri:",alpha_2)
+            alpha = alpha_2
+        else:
+            alpha = 0.99
+            print("too close to alpha divergence limit, setting =",alpha)
+    print("final alpha, alpha-local:",alpha,alpha_2)
+    return Qb, alpha, Q0, lgt_filtered, alpha_g, alpha_2
 
 def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     """
@@ -144,7 +169,7 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     data = np.loadtxt(file_path, unpack=True)
     lgt, M_original = data[0], data[1]
     
-    _, _, _, lgt_filtered = fit_data(file_path, t_cri)
+    _, _, _, lgt_filtered, _,_  = fit_data(file_path, t_cri)
     
     M_reconstructed = Qb * 10**lgM(lgt_filtered, alpha, Q0)
     
@@ -166,7 +191,7 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir):
     plt.axhline(y=max_M_reconstructed, color='#f08205', linestyle='-.', linewidth=2, label = fr"$\bar{{Q}}$: {np.around(Qb,2)}")
 
     
-    plt.xlabel(r"$ \log_{10} (t)$", fontsize=18)
+    plt.xlabel(r"$ \log_{10} (t = \frac{\kappa_e \rho c}{dv/dr})$", fontsize=18)
     plt.ylabel(r"$ \log_{10} M(t)$", fontsize=18)
     plt.legend(fontsize=16, ncol=2)
     plt.tight_layout()
@@ -479,7 +504,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             phi_cook = 3.0 * rat**(0.3 * (0.36 + np.log10(rat)))
     
         
-            qbar, alpha, q0, lgt_filtered = fit_data(file_path, t_cri)
+            qbar, alpha, q0, lgt_filtered, alpha_g, alpha_2 = fit_data(file_path, t_cri)
             
             plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir)
             
@@ -595,26 +620,33 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             if iteration >= 3 and mdot_lim < 1:
                 failure_reason = "Line-driven mass loss is not possible. Consider increasing luminosity/mass ratio or metallicity."
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
-                return f"FAILURE: {failure_reason}"
-
-            if alpha > 0.95:
-                failure_reason = "Alpha parameter too high, approaching theoretical divergence."
-                log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"FAILURE: {failure_reason}"
 
             # Convergence Criteria
             if iteration >= 3 and abs(rel_rho) <= tolerance and abs(rel_mdot) <= tolerance:
                 log_print("Converged final values (mdot, Qbar, alpha, Q0, vinf, zstar):")
-                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star)
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star, alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
+                return str(random_subdir)
+            
+            if iteration == max_iterations - 1 and alpha > 0.985:
+                failure_reason = "Alpha parameter-fit too high, approaching theoretical divergence."
+                log_print(f"Failure: {failure_reason}")
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
+                return f"FAILURE: {failure_reason}"
+            
+            # reduced cnvergence 
+            if iteration == max_iterations - 1 and (abs(rel_rho) < 1.e-2 or abs(rel_mdot) < 1.e-2):
+                log_print("Converged with reduced tolerance, final values (mdot, Qbar, alpha, Q0, vinf, zstar):")
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
                 return str(random_subdir)
 
             if iteration == max_iterations - 1 and (abs(rel_rho) > 1.e-2 or abs(rel_mdot) > 1.e-2):
                 failure_reason = "The model did not converge after the maximum allowed iterations."
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"FAILURE: {failure_reason}"
+            
 
             # Update values for the next iteration
             mdot_old = mdot

@@ -27,22 +27,6 @@ from jinja2 import Template
 import csv
 import gc
 
-# this just debug resources purpose
-import psutil
-import threading
-import logging
-
-logging.basicConfig(filename="resource_usage.log", level=logging.INFO, format="%(asctime)s - %(message)s")
-
-def log_resource_usage():
-    """Logs memory and CPU usage periodically."""
-    process = psutil.Process()
-    while True:
-        memory_usage = process.memory_info().rss / (1024 * 1024)  
-        cpu_usage = process.cpu_percent(interval=1)  
-        logging.info(f"CPU Usage: {cpu_usage:.2f}%, Memory Usage: {memory_usage:.2f} MB")
-        #time.sleep(10) 
-
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -94,21 +78,18 @@ def He_number_abundance(mass_abundances):
     
     mass_H = mass_abundances.get('H', 0.0)
     mass_He = mass_abundances.get('HE', 0.0)
-    mass_C = mass_abundances.get('C', 0.0)
     
     total_num_abun = sum(mass_abundances[element] / ATOMIC_MASSES[element] for element in mass_abundances)
 
     N_H = (mass_H / ATOMIC_MASSES['H']) / total_num_abun
     N_He = (mass_He / ATOMIC_MASSES['HE']) / total_num_abun
-    N_C = (mass_C / ATOMIC_MASSES['C']) / total_num_abun
-
+    
     if N_H == 0.0:
-        NHe = N_He/N_He
-    elif N_H == 0.0 and N_He == 0.0:
-        NHe = N_He/N_C    
+        NHe = 1e4
+    if N_H == 0.0 and N_He == 0.0:
+        NHe = 1e-4    
     else :
         NHe = N_He/N_H    
-
     return NHe
 
 def extract_data_from_file(file_path):
@@ -190,7 +171,7 @@ def load_dyn_email(filename, context):
         template = Template(file.read())
     return template.render(context)
 
-def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, pointer, batch_output_dir):
+def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, pointer, batch_output_dir, expert_mode):
     """Runs mcak_explore and emails the results"""
     try:
         output_dir = os.path.join(batch_output_dir, pdf_name)
@@ -242,15 +223,32 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         c.drawString(220, page_height - 150, title)
 
         table_data = [
-            ("Parameter", "Quantity"),
+            ("Input Parameter", "Value"),
             ("Luminosity [solar luminosity]", f"{lum:.1f}"),
             ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
             ("Eddington Ratio ", f"{gammae_itr:.2f}"),
             ("Effective Temperature [K]", f"{teff:.1f}"),
-            ("Z scale (scaled to solar)", f"{zscale:.2f}"),
             ("Z star (Calculated)", f"{zstar:.3e}"),
+            ]
+        
+        c.setFont("Helvetica", 16)
+        table = Table(table_data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgreen),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.lavender),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        table.wrapOn(c, page_width, page_height)
+        table.drawOn(c, 70, page_height - 350)
+
+        table_data = [
+            ("Output", "Value"),
             ("Electron scattering opacity ", f"{kappae_itr:.2f}"),
-            ("Critical Sobolev optical depth", f"{tcrit_itr:.2f}"),
+            ("Critical depth", f"{tcrit_itr:.2f}"),
         ]
         
         with open(simlog_path, "r") as f:
@@ -282,7 +280,46 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ]))
         table.wrapOn(c, page_width, page_height)
-        table.drawOn(c, 70, page_height - 500)
+        table.drawOn(c, 70, page_height - 530)
+
+
+        # extra table for more outputs
+
+        if expert_mode:
+            table_data = [
+                ("Extra Output", "Value"),
+                ("Z scaled to solar (input)", f"{zscale:.2e}"),]  
+            with open(simlog_path, "r") as f:
+                lines = f.readlines()
+                if len(lines) >= 2:
+                    last_values = lines[-1].split()
+                    if len(last_values) >= 10:
+                        wralphag = float(last_values[6].strip("'"))
+                        wralpha2 = float(last_values[7].strip("'"))
+                        wrvesc = float(last_values[8].strip("'"))
+                        wrvcri = float(last_values[9].strip("'"))
+                        wrrhocri = float(last_values[10].strip("'"))
+                        table_data.extend([
+                            ("Globally fitted alpha", f"{wralphag:.3f}"),
+                            ("Locally fitted alpha", f"{wralpha2:.3f}"),
+                            ("Effective v escape [km/s]", f"{wrvesc:.2f}"),
+                            ("Critical velocity", f"{wrvcri:.2f}"),
+                            ("Critical density", f"{wrrhocri:.2e}"),
+                        ])
+            c.setFont("Helvetica", 16)
+            table = Table(table_data)
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgreen),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.lavender),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ]))
+            table.wrapOn(c, page_width, page_height)
+            table.drawOn(c, 70, page_height - 690)
+
 
         # Abundances Table
         abundance_table_data = [("Element", "Abundance")] + [(el, f"{abundances[el]:.4e}") for el in abundances]
@@ -343,8 +380,8 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             if i % images_per_page == 0:
                 c.showPage()  
         
-            c.setFont("Helvetica-Bold", 20)
-            c.drawString(100, page_height - 50, "Line force multiplier v Sobolev optical depth")
+            c.setFont("Helvetica-Bold", 30)
+            c.drawString(140, page_height - 50, "Line force multiplier v t")
             
             row = (i % images_per_page) // images_per_row
             col = (i % images_per_page) % images_per_row
@@ -393,6 +430,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
 
+
 @app.route('/')
 def home():
     return render_template("index.html")
@@ -419,6 +457,9 @@ def process_data():
             return jsonify({"error": "Abundances data is missing"}), 400
         
         recipient_email = data.get("email", "").strip()
+
+        # expert mode
+        expert_mode = data.get("expert_mode", False) # by default false
         
         # Calculate values
         zstar = calculate_metallicity_massb(abundances)
@@ -436,7 +477,7 @@ def process_data():
 
         # Run computation in a separate thread
 
-        process_computation(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, -1, session_tmp_dir)
+        process_computation(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, -1, session_tmp_dir, expert_mode)
         
         #computation_thread = threading.Thread(
         #    target=process_computation,
@@ -581,9 +622,6 @@ def upload_csv():
 
                 pdf_paths = []
 
-                # Start the resource monitoring thread
-                monitoring_thread = threading.Thread(target=log_resource_usage, daemon=True)
-                monitoring_thread.start()
 
                 for index, row in df.iterrows():
                     pdf_name = str(row["name"])
@@ -631,7 +669,7 @@ def upload_csv():
                     #computation_threads.append(computation_thread)
                     #computation_thread.start()
                     
-                    process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir)
+                    process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir, False)
                     pdf_paths.append(pdf_path)
                     
 
