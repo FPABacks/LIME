@@ -15,6 +15,7 @@ from mforce import get_force_multiplier
 import random
 import shutil
 import gc
+import json
 
 
 # Atomic masses of elements (in atomic mass units, amu)
@@ -368,7 +369,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
         "This is the scaled metallicty - in mass fraction"  
         Z_scale = Z_scale * Z_asplund
     
-        max_iterations = 25 #1000
+        max_iterations = 15 #25 #1000
         tolerance = 1.e-3
     
         R_star = radius_calc(lum,T_eff)
@@ -388,13 +389,16 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
         mdot_initial = 4.*np.pi*R_star**2.*100.*1.e5
         #JS Dec: better, use initial line-force parameters:
         kap_e = cgs.sigth/cgs.mass_p*(1.+Ihe*Yhe)/(1.+4.*Yhe)
-        gamma_e = kap_e*lum/(4.*np.pi*cgs.G*M_star*cgs.c)
-        if (gamma_e >= 1):
-            log_print('gamma_e > 1', gamma_e, kap_e)
-            sys.exit(0)         
+        gamma_e = kap_e*lum/(4.*np.pi*cgs.G*M_star*cgs.c) 
+        
+        if gamma_e >= 1:
+                failure_reason = f"FAILURE: Gamma_e = {np.around(gamma_e,2)} > 1, not implemented for these regimes"
+                log_print(f"Failure: {failure_reason}")
+                return f"FAILURE: {failure_reason}"   
+        
         cgas = np.sqrt(cgs.kb * T_eff / (mu * cgs.mass_p))
         v_esc = np.sqrt(2.0 * cgs.G * M_star / R_star * (1.0 - gamma_e))
-        rat = v_esc / cgas
+        rat = v_esc / cgas    
         #initial guesses 
         qbar = (Z_star/Z_asplund)*1000.
         alpha = 2./3.
@@ -462,6 +466,8 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
         gc.collect()
         #Using start guess also for t_cri 
         #t_cri = None
+        flag = 0.0
+
         for iteration in range(max_iterations):
     
             parameters.update({
@@ -493,19 +499,30 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
               kap_e = cgs.sigth/cgs.mass_p*(1.+Ihe*Yhe)/(1.+4.*Yhe)
             
             gamma_e = kap_e*lum/(4.*np.pi*cgs.G*M_star*cgs.c)
+
+            if gamma_e >= 1:
+                failure_reason = f" Gamma_e = {np.around(gamma_e,2)} > 1, not implemented for these regimes"
+                log_print(f"Failure: {failure_reason}")
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
+                return f"{failure_reason}"
+        
                        
-            if (gamma_e >= 1):
-              log_print('gamma_e > 1', gamma_e, kap_e)
-              sys.exit(0) 
+            #if (gamma_e >= 1):
+            #  log_print('gamma_e > 1', gamma_e, kap_e)
+            #  sys.exit(0) 
         
             cgas = np.sqrt(cgs.kb * T_eff / (mu * cgs.mass_p))
             v_esc = np.sqrt(2.0 * cgs.G * M_star / R_star * (1.0 - gamma_e))
             rat = v_esc / cgas
             phi_cook = 3.0 * rat**(0.3 * (0.36 + np.log10(rat)))
+
     
-        
             qbar, alpha, q0, lgt_filtered, alpha_g, alpha_2 = fit_data(file_path, t_cri,log_print)
             
+            #if alpha_g > 0.985:
+            #    flag = 1.0
+            #if flag > 0.6:
+            #    alpha = alpha_2
             plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir,lgt_filtered,log_print)
             
             mdot_old = mdot
@@ -621,7 +638,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
                 failure_reason = "Line-driven mass loss is not possible. Consider increasing luminosity/mass ratio or metallicity."
                 log_print(f"Failure: {failure_reason}")
                 log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
-                return f"FAILURE: {failure_reason}"
+                return f"{failure_reason}"
 
             # Convergence Criteria
             if iteration >= 3 and abs(rel_rho) <= tolerance and abs(rel_mdot) <= tolerance:
@@ -635,19 +652,18 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
                 log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"FAILURE: {failure_reason}"
             
-            # reduced cnvergence 
-            if iteration == max_iterations - 1 and (abs(rel_rho) < 1.e-2 or abs(rel_mdot) < 1.e-2):
-                log_print("Converged with reduced tolerance, final values (mdot, Qbar, alpha, Q0, vinf, zstar):")
+            # reduced convergence 
+            if iteration == max_iterations - 1 and (abs(rel_rho) <= 2.e-1 or abs(rel_mdot) <= 2.e-1):
+                log_print("WARNING: Not converged to required tolerance (1e-3), please inspect final values before use (mdot, Qbar, alpha, Q0, vinf, zstar):")
                 log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
                 return str(random_subdir)
 
-            if iteration == max_iterations - 1 and (abs(rel_rho) > 1.e-2 or abs(rel_mdot) > 1.e-2):
+            if iteration == max_iterations - 1 and (abs(rel_rho) > 2.e-1 and abs(rel_mdot) > 2.e-1):
                 failure_reason = "The model did not converge after the maximum allowed iterations."
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
                 return f"FAILURE: {failure_reason}"
             
-
             # Update values for the next iteration
             mdot_old = mdot
             rho = rho_target

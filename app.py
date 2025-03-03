@@ -103,6 +103,7 @@ def extract_data_from_file(file_path):
         "kappa_e": None,
         "gamma_e": None,
         "t_crit" : None,
+        "warning": None
     }
 
     for line in lines:                
@@ -157,7 +158,12 @@ def extract_data_from_file(file_path):
         if "Zmass =" in line:
             match = re.search(r"Zmass = ([\d.e+-]+)", line)
             if match:
-                last_iteration_data["Zmass"] = float(match.group(1))                                                                                        
+                last_iteration_data["Zmass"] = float(match.group(1))
+
+    if len(lines) >= 2 and "WARNING" in lines[-2]:
+        warning_message = " WARNING: Not converged to required tolerance (1e-3), please inspect final values before use"
+        last_iteration_data["warning"] = warning_message                                                                                                  
+    
     return last_iteration_data
 
 
@@ -209,7 +215,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         #extracting the last iteration data for various quantities
         iteration_data = extract_data_from_file(simlog_path)
         vink_itr,bjor_itr,krt_itr,gammae_itr,kappae_itr,tcrit_itr = iteration_data["Vink"], iteration_data["Bjoklund"], iteration_data["Kriticka"], iteration_data["Gamma_e"], iteration_data["kappa_e"], iteration_data["t_crit"]
-        
+    
         c = canvas.Canvas(pdf_filename, pagesize=letter)
         page_width, page_height = letter
 
@@ -219,6 +225,16 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         if os.path.exists(logo_path):
             c.drawImage(logo_path, 50, page_height - 150, width=120, height=120, preserveAspectRatio=True, anchor='c')
         
+        warning_path = "./static/warning.png"
+        warning_message = iteration_data.get("warning")
+        
+        if warning_message:
+            c.setFont("Helvetica", 10)  
+            c.drawString(130, page_height - 15, warning_message)
+            if os.path.exists(warning_path):
+                c.drawImage(warning_path, 113, page_height - 17.5, width=15, height=15, preserveAspectRatio=True, anchor='c')
+        
+            
         c.setFont("Helvetica-Bold", 30)
         c.drawString(220, page_height - 150, title)
 
@@ -518,7 +534,6 @@ def process_data():
                 "luminosity": f"{luminosity:.1f}",
                 "teff": f"{teff:.1f}",
                 "mstar": f"{mstar:.1f}",
-                "zscale": f"{zscale:.2f}",
                 "zstar": f"{wrzstar:.3e}",
                 "mass_loss_rate": f"{wrmdot:.3e}",
                 "qbar": f"{wrqbar:.0f}",
@@ -697,32 +712,38 @@ def upload_csv():
                                     abundance_value = float(parts[-1])  
                                     abundances_data[element_symbol] = abundance_value
                     
-                    if os.path.exists(simlog_path):
-                        with open(simlog_path, "r") as f:
-                            lines = f.readlines()
-                            if len(lines) >= 2:
-                                last_values = lines[-1].split()
-                                if len(last_values) >= 4:
+                    remark = ""
+                    with open(simlog_path, "r") as f:
+                        lines = f.readlines()
+                        failure_reason = ""
+                        
+                        for line in lines:
+                            if "Failure:" in line:
+                                failure_reason = line.strip().replace("Failure:", "").strip()
+                                break 
+
+                        if len(lines) >= 2 : 
+                            last_values = lines[-1].split()
+                            try:
+                                if len(last_values) >= 6:
                                     wrmdot = float(last_values[0].strip("'"))
                                     wrqbar = float(last_values[1].strip("'"))
                                     wralp = float(last_values[2].strip("'"))
                                     wrq0 = float(last_values[3].strip("'"))
                                     wrvinf = float(last_values[4].strip("'"))
                                     wrzstar = float(last_values[5].strip("'"))
-                                else:
-                                    wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar  = None, None, None, None, None
-                            else:
-                                wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar = None, None, None, None, None
-                    else:
-                        wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar = None, None, None, None, None
-
+                            except ValueError:
+                                failure_reason = "Parsing error in output file"
+                    
+                        if failure_reason:
+                            remark = failure_reason  
                     
                     with open(results_csv_path, mode='a', newline='') as f:
-                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Zscale", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
+                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
                         if not csv_header_written:
                             writer.writeheader()
                             csv_header_written = True
-                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Zscale": row["zscale"], "Zstar": f"{wrzstar:.3e}", "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", "Vinf": f"{wrvinf:.2e}", "Remark":remark, **abundances_data})
+                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Zstar": f"{wrzstar:.3e}", "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", "Vinf": f"{wrvinf:.2e}", "Remark":remark, **abundances_data})
                  
                 # Save results to CSV file
                 #results_csv_path = os.path.join(batch_output_dir, "results.csv")
