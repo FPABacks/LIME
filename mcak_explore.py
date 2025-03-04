@@ -178,7 +178,7 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir,lgt_filte
     np.savetxt(output_file, np.column_stack((lgt_filtered, M_reconstructed)), 
                header='lgt_filtered\tM_reconstructed', fmt='%.6e', comments='')
     
-    plt.figure(figsize=(8, 6))
+    plt.figure(file_path, figsize=(8, 6))
     plt.semilogy(lgt, M_original, marker='H', color='g', markerfacecolor='yellowgreen',
                  markeredgecolor='darkolivegreen', label=r'$M(t)$', markersize=10)
     plt.semilogy(lgt_filtered, M_reconstructed, color='k', label=r'$M_{\rm FIT}(t)$', linewidth=2)
@@ -198,6 +198,45 @@ def plot_fit(file_path, alpha, Q0, Qb, iteration, t_cri, random_subdir,lgt_filte
     plt.tight_layout()
 
     plt.savefig(f'{random_subdir}/Mt_fit_{iteration}.png')
+    plt.close()
+
+
+def plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num):
+    """
+    Plots the convergence of the various relevant parameters.
+    """
+    fig, axes = plt.subplots(3, 2, figsize=(8, 8), sharex=True, num=random_subdir)
+    # Flatten axes for easy indexing
+    axes = axes.flatten()
+    axes[0].plot(it_num, np.log10([mdot * cgs.year / cgs.Msun for mdot in mdot_num]), marker="D", markersize=10,
+                 markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
+    axes[1].plot(it_num, qbar_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k',
+                 linestyle='--', linewidth=2)
+    axes[2].plot(it_num, alpha_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k',
+                 linestyle='--', linewidth=2)
+    axes[3].plot(it_num, q0_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k',
+                 linestyle='--', linewidth=2)
+    axes[4].plot(it_num, np.log10(eps_num), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k',
+                 color='k', linestyle='--', linewidth=2)
+    axes[5].plot(it_num, np.log10(delrho_num), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k',
+                 color='k', linestyle='--', linewidth=2)
+
+    axes[0].set_ylabel(r"$\dot{M} [M_\odot/yr]$")
+    axes[1].set_ylabel(r"$\bar{Q}$")
+    axes[2].set_ylabel(r"$\alpha$")
+    axes[3].set_ylabel(r"$Q_0$")
+    axes[4].set_ylabel(r"log $\epsilon_{\dot{M}}$")
+    axes[5].set_ylabel(r"log $\epsilon_{\rho}$")
+    # Set x-label for the bottom row only
+    for ax in axes[-2:]:
+        ax.set_xlabel("Iteration")
+    for ax in axes:
+        ax.xaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
+        ax.yaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
+        ax.ticklabel_format(useOffset=False, style='plain', axis='both')
+        # axes[2].set_xlabel("iteration")
+    plt.tight_layout()
+    plt.savefig(f"{random_subdir}/sim_log.png")
     plt.close()
 
 def cak_massloss(lum, qbar, q0, alpha, gamma_e, rat): 
@@ -225,7 +264,7 @@ def radius_calc(lum,teff):
 
 def vinf_Kudritzki(alpha, vesc):
     f1 = 8/5*(1-3/4*alpha)
-    f3 = 1-0.3*np.exp(-vesc/300)
+    f3 = 1-0.3*np.exp(-vesc/300/1e5)
     #print(f1,f3, 2.25*alpha/(1-alpha), alpha)
     vinf = 2.25*alpha/(1-alpha)*vesc*f1*f3
     return vinf
@@ -320,8 +359,6 @@ def run_mforce(parameters):
     Translates the dictionary of parameters to the input of the get_force_multiplier function and calls the function.
     Note that the order can be confusing, do not assume what it would be, check it if you feel the need to change things
     """
-
-    print("THE RANDOM DIRECTORY IS: ", parameters["DIR"])
 
     get_force_multiplier(parameters["lgTmin"],
                          parameters["lgTmax"],
@@ -523,7 +560,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             #    flag = 1.0
             #if flag > 0.6:
             #    alpha = alpha_2
-            plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir,lgt_filtered,log_print)
+            # plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir,lgt_filtered,log_print)
             
             mdot_old = mdot
         
@@ -598,37 +635,6 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             log_print(f"Kriticka = {kriticka_mdot}")
             
             log_print("----------x----------x----------x----------x----------")
-
-            # Plotting some stuffs
-
-            fig, axes = plt.subplots(3, 2, figsize=(8, 8), sharex=True)
-            # Flatten axes for easy indexing
-            axes = axes.flatten()
-            axes[0].plot(it_num, np.log10([mdot * cgs.year / cgs.Msun for mdot in mdot_num]), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
-            axes[1].plot(it_num, qbar_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
-            axes[2].plot(it_num, alpha_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
-            axes[3].plot(it_num, q0_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
-            axes[4].plot(it_num, np.log10(eps_num), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
-            axes[5].plot(it_num, np.log10(delrho_num), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
-            
-
-            axes[0].set_ylabel(r"$\dot{M} [M_\odot/yr]$")
-            axes[1].set_ylabel(r"$\bar{Q}$")
-            axes[2].set_ylabel(r"$\alpha$")
-            axes[3].set_ylabel(r"$Q_0$")            
-            axes[4].set_ylabel(r"log $\epsilon_{\dot{M}}$")
-            axes[5].set_ylabel(r"log $\epsilon_{\rho}$")
-            # Set x-label for the bottom row only
-            for ax in axes[-2:]:
-                ax.set_xlabel("Iteration")
-            for ax in axes:
-                ax.xaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
-                ax.yaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
-                ax.ticklabel_format(useOffset=False, style='plain', axis='both') 
-            #axes[2].set_xlabel("iteration")
-            plt.tight_layout()
-            plt.savefig(f"{random_subdir}/sim_log.png")
-            plt.close()
             
            #JS-JAN 2025 - imposing lower limit for validity of line-driven mass loss
             if iteration < 3:
@@ -642,6 +648,8 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
 
             # Convergence Criteria
             if iteration >= 3 and abs(rel_rho) <= tolerance and abs(rel_mdot) <= tolerance:
+                plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num)
+                plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered, log_print)
                 log_print("Converged final values (mdot, Qbar, alpha, Q0, vinf, zstar):")
                 log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star, alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
                 return str(random_subdir)
@@ -654,6 +662,8 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             
             # reduced convergence 
             if iteration == max_iterations - 1 and (abs(rel_rho) <= 2.e-1 or abs(rel_mdot) <= 2.e-1):
+                plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num)
+                plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered, log_print)
                 log_print("WARNING: Not converged to required tolerance (1e-3), please inspect final values before use (mdot, Qbar, alpha, Q0, vinf, zstar):")
                 log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
                 return str(random_subdir)

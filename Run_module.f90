@@ -151,7 +151,6 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    CALL  flush(stdout) 
 
    ! Get Line data, but only the first time the subroutine is called.
-   WRITE(*,*) 'first iterative loop', first_run
    if (first_run) then
       !WRITE(*,*)'Initialise Line Data'
       CALL LINE_DATA%Initialise(verbose  = ver)

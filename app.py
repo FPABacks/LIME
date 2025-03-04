@@ -358,19 +358,19 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             c.showPage()
             c.setFont("Helvetica-Bold", 30)
             c.drawString(150, page_height - 50, "Simulation Log Figures")
-            
+
             img = Image.open(sim_log_image_path)
             img_width, img_height = img.size
             aspect_ratio = img_width / img_height
-            new_width = page_width - 100 
-            new_height = new_width / aspect_ratio  
+            new_width = page_width - 100
+            new_height = new_width / aspect_ratio
 
             if new_height > page_height - 100:
                 new_height = page_height - 50
                 new_width = new_height * aspect_ratio
 
-            x_position = (page_width - new_width) / 2  
-            y_position = (page_height - new_height) / 2  
+            x_position = (page_width - new_width) / 2
+            y_position = (page_height - new_height) / 2
 
             c.drawImage(sim_log_image_path, x_position, y_position, width=new_width, height=new_height)
 
@@ -381,46 +381,46 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             wrapped_text = simpleSplit(description, "Helvetica", 14, page_width - 100)
             for line in wrapped_text:
                 c.drawString(text_x, text_y, line)
-                text_y -= 16  
+                text_y -= 16
 
             figures_list.remove(sim_log_image_path)
-        
+
         # --- 2. Arrange Remaining Figures in Pages with Titles ---
         images_per_row, images_per_col = 2, 3
         images_per_page = images_per_row * images_per_col
         max_width = (page_width - 100) / images_per_row
         max_height = (page_height - 150) / images_per_col
-        x_start, y_start = 50, page_height - 300 
-        
+        x_start, y_start = 50, page_height - 300
+
         for i, fig_path in enumerate(figures_list):
             if i % images_per_page == 0:
-                c.showPage()  
-        
+                c.showPage()
+
             c.setFont("Helvetica-Bold", 30)
             c.drawString(140, page_height - 50, "Line force multiplier v t")
-            
+
             row = (i % images_per_page) // images_per_row
             col = (i % images_per_page) % images_per_row
             x_position = x_start + col * max_width
             y_position = y_start - row * max_height
-        
+
             # Load image to get actual dimensions
             with Image.open(fig_path) as img:
                 img_width, img_height = img.size
-        
+
             # Compute scaling factor while maintaining aspect ratio
             scale_factor = min(max_width / img_width, max_height / img_height)
             new_width = img_width * scale_factor
             new_height = img_height * scale_factor
-        
+
             # Center the image within its allocated space
             x_adjusted = x_position + (max_width - new_width) / 2
             y_adjusted = y_position + (max_height - new_height) / 2
-        
+
             c.drawImage(fig_path, x_adjusted, y_adjusted, width=new_width, height=new_height)
-        
+
             c.setFont("Helvetica", 10)
-            
+
         # --- 3. Add Simulation Log (simlog.txt) on a New Page ---
         #if os.path.exists(simlog_path):
         #    c.showPage()  # New page for text
@@ -492,15 +492,7 @@ def process_data():
         pdf_path = os.path.join(output_dir, f"{pdf_name}.pdf")  
 
         # Run computation in a separate thread
-
         process_computation(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, -1, session_tmp_dir, expert_mode)
-        
-        #computation_thread = threading.Thread(
-        #    target=process_computation,
-        #    args=(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, -1, session_tmp_dir)
-        #)
-        #computation_thread.start()
-        #computation_thread.join()  # Wait for completion before proceeding
 
         # Check if the PDF exists at the correct path
         if not os.path.exists(pdf_path):
@@ -780,4 +772,4 @@ def upload_csv():
         return jsonify({"error": f"Unexpected error in upload_csv: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
