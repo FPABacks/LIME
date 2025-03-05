@@ -597,6 +597,8 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
 
             log_print(f"rel_mdot = {rel_mdot}, rel_rho = {rel_rho}")
             log_print(f"kappa_e = {kap_e}, Gamma_e = {gamma_e}, vesc = {v_esc}, rat = {rat}, phi_cook = {phi_cook}")
+            log_print(f"R_star = {R_star/cgs.Rsun}")
+            log_print(f"log_g = {np.log10(cgs.G*M_star/R_star**2)}")
             log_print(f"Qbar = {qbar}, alpha = {alpha}, Q0 = {q0}")
             log_print(f"vinf = {vinf}")
             log_print(f"t_crit = {t_cri}")
@@ -644,7 +646,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
                 failure_reason = "Line-driven mass loss is not possible. Consider increasing luminosity/mass ratio or metallicity."
                 log_print(f"Failure: {failure_reason}")
                 log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
-                return f"{failure_reason}"
+                return f"FAILURE: {failure_reason}"
 
             # Convergence Criteria
             if iteration >= 3 and abs(rel_rho) <= tolerance and abs(rel_mdot) <= tolerance:

@@ -930,7 +930,8 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      REAL(DP) :: gg = 0.0d0, Xg = 0.0d0, gl = 0.0d0, Xl = 0.0d0, SUM_Excitation_numb_frac = 0.0d0
      REAL(DP) :: Bolz_fact = 0.0d0, N_electron_old = 0.0d0, N_electron_new = 0.0d0
      INTEGER(I4B) :: L = 0, I = 0, Z = 0, ind = 0
- 
+
+
      ! Pars the input optianal variables
      ! If trerative = true recompute the electrone number density
      iterative = .TRUE.
@@ -991,6 +992,12 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      !    PRINT*,OBJ%Nuclei(Z)
      ! END DO
      IF(ANY(ISNAN(OBJ%Nuclei(:)))) STOP '---- Nuclei Is NaN ----'
+     
+     !IF (ANY(ISNAN(OBJ%Nuclei(:)))) THEN
+     ! PRINT*, 'WARNING: Nuclei number density contained NaN, replacing with 1e-10'
+     ! OBJ%Nuclei(:) = 1.0D-10  ! Small default value
+     ! hasError = .TRUE.
+     !END IF
      IF(ver) PRINT*, '  - Number densities of each Nuclei computed'
  
      ! ------ Executing 2)

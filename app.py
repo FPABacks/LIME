@@ -584,9 +584,9 @@ def upload_csv():
         num_rows = len(df)
 
         # **Check the number of rows in CSV**
-        if num_rows > 100:
+        if num_rows > 200:
             return jsonify({
-                "error": "Too many entries! Please reduce the number of stars to 100 or split the CSV into smaller parts."
+                "error": "Too many entries! Please reduce the number of stars to 200 or split the CSV into smaller parts."
             }), 400
 
         # Create a single batch directory for all results
