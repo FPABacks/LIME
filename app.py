@@ -102,6 +102,8 @@ def extract_data_from_file(file_path):
         "Kriticka": None,
         "kappa_e": None,
         "gamma_e": None,
+        "R_star" : None,
+        "log_g" : None,
         "t_crit" : None,
         "warning": None
     }
@@ -131,6 +133,14 @@ def extract_data_from_file(file_path):
             match = re.search(r"Gamma_e = ([\d.e+-]+)", line)
             if match:
                 last_iteration_data["Gamma_e"] = float(match.group(1))
+        if "R_star =" in line:
+            match = re.search(r"R_star = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["R_star"] = float(match.group(1))
+        if "log_g =" in line:
+            match = re.search(r"log_g = ([\d.e+-]+)", line)
+            if match:
+                last_iteration_data["log_g"] = float(match.group(1))                
         if "t_crit =" in line:
             match = re.search(r"t_crit = ([\d.e+-]+)", line)
             if match:
@@ -214,7 +224,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         simlog_path = os.path.join(output_dir, "simlog.txt")
         #extracting the last iteration data for various quantities
         iteration_data = extract_data_from_file(simlog_path)
-        vink_itr,bjor_itr,krt_itr,gammae_itr,kappae_itr,tcrit_itr = iteration_data["Vink"], iteration_data["Bjoklund"], iteration_data["Kriticka"], iteration_data["Gamma_e"], iteration_data["kappa_e"], iteration_data["t_crit"]
+        vink_itr,bjor_itr,krt_itr,gammae_itr,kappae_itr,tcrit_itr,radius_itr,logg_itr = iteration_data["Vink"], iteration_data["Bjoklund"], iteration_data["Kriticka"], iteration_data["Gamma_e"], iteration_data["kappa_e"], iteration_data["t_crit"], iteration_data["R_star"], iteration_data["log_g"]
     
         c = canvas.Canvas(pdf_filename, pagesize=letter)
         page_width, page_height = letter
@@ -243,6 +253,8 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             ("Luminosity [solar luminosity]", f"{lum:.1f}"),
             ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
             ("Eddington Ratio ", f"{gammae_itr:.2f}"),
+            ("Stellar Radius [solar radius] ", f"{radius_itr:.2f}"),
+            ("log g ", f"{logg_itr:.2f}"),
             ("Effective Temperature [K]", f"{teff:.1f}"),
             ("Z star (Calculated)", f"{zstar:.3e}"),
             ]
@@ -511,14 +523,16 @@ def process_data():
         simlog_path = os.path.join(output_dir, "simlog.txt")
         if os.path.exists(simlog_path):
             iteration_data = extract_data_from_file(simlog_path)
-            wrmdot = iteration_data.get("Mass loss rate", None)
-            wrqbar = iteration_data.get("Qbar", None)
-            wralp = iteration_data.get("alpha", None)
-            wrq0 = iteration_data.get("Q0", None)
-            wrvinf = iteration_data.get("vinf", None)
-            wrzstar = iteration_data.get("vinf", None)
+            wrmdot = iteration_data["Mass loss rate"]
+            wrqbar = iteration_data["Qbar"]
+            wralp = iteration_data["alpha"]
+            wrq0 = iteration_data["Q0"]
+            wrvinf = iteration_data["vinf"]
+            wrzstar = iteration_data["Zmass"]
+            wrrstar = iteration_data["R_star"]
+            wrlogg = iteration_data["log_g"]
         else:
-            wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar = None, None, None, None, None
+            wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar, wrrstar, wrlogg = None, None, None, None, None, None, None
 
         # **Send Email if recipient email is provided**
         if recipient_email:
@@ -526,6 +540,8 @@ def process_data():
                 "luminosity": f"{luminosity:.1f}",
                 "teff": f"{teff:.1f}",
                 "mstar": f"{mstar:.1f}",
+                "rstar": f"{wrrstar:.2f}",
+                "logg": f"{wrlogg:.2f}",
                 "zstar": f"{wrzstar:.3e}",
                 "mass_loss_rate": f"{wrmdot:.3e}",
                 "qbar": f"{wrqbar:.0f}",
@@ -724,6 +740,8 @@ def upload_csv():
                                     wrq0 = float(last_values[3].strip("'"))
                                     wrvinf = float(last_values[4].strip("'"))
                                     wrzstar = float(last_values[5].strip("'"))
+                                    wrrstar = float(last_values[11].strip("'"))
+                                    wrlogg = float(last_values[12].strip("'"))
                             except ValueError:
                                 failure_reason = "Parsing error in output file"
                     
@@ -731,11 +749,11 @@ def upload_csv():
                             remark = failure_reason  
                     
                     with open(results_csv_path, mode='a', newline='') as f:
-                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
+                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Rstar", "log g", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
                         if not csv_header_written:
                             writer.writeheader()
                             csv_header_written = True
-                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Zstar": f"{wrzstar:.3e}", "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", "Vinf": f"{wrvinf:.2e}", "Remark":remark, **abundances_data})
+                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Rstar": f"{wrrstar:.2e}", "log g": f"{wrlogg:.2e}","Zstar": f"{wrzstar:.3e}", "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", "Vinf": f"{wrvinf:.2e}", "Remark":remark, **abundances_data})
                  
                 # Save results to CSV file
                 #results_csv_path = os.path.join(batch_output_dir, "results.csv")

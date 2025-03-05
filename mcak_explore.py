@@ -210,11 +210,11 @@ def plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_nu
     axes = axes.flatten()
     axes[0].plot(it_num, np.log10([mdot * cgs.year / cgs.Msun for mdot in mdot_num]), marker="D", markersize=10,
                  markerfacecolor='gray', markeredgecolor='k', color='k', linestyle='--', linewidth=2)
-    axes[1].plot(it_num, qbar_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k',
+    axes[1].plot(it_num, np.log10(qbar_num), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k',
                  linestyle='--', linewidth=2)
     axes[2].plot(it_num, alpha_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k',
                  linestyle='--', linewidth=2)
-    axes[3].plot(it_num, q0_num, marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k',
+    axes[3].plot(it_num, np.log10(q0_num), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k', color='k',
                  linestyle='--', linewidth=2)
     axes[4].plot(it_num, np.log10(eps_num), marker="D", markersize=10, markerfacecolor='gray', markeredgecolor='k',
                  color='k', linestyle='--', linewidth=2)
@@ -222,9 +222,9 @@ def plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_nu
                  color='k', linestyle='--', linewidth=2)
 
     axes[0].set_ylabel(r"$\dot{M} [M_\odot/yr]$")
-    axes[1].set_ylabel(r"$\bar{Q}$")
+    axes[1].set_ylabel(r"$\log_{10}(\bar{Q})$")
     axes[2].set_ylabel(r"$\alpha$")
-    axes[3].set_ylabel(r"$Q_0$")
+    axes[3].set_ylabel(r"$\log_{10}(Q_0)$")
     axes[4].set_ylabel(r"log $\epsilon_{\dot{M}}$")
     axes[5].set_ylabel(r"log $\epsilon_{\rho}$")
     # Set x-label for the bottom row only
@@ -540,7 +540,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             if gamma_e >= 1:
                 failure_reason = f" Gamma_e = {np.around(gamma_e,2)} > 1, not implemented for these regimes"
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"{failure_reason}"
         
                        
@@ -645,7 +645,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             if iteration >= 3 and mdot_lim < 1:
                 failure_reason = "Line-driven mass loss is not possible. Consider increasing luminosity/mass ratio or metallicity."
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"FAILURE: {failure_reason}"
 
             # Convergence Criteria
@@ -653,13 +653,13 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
                 plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num)
                 plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered, log_print)
                 log_print("Converged final values (mdot, Qbar, alpha, Q0, vinf, zstar):")
-                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star, alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star, alpha_g, alpha_2,v_esc/1.e5,v_cri,rho,R_star/cgs.Rsun,np.log10(cgs.G*M_star/R_star**2))
                 return str(random_subdir)
             
             if iteration == max_iterations - 1 and alpha > 0.985:
                 failure_reason = "Alpha parameter-fit too high, approaching theoretical divergence."
                 log_print(f"Failure: {failure_reason}")
-                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
+                log_print(np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan)
                 return f"FAILURE: {failure_reason}"
             
             # reduced convergence 
@@ -667,13 +667,13 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
                 plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num)
                 plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered, log_print)
                 log_print("WARNING: Not converged to required tolerance (1e-3), please inspect final values before use (mdot, Qbar, alpha, Q0, vinf, zstar):")
-                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho,R_star/cgs.Rsun,np.log10(cgs.G*M_star/R_star**2))
                 return str(random_subdir)
 
             if iteration == max_iterations - 1 and (abs(rel_rho) > 2.e-1 and abs(rel_mdot) > 2.e-1):
                 failure_reason = "The model did not converge after the maximum allowed iterations."
                 log_print(f"Failure: {failure_reason}")
-                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho)
+                log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho,R_star/cgs.Rsun,np.log10(cgs.G*M_star/R_star**2))
                 return f"FAILURE: {failure_reason}"
             
             # Update values for the next iteration
