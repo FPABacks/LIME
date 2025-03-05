@@ -378,7 +378,7 @@ def run_mforce(parameters):
 
 # Integrating the functionality into the main workflow
 
-def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
+def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir, does_plot):
 
     # Making a temporary file
     os.makedirs(random_subdir, exist_ok=True) 
@@ -650,8 +650,9 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
 
             # Convergence Criteria
             if iteration >= 3 and abs(rel_rho) <= tolerance and abs(rel_mdot) <= tolerance:
-                plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num)
-                plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered, log_print)
+                if does_plot == True:
+                    plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num)
+                    plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered, log_print)
                 log_print("Converged final values (mdot, Qbar, alpha, Q0, vinf, zstar):")
                 log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star, alpha_g, alpha_2,v_esc/1.e5,v_cri,rho,R_star/cgs.Rsun,np.log10(cgs.G*M_star/R_star**2))
                 return str(random_subdir)
@@ -664,8 +665,9 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhel, random_subdir):
             
             # reduced convergence 
             if iteration == max_iterations - 1 and (abs(rel_rho) <= 2.e-1 or abs(rel_mdot) <= 2.e-1):
-                plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num)
-                plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered, log_print)
+                if does_plot == True:
+                    plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_num, eps_num, delrho_num)
+                    plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered, log_print)
                 log_print("WARNING: Not converged to required tolerance (1e-3), please inspect final values before use (mdot, Qbar, alpha, Q0, vinf, zstar):")
                 log_print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star,alpha_g, alpha_2,v_esc/1.e5,v_cri,rho,R_star/cgs.Rsun,np.log10(cgs.G*M_star/R_star**2))
                 return str(random_subdir)
