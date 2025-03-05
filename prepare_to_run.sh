@@ -1,6 +1,6 @@
 #!/bin/env bash
 
-CodeDir="${MFORCE_DIR:-$PWD/MFORCE-LTE/}"
+CodeDir="${MFORCE_DIR:-$PWD/MForce-LTE/}"
 # There is a bug in f2py that causes it not to be able to read files in different locations.
 # This is the most low-tech but fairly fool proof solution for now. Just creating a symbolic link for the
 # compilation then get rid of those again.
