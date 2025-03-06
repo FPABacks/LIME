@@ -1,6 +1,7 @@
 import requests
 import unittest
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import io
 
 # Make sure this is the right web address
 server_url = "http://127.0.0.1:8000"
@@ -27,9 +28,13 @@ def calc_single_model():
 
 def calc_model_grid():
     """Sends a request to calculate a set of mass-loss rates based on an input csv-file"""
+    file_path = 'test_sample.csv'
+    with open(file_path, 'r') as file:
+        file_content = file.read()
+    fake_file = io.BytesIO(file_content.encode())
     return requests.post(f"{server_url}/upload_csv",
-                         files={"file": "tests/test_sample.csv"},
-                         data={"email": "e@mail.com"})
+                         data={"email": "e@mail.com"},
+                         files={"file": ("test_sample.csv", fake_file, "text/csv")})
 
 
 class TestLimeServer(unittest.TestCase):
@@ -46,7 +51,7 @@ class TestLimeServer(unittest.TestCase):
         Does the single model test, but multiple at once, preferably more than the number of workers to stress test
         the server a little.
         """
-        n_requests = 10  # Put in 10 requests at once (this is more than the expected number of workers of the server)
+        n_requests = 10  # Put in many requests at once (more than the expected number of workers of the server)
         with ThreadPoolExecutor(max_workers=n_requests) as executor:
             futures = [executor.submit(calc_single_model) for _ in range(n_requests)]
             results = [future.result().status_code for future in as_completed(futures)]
@@ -55,7 +60,9 @@ class TestLimeServer(unittest.TestCase):
             self.assertEqual(status, 200)
 
     # NOTE: This is a flawed test, it does not work properly as it does not require models to be calculated.
-    # It only waits for the server response, which is (nearly) instant.
+    # It only waits for the server response, which is (nearly) instant. Though it likely causes the other tests to fail
+    # as they get stuck in a "queue" waiting for a response that doesn't come. We would need a proper queue system for
+    # this.
     def test_csv_grid_run(self):
         """Tests if a single grid of models can be successfully be computed"""
         response = calc_model_grid()
@@ -66,13 +73,13 @@ class TestLimeServer(unittest.TestCase):
     # of the server.
     def test_many_csv_grid_runs(self):
         """Tests if a many grids of models can be successfully be computed"""
-        n_requests = 10  # Put in 10 requests at once (this is more than the expected number of workers of the server)
+        n_requests = 4  # Put in many requests at once
         with ThreadPoolExecutor(max_workers=n_requests) as executor:
             futures = [executor.submit(calc_model_grid) for _ in range(n_requests)]
-            results = [future.result().status_code for future in as_completed(futures)]
+            results = [future.result() for future in as_completed(futures)]
 
-        for status in results:
-            self.assertEqual(status, 200)
+        for result in results:
+            self.assertEqual(result.status_code, 200)
 
 
 if __name__ == "__main__":

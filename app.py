@@ -1,32 +1,20 @@
 from flask import Flask, request, jsonify, render_template, send_file, url_for
 import subprocess
 import numpy as np
-import json
 import os
 import threading
 import shutil
-import re
 from mcak_explore import main as mcak_main
-from matplotlib.backends.backend_pdf import PdfPages
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import simpleSplit
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfbase import pdfmetrics
 from PIL import Image
 import pandas as pd
 import tempfile
-import random
-import zipfile
-import time
 from jinja2 import Template
 import csv
-import gc
-
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -43,30 +31,42 @@ ATOMIC_MASSES = {
     'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690, 'CU': 63.546, 'ZN': 65.390
 }
 
+# This is a dictionary with dummy results in case things crash, so there is something to work with
+DUMMY_RESULTS = {"Iteration": -1,
+                 "rho": np.nan,
+                 "gamma_e*(1+qbar)": np.nan,
+                 "rel_mdot": np.nan,
+                 "rel_rho": np.nan,
+                 "kappa_e": np.nan,
+                 "Gamma_e": np.nan,
+                 "vesc": np.nan,
+                 "rat": np.nan,
+                 "phi_cook": np.nan,
+                 "R_star": np.nan,
+                 "log_g": np.nan,
+                 "Qbar": np.nan,
+                 "alpha": np.nan,
+                 "Q0": np.nan,
+                 "vinf": np.nan,
+                 "t_crit": np.nan,
+                 "v_crit": np.nan,
+                 "density": np.nan,
+                 "mdot": np.nan,
+                 "Zmass": np.nan,
+                 "Zscale": np.nan,
+                 "alphag": np.nan,
+                 "alpha2": np.nan,
+                 "warning": False,
+                 "fail": True,
+                 "fail_reason": ""}
+
+
 def calculate_metallicity_massb(mass_abundances):
     """Calculates the actual metallicity from the number abundances input by the user"""
     metals = {e for e in ATOMIC_MASSES if e not in {'H', 'HE'}}
-    metallicity = sum(
-        mass_abundances[element]
-        for element in metals if element in mass_abundances
-    )
-    
+    metallicity = sum(mass_abundances[element] for element in metals if element in mass_abundances)
     return metallicity
 
-def calculate_metallicity(number_abundances):
-    """Calculates the actual metallicity from the number abundances input by the user"""
-    total_mass_abundance = sum(
-        number_abundances[element] * ATOMIC_MASSES[element]
-        for element in number_abundances if element in ATOMIC_MASSES
-    )
-    
-    metals = {e for e in ATOMIC_MASSES if e not in {'H', 'HE'}}
-    metallicity = sum(
-        number_abundances[element] * ATOMIC_MASSES[element] / total_mass_abundance
-        for element in metals if element in number_abundances
-    )
-    
-    return metallicity
 
 def He_number_abundance(mass_abundances):
     """
@@ -75,7 +75,6 @@ def He_number_abundance(mass_abundances):
     
     :return: Number abundance of helium (relative to all elements)
     """
-    
     mass_H = mass_abundances.get('H', 0.0)
     mass_He = mass_abundances.get('HE', 0.0)
     
@@ -83,103 +82,18 @@ def He_number_abundance(mass_abundances):
 
     N_H = (mass_H / ATOMIC_MASSES['H']) / total_num_abun
     N_He = (mass_He / ATOMIC_MASSES['HE']) / total_num_abun
-    
-    if N_H == 0.0:
-        NHe = 1e4
+
     if N_H == 0.0 and N_He == 0.0:
         NHe = 1e-4    
-    else :
+    else:
         NHe = N_He/N_H    
     return NHe
-
-def extract_data_from_file(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-
-    last_iteration_data = {
-        "Vink": None,
-        "Bjoklund": None,
-        "Kriticka": None,
-        "kappa_e": None,
-        "gamma_e": None,
-        "R_star" : None,
-        "log_g" : None,
-        "t_crit" : None,
-        "warning": None
-    }
-
-    for line in lines:                
-                  
-        if "Iteration" in line:
-            last_iteration_data = {key: None for key in last_iteration_data}
-
-        if "Vink =" in line:
-            match = re.search(r"Vink = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["Vink"] = float(match.group(1))
-        if "Bjoklund =" in line:
-            match = re.search(r"Bjoklund = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["Bjoklund"] = float(match.group(1))
-        if "Kriticka =" in line:
-            match = re.search(r"Kriticka = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["Kriticka"] = float(match.group(1))                
-        if "kappa_e =" in line:
-            match = re.search(r"kappa_e = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["kappa_e"] = float(match.group(1))
-        if "Gamma_e =" in line:
-            match = re.search(r"Gamma_e = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["Gamma_e"] = float(match.group(1))
-        if "R_star =" in line:
-            match = re.search(r"R_star = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["R_star"] = float(match.group(1))
-        if "log_g =" in line:
-            match = re.search(r"log_g = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["log_g"] = float(match.group(1))                
-        if "t_crit =" in line:
-            match = re.search(r"t_crit = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["t_crit"] = float(match.group(1))
-        if "Mass loss rate =" in line:
-            match = re.search(r"Mass loss rate = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["Mass loss rate"] = float(match.group(1))
-        if "Qbar =" in line:
-            match = re.search(r"Qbar = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["Qbar"] = float(match.group(1))  
-        if "alpha =" in line:
-            match = re.search(r"alpha = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["alpha"] = float(match.group(1))
-        if "Q0 =" in line:
-            match = re.search(r"Q0 = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["Q0"] = float(match.group(1)) 
-        if "vinf =" in line:
-            match = re.search(r"vinf = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["vinf"] = float(match.group(1))
-        if "Zmass =" in line:
-            match = re.search(r"Zmass = ([\d.e+-]+)", line)
-            if match:
-                last_iteration_data["Zmass"] = float(match.group(1))
-
-    if len(lines) >= 2 and "WARNING" in lines[-2]:
-        warning_message = " WARNING: Not converged to required tolerance (1e-3), please inspect final values before use"
-        last_iteration_data["warning"] = warning_message                                                                                                  
-    
-    return last_iteration_data
 
 
 def load_email_body(filename):
     with open(filename, 'r') as file:
         return file.read()
+
 
 def load_dyn_email(filename, context):
     """Load and render email body from Jinja2 template."""
@@ -187,8 +101,10 @@ def load_dyn_email(filename, context):
         template = Template(file.read())
     return template.render(context)
 
-def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, pointer, batch_output_dir, expert_mode, does_plot):
-    """Runs mcak_explore and emails the results"""
+
+def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, pdf_name,
+                        batch_output_dir, expert_mode, does_plot):
+    """Runs mcak_explore and generates a pdf with the results if desired. """
     try:
         output_dir = os.path.join(batch_output_dir, pdf_name)
         os.makedirs(output_dir, exist_ok=True)
@@ -200,10 +116,10 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             for i, (element, value) in enumerate(abundances.items(), start=1):
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
 
-        generated_file = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir, does_plot)
+        generated_file, results_dict = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir, does_plot)
 
-        if generated_file.startswith("FAILURE:"):
-            failure_reason = generated_file.replace("FAILURE: ", "").strip()
+        if results_dict["fail"]:
+            failure_reason = results_dict["fail_reason"]
             print(f"Simulation failed: {failure_reason}")
             pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
             c = canvas.Canvas(pdf_filename, pagesize=letter)
@@ -217,16 +133,15 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 c.drawString(120, y_pos, line)
                 y_pos -= 20
             c.save()
-            return
-        
+            # Leave it at this if the calculation failed
+            return results_dict
+
+        # make some diagnostic plots and informative tables for the pdf output.
         if does_plot == True :
             pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
             figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith(".png")]
-            simlog_path = os.path.join(output_dir, "simlog.txt")
-            #extracting the last iteration data for various quantities
-            iteration_data = extract_data_from_file(simlog_path)
-            vink_itr,bjor_itr,krt_itr,gammae_itr,kappae_itr,tcrit_itr,radius_itr,logg_itr = iteration_data["Vink"], iteration_data["Bjoklund"], iteration_data["Kriticka"], iteration_data["Gamma_e"], iteration_data["kappa_e"], iteration_data["t_crit"], iteration_data["R_star"], iteration_data["log_g"]
-        
+
+            # Initialize
             c = canvas.Canvas(pdf_filename, pagesize=letter)
             page_width, page_height = letter
     
@@ -235,17 +150,15 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             
             if os.path.exists(logo_path):
                 c.drawImage(logo_path, 50, page_height - 150, width=120, height=120, preserveAspectRatio=True, anchor='c')
-            
+
+            # Add a warning at the top of the pdf file if there is a potential issue
             warning_path = "./static/warning.png"
-            warning_message = iteration_data.get("warning")
-            
-            if warning_message:
+            if results_dict["warning"]:
                 c.setFont("Helvetica", 10)  
-                c.drawString(130, page_height - 15, warning_message)
+                c.drawString(130, page_height - 15, results_dict["warning_message"])
                 if os.path.exists(warning_path):
                     c.drawImage(warning_path, 113, page_height - 17.5, width=15, height=15, preserveAspectRatio=True, anchor='c')
-            
-                
+
             c.setFont("Helvetica-Bold", 30)
             c.drawString(220, page_height - 150, title)
     
@@ -253,12 +166,11 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 ("Input Parameter", "Value"),
                 ("Luminosity [solar luminosity]", f"{lum:.1f}"),
                 ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
-                ("Eddington Ratio ", f"{gammae_itr:.2f}"),
-                ("Stellar Radius [solar radius] ", f"{radius_itr:.2f}"),
-                ("log g ", f"{logg_itr:.2f}"),
+                ("Eddington Ratio ", f"{results_dict["kappa_e"]:.2f}"),
+                ("Stellar Radius [solar radius] ", f"{results_dict["R_star"]:.2f}"),
+                ("log g ", f"{results_dict["log_g"]:.2f}"),
                 ("Effective Temperature [K]", f"{teff:.1f}"),
-                ("Z star (Calculated)", f"{zstar:.3e}"),
-                ]
+                ("Z star (Calculated)", f"{zstar:.3e}")]
             
             c.setFont("Helvetica", 16)
             table = Table(table_data)
@@ -273,30 +185,17 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             ]))
             table.wrapOn(c, page_width, page_height)
             table.drawOn(c, 70, page_height - 350)
-    
-            table_data = [
-                ("Output", "Value"),
-                ("Electron scattering opacity ", f"{kappae_itr:.2f}"),
-                ("Critical depth", f"{tcrit_itr:.2f}"),
-            ]
-            
-            with open(simlog_path, "r") as f:
-                lines = f.readlines()
-                if len(lines) >= 2:
-                    last_values = lines[-1].split()
-                    if len(last_values) >= 4:
-                        wrmdot = float(last_values[0].strip("'"))
-                        wrqbar = float(last_values[1].strip("'"))
-                        wralp = float(last_values[2].strip("'"))
-                        wrq0 = float(last_values[3].strip("'"))
-                        wrvinf = float(last_values[4].strip("'"))
-                        table_data.extend([
-                            ("Mass loss rate [solar mass/year]", f"{wrmdot:.3e}"),
-                            ("Q bar", f"{wrqbar:.2f}"),
-                            ("alpha", f"{wralp:.2f}"),
-                            ("Q0", f"{wrq0:.2f}"),
-                            ("vinf [km/s]", f"{wrvinf:.2f}"),
-                        ])
+
+            # Make the results table
+            table_data = [("Output", "Value"),
+                          ("Mass loss rate [solar mass/year]", f"{results_dict["mdot"]:.3e}"),
+                          ("vinf [km/s]", f"{results_dict["vinf"]:.2f}"),
+                          ("Electron scattering opacity ", f"{results_dict["kappa_e"]:.2f}"),
+                          ("Critical depth", f"{results_dict["t_crit"]:.2f}"),
+                          ("Q bar", f"{results_dict["Qbar"]:.2f}"),
+                          ("alpha", f"{results_dict["alpha"]:.2f}"),
+                          ("Q0", f"{results_dict["Q0"]:.2f}")]
+
             c.setFont("Helvetica", 16)
             table = Table(table_data)
             table.setStyle(TableStyle([
@@ -310,31 +209,17 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             ]))
             table.wrapOn(c, page_width, page_height)
             table.drawOn(c, 70, page_height - 530)
-    
-    
-            # extra table for more outputs
-    
+
+            # If desired produce more information in the output
             if expert_mode:
-                table_data = [
-                    ("Extra Output", "Value"),
-                    ("Z scaled to solar (input)", f"{zscale:.2e}"),]  
-                with open(simlog_path, "r") as f:
-                    lines = f.readlines()
-                    if len(lines) >= 2:
-                        last_values = lines[-1].split()
-                        if len(last_values) >= 10:
-                            wralphag = float(last_values[6].strip("'"))
-                            wralpha2 = float(last_values[7].strip("'"))
-                            wrvesc = float(last_values[8].strip("'"))
-                            wrvcri = float(last_values[9].strip("'"))
-                            wrrhocri = float(last_values[10].strip("'"))
-                            table_data.extend([
-                                ("Globally fitted alpha", f"{wralphag:.3f}"),
-                                ("Locally fitted alpha", f"{wralpha2:.3f}"),
-                                ("Effective v escape [km/s]", f"{wrvesc:.2f}"),
-                                ("Critical velocity", f"{wrvcri:.2f}"),
-                                ("Critical density", f"{wrrhocri:.2e}"),
-                            ])
+                table_data = [("Extra Output", "Value"),
+                              ("Z scaled to solar (input)", f"{zscale:.2e}"),
+                              ("Globally fitted alpha", f"{results_dict["alphag"]:.3f}"),
+                              ("Locally fitted alpha", f"{results_dict["alpha2"]:.3f}"),
+                              ("Effective v escape [km/s]", f"{results_dict["vesc"]:.2f}"),
+                              ("Critical velocity", f"{results_dict["v_crit"]:.2f}"),
+                              ("Critical density", f"{results_dict["density"]:.2e}")]
+
                 c.setFont("Helvetica", 16)
                 table = Table(table_data)
                 table.setStyle(TableStyle([
@@ -348,8 +233,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 ]))
                 table.wrapOn(c, page_width, page_height)
                 table.drawOn(c, 70, page_height - 690)
-    
-    
+
             # Abundances Table
             abundance_table_data = [("Element", "Abundance")] + [(el, f"{abundances[el]:.4e}") for el in abundances]
             abundance_table = Table(abundance_table_data, colWidths=[100, 150])
@@ -433,36 +317,22 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 c.drawImage(fig_path, x_adjusted, y_adjusted, width=new_width, height=new_height)
     
                 c.setFont("Helvetica", 10)
-    
-            # --- 3. Add Simulation Log (simlog.txt) on a New Page ---
-            #if os.path.exists(simlog_path):
-            #    c.showPage()  # New page for text
-            #    c.setFont("Helvetica", 12)
-            #    y_position = page_height - 50  # Start from the top
-            
-            #    with open(simlog_path, "r") as f:
-            #        log_text = f.readlines()
-            
-            #    for line in log_text:
-            #        if y_position < 50:  # If out of space, start a new page
-            #            c.showPage()
-            #            c.setFont("Helvetica", 12)
-            #            y_position = page_height - 50
-            
-            #        c.drawString(50, y_position, line.strip())  # Add text line
-            #        y_position -= 12  # Move down        
 
             c.save()  
 
-        
-   
+        return results_dict
+
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
+
+    print("Process Computation failed!")
+    return DUMMY_RESULTS
 
 
 @app.route('/')
 def home():
     return render_template("index.html")
+
 
 @app.route('/process_data', methods=['POST'])
 def process_data():
@@ -487,8 +357,8 @@ def process_data():
         
         recipient_email = data.get("email", "").strip()
 
-        # expert mode
-        expert_mode = data.get("expert_mode", False) # by default false
+        # To allow additional output:
+        expert_mode = data.get("expert_mode", False)  # by default false
         
         # Calculate values
         zstar = calculate_metallicity_massb(abundances)
@@ -508,8 +378,8 @@ def process_data():
         does_plot = True
 
         # Run computation in a separate thread
-        process_computation(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances, recipient_email, pdf_name, -1, session_tmp_dir, expert_mode, does_plot)
-
+        results_dict = process_computation(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances,
+                                           pdf_name, session_tmp_dir, expert_mode, does_plot)
         # Check if the PDF exists at the correct path
         if not os.path.exists(pdf_path):
             return jsonify({"error": f"PDF generation failed. Expected at {pdf_path}"}), 500
@@ -521,38 +391,27 @@ def process_data():
         relative_session_id = os.path.relpath(session_tmp_dir, base_tmp_dir)
 
         pdf_url = url_for("download_temp_file", session_id=relative_session_id, filename=f"{pdf_name}/result.pdf", _external=True)
-        
-        
-        # Extract the computed values from simlog.txt
-        simlog_path = os.path.join(output_dir, "simlog.txt")
-        if os.path.exists(simlog_path):
-            iteration_data = extract_data_from_file(simlog_path)
-            wrmdot = iteration_data["Mass loss rate"]
-            wrqbar = iteration_data["Qbar"]
-            wralp = iteration_data["alpha"]
-            wrq0 = iteration_data["Q0"]
-            wrvinf = iteration_data["vinf"]
-            wrzstar = iteration_data["Zmass"]
-            wrrstar = iteration_data["R_star"]
-            wrlogg = iteration_data["log_g"]
-        else:
-            wrmdot, wrqbar, wralp, wrq0, wrvinf, wrzstar, wrrstar, wrlogg = None, None, None, None, None, None, None
 
         # **Send Email if recipient email is provided**
         if recipient_email:
-            email_context = {
-                "luminosity": f"{luminosity:.1f}",
-                "teff": f"{teff:.1f}",
-                "mstar": f"{mstar:.1f}",
-                "rstar": f"{wrrstar:.2f}",
-                "logg": f"{wrlogg:.2f}",
-                "zstar": f"{wrzstar:.3e}",
-                "mass_loss_rate": f"{wrmdot:.3e}",
-                "qbar": f"{wrqbar:.0f}",
-                "alpha": f"{wralp:.2f}",
-                "q0": f"{wrq0:.0f}",
-                "vinf": f"{wrvinf:.2e}" 
-            }
+            if results_dict is None:
+                email_context = {"Result": "Failed to calculate a model"}
+            else:
+                if not results_dict["fail"]:
+                    email_context = {
+                        "luminosity": f"{luminosity:.1f}",
+                        "teff": f"{teff:.1f}",
+                        "mstar": f"{mstar:.1f}",
+                        "rstar": f"{results_dict["R_star"]:.2f}",
+                        "logg": f"{results_dict["log_g"]:.2f}",
+                        "zstar": f"{results_dict["Zmass"]:.3e}",
+                        "mass_loss_rate": f"{results_dict["mdot"]:.3e}",
+                        "qbar": f"{results_dict["Qbar"]:.0f}",
+                        "alpha": f"{results_dict["alpha"]:.2f}",
+                        "q0": f"{results_dict["Q0"]:.0f}",
+                        "vinf": f"{results_dict["vinf"]:.2e}"}
+                else:
+                    email_context = {"Result": results_dict["fail_message"]}
 
             email_body = load_dyn_email('./mailing/mail_dyn.j2', email_context)
 
@@ -561,8 +420,7 @@ def process_data():
                 "python3", "./mailing/mailer.py",
                 "--t", recipient_email,
                 "--s", "LIME Computation Results",
-                "--b", email_body
-            ])
+                "--b", email_body])
 
         return jsonify({"message": "Computation complete", "download_url": pdf_url}), 200
     
@@ -588,6 +446,7 @@ def download_temp_file(session_id, filename):
         return jsonify({"error": f"File {filename} not found"}), 404
 
     return send_file(file_path, mimetype='application/pdf')
+
 
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():
@@ -640,15 +499,11 @@ def upload_csv():
                     "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
                 }
 
-                #computation_threads = []
-                #results_data = []  
-
                 results_csv_path = os.path.join(batch_output_dir, "results.csv")
-                csv_header_written = False  
-                final_zip_path = os.path.join(batch_output_dir, "final_results.zip")
+                csv_header_written = False
 
                 pdf_paths = []
-
+                all_results = []
 
                 for index, row in df.iterrows():
                     pdf_name = str(row["name"])
@@ -661,7 +516,6 @@ def upload_csv():
                     result_dir = os.path.join(batch_output_dir, pdf_name)
                     os.makedirs(result_dir, exist_ok=True)
                     pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
-                    
 
                     abundances = {}
                     total_metal_mass = 0
@@ -679,41 +533,22 @@ def upload_csv():
                     helium_abundance = abundances["HE"]
                     hydrogen_abundance = 1.0 - (total_metal_mass + helium_abundance)
 
-                    remark = ""
-
                     if hydrogen_abundance >= 0:
                         abundances["H"] = hydrogen_abundance
-                    else:
-                        remark = "WARNING: Abundances exceed 1. Check input values."
-                        hydrogen_abundance = max(0, hydrogen_abundance)    
 
-                    pointer = -1
-
-                    #computation_thread = threading.Thread(
-                    #    target=process_computation,
-                    #    args=(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir)
-                    #)
-                    #computation_threads.append(computation_thread)
-                    #computation_thread.start()
-
-                    # no figure
+                    # No need to make figures when running working through a csv file.
                     does_plot = False
-                    
-                    process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, user_email, pdf_name, pointer, batch_output_dir, False, does_plot)
+
+                    # Start the main calculation
+                    results_dict = process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances,
+                                                       pdf_name, batch_output_dir, False, does_plot)
                     pdf_paths.append(pdf_path)
-                    
+                    all_results.append(results_dict)
 
-                # Wait for all threads to finish
-                #for thread in computation_threads:
-                #    thread.join()
-
-                # Collect results from each computation
-
-                
                 for index, row in df.iterrows():
+                    results_dict = all_results[index]
                     pdf_name = str(row["name"])
                     result_dir = os.path.join(batch_output_dir, pdf_name)
-                    simlog_path = os.path.join(result_dir, "simlog.txt")
                     mass_abundance_path = os.path.join(result_dir, "output", "mass_abundance")
 
                     # Read abundances from the mass_abundance file
@@ -727,63 +562,45 @@ def upload_csv():
                                     abundance_value = float(parts[-1])  
                                     abundances_data[element_symbol] = abundance_value
                     
-                    remark = ""
-                    with open(simlog_path, "r") as f:
-                        lines = f.readlines()
-                        failure_reason = ""
-                        
-                        for line in lines:
-                            if "Failure:" in line:
-                                failure_reason = line.strip().replace("Failure:", "").strip()
-                                break 
-
-                        if len(lines) >= 2 : 
-                            last_values = lines[-1].split()
-                            try:
-                                if len(last_values) >= 6:
-                                    wrmdot = float(last_values[0].strip("'"))
-                                    wrqbar = float(last_values[1].strip("'"))
-                                    wralp = float(last_values[2].strip("'"))
-                                    wrq0 = float(last_values[3].strip("'"))
-                                    wrvinf = float(last_values[4].strip("'"))
-                                    wrzstar = float(last_values[5].strip("'"))
-                                    wrrstar = float(last_values[11].strip("'"))
-                                    wrlogg = float(last_values[12].strip("'"))
-                            except ValueError:
-                                failure_reason = "Parsing error in output file"
-                    
-                        if failure_reason:
-                            remark = failure_reason  
-                    
                     with open(results_csv_path, mode='a', newline='') as f:
                         writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Rstar", "log g", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
                         if not csv_header_written:
                             writer.writeheader()
                             csv_header_written = True
-                        writer.writerow({"Name": pdf_name, "Luminosity": row["luminosity"], "Teff": row["teff"], "Mstar": row["mstar"], "Rstar": f"{wrrstar:.2e}", "log g": f"{wrlogg:.2e}","Zstar": f"{wrzstar:.3e}", "Mass Loss Rate": f"{wrmdot:.3e}", "Qbar": f"{wrqbar:.2e}", "Alpha": f"{wralp:.2e}", "Q0": f"{wrq0:.2e}", "Vinf": f"{wrvinf:.2e}", "Remark":remark, **abundances_data})
-                 
-                # Save results to CSV file
-                #results_csv_path = os.path.join(batch_output_dir, "results.csv")
-                #results_df = pd.DataFrame(results_data)
-                #results_df.to_csv(results_csv_path, index=False)
-
-                # **Create ZIP file with results**
-                final_zip_path = os.path.join(batch_output_dir, "results.csv")
-                
-                #with zipfile.ZipFile(final_zip_path, 'w') as zipf:
-                #    if num_rows > 20:
-                        # **Only add CSV for large files**
-                #        zipf.write(results_csv_path, os.path.basename(results_csv_path))
-                #    else:
-                        # **Include both CSV and PDFs for small files**
-                #        for pdf_path in pdf_paths:
-                #            if os.path.exists(pdf_path):
-                #                zipf.write(pdf_path, os.path.relpath(pdf_path, batch_output_dir))
-                #        zipf.write(results_csv_path, os.path.basename(results_csv_path))
+                        if not results_dict["fail"]:
+                            writer.writerow({"Name": pdf_name,
+                                             "Luminosity": row["luminosity"],
+                                             "Teff": row["teff"],
+                                             "Mstar": row["mstar"],
+                                             "Rstar": f"{results_dict["R_star"]:.2e}",
+                                             "log g": f"{results_dict["log_g"]:.2e}",
+                                             "Zstar": f"{results_dict["Zmass"]:.3e}",
+                                             "Mass Loss Rate": f"{results_dict["mdot"]:.3e}",
+                                             "Qbar": f"{results_dict["Qbar"]:.2e}",
+                                             "Alpha": f"{results_dict["alpha"]:.2e}",
+                                             "Q0": f"{results_dict["Q0"]:.2e}",
+                                             "Vinf": f"{results_dict["vinf"]:.2e}",
+                                             "Remark": results_dict["fail_reason"],
+                                             **abundances_data})
+                        else:
+                            writer.writerow({"Name": pdf_name,
+                                             "Luminosity": row["luminosity"],
+                                             "Teff": row["teff"],
+                                             "Mstar": row["mstar"],
+                                             "Rstar": f"{np.nan}",
+                                             "log g": f"{np.nan}",
+                                             "Zstar": f"{np.nan}",
+                                             "Mass Loss Rate": f"{np.nan}",
+                                             "Qbar": f"{np.nan}",
+                                             "Alpha": f"{np.nan}",
+                                             "Q0": f"{np.nan}",
+                                             "Vinf": f"{np.nan}",
+                                             "Remark": results_dict["fail_reason"],
+                                             **abundances_data})
 
                 # Send email with ZIP
                 body = load_email_body('./mailing/mail_template.j2')
-                subprocess.run(["python3", "./mailing/mailer.py", "--t", user_email, "--s", "LIME Computation Results", "--b", body, "--a", final_zip_path])
+                subprocess.run(["python3", "./mailing/mailer.py", "--t", user_email, "--s", "LIME Computation Results", "--b", body, "--a", results_csv_path])
 
             except Exception as e:
                 print(f"Unexpected error in batch processing: {str(e)}")
@@ -796,6 +613,7 @@ def upload_csv():
 
     except Exception as e:
         return jsonify({"error": f"Unexpected error in upload_csv: {str(e)}"}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True)
