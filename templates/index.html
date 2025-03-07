@@ -540,6 +540,12 @@
         attachAbundanceListeners();
         
         function runCalculation() {
+            const runButton = document.querySelector(".button-container button");
+        
+            // Disable the button to prevent multiple clicks
+            runButton.disabled = true;
+            runButton.textContent = "Processing..."; // Optional: Change text while waiting
+            
             // Get input values
             const luminosity = parseFloat(document.getElementById("luminosity").value);
             const teff = parseFloat(document.getElementById("teff").value);
@@ -552,43 +558,36 @@
                 const value = parseFloat(document.getElementById(`abundance-${element}`).value);
                 abundances[element] = value;
             }
+        
             let email = "";
             if (document.getElementById("email-toggle").checked) {
                 email = document.getElementById("user-email").value.trim();
                 if (!email) {
                     alert("Please enter a valid email address.");
+                    runButton.disabled = false; // Re-enable button
+                    runButton.textContent = "Run"; // Restore button text
                     return;
                 }
             }
-
+        
             const expertMode = document.getElementById("expert-toggle").checked;
-   
-            // Show loading message and disable button
+        
+            // Show loading message
             document.getElementById("loading").style.display = "block";
-            document.querySelector(".button-container button").disabled = true;
-    
+        
             fetch('/process_data', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    luminosity: luminosity,
-                    teff: teff,
-                    mstar: mstar,
-                    zscale: zscale,
-                    abundances: abundances,
-                    email : email,
-                    expert_mode: expertMode
+                    luminosity, teff, mstar, zscale, abundances, email, expert_mode: expertMode
                 })
             })
             .then(response => response.json())
             .then(data => {
-                // Hide loading message and enable button
                 document.getElementById("loading").style.display = "none";
-                document.querySelector(".button-container button").disabled = false;
-                
-    
+                runButton.disabled = false;  // Re-enable button
+                runButton.textContent = "Run"; // Restore button text
+        
                 if (data.download_url) {
                     window.open(data.download_url, '_blank');  
                 } else if (data.message) {
@@ -601,9 +600,9 @@
                 console.error("Error:", error);
                 alert("There was an error processing the data.");
                 
-                // Hide loading message and enable button
                 document.getElementById("loading").style.display = "none";
-                document.querySelector(".button-container button").disabled = false;
+                runButton.disabled = false;  // Re-enable button
+                runButton.textContent = "Run"; // Restore button text
             });
         }
 

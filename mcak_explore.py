@@ -496,7 +496,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
             plot_fit(file_path, alpha, q0, qbar, iteration, t_cri, random_subdir, lgt_filtered)
 
         print(f"{color.GREEN}{color.BOLD}\n Converged! {color.END}{color.BOLD}{color.BLUE}")
-        print(f"{"Mass-loss rate":>15}{"Qbar":>10}{"alpha":>10}{"Q0":>10}{"vinf":>10}{"zstar":>10}{color.END}"
+        print(f'{"Mass-loss rate":>15}{"Qbar":>10}{"alpha":>10}{"Q0":>10}{"vinf":>10}{"zstar":>10}{color.END}'
               f"{color.BOLD}{color.GREEN}")
         print(f"{mdot * cgs.year / cgs.Msun:>15.3g}{qbar:>10.3g}{alpha:>10.3g}{q0:>10.3g}{vinf:>10.3g}{Z_star:>10.3g}")
         print(color.END)

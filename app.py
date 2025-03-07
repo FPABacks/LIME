@@ -166,9 +166,9 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 ("Input Parameter", "Value"),
                 ("Luminosity [solar luminosity]", f"{lum:.1f}"),
                 ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
-                ("Eddington Ratio ", f"{results_dict["kappa_e"]:.2f}"),
-                ("Stellar Radius [solar radius] ", f"{results_dict["R_star"]:.2f}"),
-                ("log g ", f"{results_dict["log_g"]:.2f}"),
+                ("Eddington Ratio ", "{:.2f}".format(results_dict["kappa_e"])),
+                ("Stellar Radius [solar radius] ","{:.2f}".format(results_dict["R_star"])),
+                ("log g ","{:.2f}".format(results_dict["log_g"])),
                 ("Effective Temperature [K]", f"{teff:.1f}"),
                 ("Z star (Calculated)", f"{zstar:.3e}")]
             
@@ -188,13 +188,13 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
 
             # Make the results table
             table_data = [("Output", "Value"),
-                          ("Mass loss rate [solar mass/year]", f"{results_dict["mdot"]:.3e}"),
-                          ("vinf [km/s]", f"{results_dict["vinf"]:.2f}"),
-                          ("Electron scattering opacity ", f"{results_dict["kappa_e"]:.2f}"),
-                          ("Critical depth", f"{results_dict["t_crit"]:.2f}"),
-                          ("Q bar", f"{results_dict["Qbar"]:.2f}"),
-                          ("alpha", f"{results_dict["alpha"]:.2f}"),
-                          ("Q0", f"{results_dict["Q0"]:.2f}")]
+                          ("Mass loss rate [solar mass/year]", "{:.3e}".format(results_dict["mdot"])),
+                          ("vinf [km/s]",  "{:.2f}".format(results_dict["vinf"])),
+                          ("Electron scattering opacity ",  "{:.2f}".format(results_dict["kappa_e"])),
+                          ("Critical depth", "{:.2f}".format(results_dict["t_crit"])),
+                          ("Q bar", "{:.2f}".format(results_dict["Qbar"])),
+                          ("alpha", "{:.2f}".format(results_dict["alpha"])),
+                          ("Q0", "{:.2f}".format(results_dict["Q0"]))]
 
             c.setFont("Helvetica", 16)
             table = Table(table_data)
@@ -214,11 +214,11 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             if expert_mode:
                 table_data = [("Extra Output", "Value"),
                               ("Z scaled to solar (input)", f"{zscale:.2e}"),
-                              ("Globally fitted alpha", f"{results_dict["alphag"]:.3f}"),
-                              ("Locally fitted alpha", f"{results_dict["alpha2"]:.3f}"),
-                              ("Effective v escape [km/s]", f"{results_dict["vesc"]:.2f}"),
-                              ("Critical velocity", f"{results_dict["v_crit"]:.2f}"),
-                              ("Critical density", f"{results_dict["density"]:.2e}")]
+                              ("Globally fitted alpha", "{:.3f}".format(results_dict["alphag"])),
+                              ("Locally fitted alpha", "{:.3f}".format(results_dict["alpha2"])),
+                              ("Effective v escape [km/s]", "{:.2f}".format(results_dict["vesc"])),
+                              ("Critical velocity", "{:.2f}".format(results_dict["v_crit"])),
+                              ("Critical density", "{:.2e}".format(results_dict["density"]))]
 
                 c.setFont("Helvetica", 16)
                 table = Table(table_data)
@@ -402,18 +402,20 @@ def process_data():
                         "luminosity": f"{luminosity:.1f}",
                         "teff": f"{teff:.1f}",
                         "mstar": f"{mstar:.1f}",
-                        "rstar": f"{results_dict["R_star"]:.2f}",
-                        "logg": f"{results_dict["log_g"]:.2f}",
-                        "zstar": f"{results_dict["Zmass"]:.3e}",
-                        "mass_loss_rate": f"{results_dict["mdot"]:.3e}",
-                        "qbar": f"{results_dict["Qbar"]:.0f}",
-                        "alpha": f"{results_dict["alpha"]:.2f}",
-                        "q0": f"{results_dict["Q0"]:.0f}",
-                        "vinf": f"{results_dict["vinf"]:.2e}"}
+                        "rstar": "{:.2f}".format(results_dict["R_star"]),
+                        "logg": "{:.2f}".format(results_dict["log_g"]),
+                        "zstar": "{:.3e}".format(results_dict["Zmass"]),
+                        "mass_loss_rate": "{:.3e}".format(results_dict["mdot"]),
+                        "qbar": "{:.0f}".format(results_dict["Qbar"]),
+                        "alpha": "{:.2f}".format(results_dict["alpha"]),
+                        "q0": "{:.0f}".format(results_dict["Q0"]),
+                        "vinf": "{:.2e}".format(results_dict["vinf"]),}
+                    email_body = load_dyn_email('./mailing/mail_dyn.j2', email_context)
                 else:
-                    email_context = {"Result": results_dict["fail_message"]}
-
-            email_body = load_dyn_email('./mailing/mail_dyn.j2', email_context)
+                    email_context = {"Result": results_dict["fail_reason"]}
+                    email_body = load_dyn_email('./mailing/fail_template.j2', email_context)
+            
+            
 
             # Send the email using mailer.py
             subprocess.run([
@@ -445,7 +447,14 @@ def download_temp_file(session_id, filename):
         print(f"File NOT FOUND: {file_path}")  # Debugging output
         return jsonify({"error": f"File {filename} not found"}), 404
 
-    return send_file(file_path, mimetype='application/pdf')
+    response = send_file(file_path, mimetype='application/pdf')
+    
+    def cleanup():
+        shutil.rmtree(session_tmp_dir, ignore_errors=True)
+    
+    threading.Timer(5, cleanup).start()  
+
+    return response
 
 
 @app.route('/upload_csv', methods=['POST'])
@@ -463,7 +472,7 @@ def upload_csv():
         num_rows = len(df)
 
         # **Check the number of rows in CSV**
-        if num_rows > 200:
+        if num_rows > 1000:
             return jsonify({
                 "error": "Too many entries! Please reduce the number of stars to 200 or split the CSV into smaller parts."
             }), 400
@@ -572,14 +581,14 @@ def upload_csv():
                                              "Luminosity": row["luminosity"],
                                              "Teff": row["teff"],
                                              "Mstar": row["mstar"],
-                                             "Rstar": f"{results_dict["R_star"]:.2e}",
-                                             "log g": f"{results_dict["log_g"]:.2e}",
-                                             "Zstar": f"{results_dict["Zmass"]:.3e}",
-                                             "Mass Loss Rate": f"{results_dict["mdot"]:.3e}",
-                                             "Qbar": f"{results_dict["Qbar"]:.2e}",
-                                             "Alpha": f"{results_dict["alpha"]:.2e}",
-                                             "Q0": f"{results_dict["Q0"]:.2e}",
-                                             "Vinf": f"{results_dict["vinf"]:.2e}",
+                                             "Rstar": "{:.2e}".format(results_dict["R_star"]),
+                                             "log g": "{:.2e}".format(results_dict["log_g"]),
+                                             "Zstar": "{:.3e}".format(results_dict["Zmass"]),
+                                             "Mass Loss Rate": "{:.3e}".format(results_dict["mdot"]),
+                                             "Qbar": "{:.2e}".format(results_dict["Qbar"]),
+                                             "Alpha": "{:.2e}".format(results_dict["alpha"]),
+                                             "Q0": "{:.2e}".format(results_dict["Q0"]),
+                                             "Vinf": "{:.2e}".format(results_dict["vinf"]),
                                              "Remark": results_dict["fail_reason"],
                                              **abundances_data})
                         else:
@@ -604,6 +613,10 @@ def upload_csv():
 
             except Exception as e:
                 print(f"Unexpected error in batch processing: {str(e)}")
+
+            finally:
+                # The batch directory is removed after processing
+                shutil.rmtree(batch_output_dir, ignore_errors=True)    
 
         # **Start computation in a new thread**
         batch_thread = threading.Thread(target=process_batch)
