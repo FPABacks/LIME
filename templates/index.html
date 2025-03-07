@@ -107,10 +107,13 @@
         }
 
         .button-container {
-            text-align: left;
-            margin-top: 20px;      
+            display: flex;
+            align-items: left;
+            gap: 15px; 
+            justify-content: left;
+            margin-top: 20px;
         }
-
+        
         button {
             padding: 10px 20px;
             background-color: #7a8c97;
@@ -119,24 +122,22 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 25px;
+            width: 150px;  /* Fixed width for consistency */
+            text-align: center;
         }
+        
         button:hover {
             background-color: #5f6d7e;
         }
-
-         /* Loading animation styles */
+        
         .loading-container {
-            display: none; /* Initially hidden */
-            text-align: center;
-            font-size: 20px;
-            color: #2c3e50;
-            margin-top: 20px;
+            display: none;
+            align-items: center;
         }
-    
+        
         .loading-container img {
             width: 50px;
             height: 50px;
-            margin-top: 10px;
             animation: spin 1s linear infinite;
         }
     
@@ -223,11 +224,6 @@
             <img src="{{ url_for('static', filename='logo.png') }}" alt="MCAK-Mforce Logo" class="logo">
         </div>
 
-        <div id="loading" class="loading-container">
-            <p>Processing... Please wait.</p>
-            <img src="{{ url_for('static', filename='loading.gif') }}" alt="Loading">
-        </div>
-
         <!-- Tab navigation -->
         <div class="tabs">
             <button class="tab active-tab" onclick="showTab('info')">Tool Info</button>
@@ -312,9 +308,11 @@
                 <input type="number" id="zscale" step="any" onblur="updateAbundances()">
             </div>
             <div class="button-container">
-                <button onclick="runCalculation()">Run</button>
+                <button id="runButton" onclick="runCalculation()">Run</button>
+                <div id="loading" class="loading-container">
+                    <img src="{{ url_for('static', filename='loading.gif') }}" alt="Loading">
+                </div>
             </div>
-
             <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px;">
                 <label class="switch">
                     <input type="checkbox" id="email-toggle" onchange="toggleEmailInput()">
@@ -541,10 +539,11 @@
         
         function runCalculation() {
             const runButton = document.querySelector(".button-container button");
+            const loadingIcon = document.getElementById("loading");
         
             // Disable the button to prevent multiple clicks
             runButton.disabled = true;
-            runButton.textContent = "Processing..."; // Optional: Change text while waiting
+            runButton.textContent = "Running"; 
             
             // Get input values
             const luminosity = parseFloat(document.getElementById("luminosity").value);
