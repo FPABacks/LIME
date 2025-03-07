@@ -450,6 +450,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
 
         # Make sure at least 3 iterations happen
         if iteration < 3:
+            rho = rho_target
             continue
 
         # Fail reason 1, cannot drive wind
@@ -482,6 +483,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
             fail = True
             failure_reason = "The model did not converge after the maximum allowed iterations."
             break
+        
         # Update the density to the target density for the next iteration
         rho = rho_target
 
