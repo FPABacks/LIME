@@ -2,6 +2,8 @@ import requests
 import unittest
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import io
+import time
+
 
 # Make sure this is the right web address
 server_url = "http://127.0.0.1:8000"
@@ -44,20 +46,49 @@ class TestLimeServer(unittest.TestCase):
         Tests if a single mass loss rate can be calculated.
         """
         response = calc_single_model()
-        self.assertEqual(response.status_code, 200)
+        task_id = response.json().get("task_id")
+        timeout = 60
+        start_time = time.time()
+        while True:
+            status_response = requests.get(f"{server_url}/task_status/{task_id}")
+            status_data = status_response.json()
+            if status_data["status"] in ["SUCCESS", "FAILURE"]:
+                break
+            if time.time() - start_time > timeout:
+                raise TimeoutError(f"It took longer than {timeout} seconds, that is too long!")
+            time.sleep(0.1)
+
+        # This is still a very basic check now. As long as it thinks it was a success it is all good.
+        self.assertEqual(status_data["status"],"SUCCESS")
 
     def test_multiple_models(self):
         """
         Does the single model test, but multiple at once, preferably more than the number of workers to stress test
         the server a little.
         """
-        n_requests = 10  # Put in many requests at once (more than the expected number of workers of the server)
+        n_requests = 500  # Put in many requests at once (more than the expected number of workers of the server)
         with ThreadPoolExecutor(max_workers=n_requests) as executor:
             futures = [executor.submit(calc_single_model) for _ in range(n_requests)]
-            results = [future.result().status_code for future in as_completed(futures)]
+            results = [future.result() for future in as_completed(futures)]
 
-        for status in results:
-            self.assertEqual(status, 200)
+        timeout = 600
+        start_time = time.time()
+        n_success = 0
+        while True:
+            for res in results:
+
+                task_id = res.json().get("task_id")
+                status_response = requests.get(f"{server_url}/task_status/{task_id}")
+                status_data = status_response.json()
+                if status_data["status"] in ["SUCCESS", "FAILURE"]:
+                    self.assertEqual(status_data["status"], "SUCCESS")
+                    n_success += 1
+                    results.remove(res)
+            if n_success == n_requests:
+                break
+            if time.time() - start_time > timeout:
+                raise TimeoutError(f"It took longer than {timeout} seconds, that is too long!")
+            time.sleep(0.1)
 
     # NOTE: This is a flawed test, it does not work properly as it does not require models to be calculated.
     # It only waits for the server response, which is (nearly) instant. Though it likely causes the other tests to fail

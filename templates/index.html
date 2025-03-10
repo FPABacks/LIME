@@ -540,24 +540,24 @@
         function runCalculation() {
             const runButton = document.querySelector(".button-container button");
             const loadingIcon = document.getElementById("loading");
-        
+
             // Disable the button to prevent multiple clicks
             runButton.disabled = true;
-            runButton.textContent = "Running"; 
-            
+            runButton.textContent = "Running";
+
             // Get input values
             const luminosity = parseFloat(document.getElementById("luminosity").value);
             const teff = parseFloat(document.getElementById("teff").value);
             const mstar = parseFloat(document.getElementById("mstar").value);
             const zscale = parseFloat(document.getElementById("zscale").value);
-            
+
             // Collect abundances
             const abundances = {};
             for (const element of Object.keys(defaultAbundances)) {
                 const value = parseFloat(document.getElementById(`abundance-${element}`).value);
                 abundances[element] = value;
             }
-        
+
             let email = "";
             if (document.getElementById("email-toggle").checked) {
                 email = document.getElementById("user-email").value.trim();
@@ -568,42 +568,70 @@
                     return;
                 }
             }
-        
+
             const expertMode = document.getElementById("expert-toggle").checked;
-        
+
             // Show loading message
             document.getElementById("loading").style.display = "block";
-        
-            fetch('/process_data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+
+            // Send request to start processing
+            fetch("/process_data", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     luminosity, teff, mstar, zscale, abundances, email, expert_mode: expertMode
                 })
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("loading").style.display = "none";
-                runButton.disabled = false;  // Re-enable button
-                runButton.textContent = "Run"; // Restore button text
-        
-                if (data.download_url) {
-                    window.open(data.download_url, '_blank');  
-                } else if (data.message) {
-                    alert(data.message);
-                } else if (data.error) {
-                    alert(data.error);
+                if (data.task_id) {
+                    // Start polling for task status
+                    pollTaskStatus(data.task_id);
+                } else {
+                    // If no task ID is returned, show an error
+                    document.getElementById("loading").style.display = "none";
+                    runButton.disabled = false;
+                    runButton.textContent = "Run";
+                    alert(data.error || "An unexpected error occurred.");
                 }
             })
             .catch(error => {
                 console.error("Error:", error);
                 alert("There was an error processing the data.");
-                
+
                 document.getElementById("loading").style.display = "none";
-                runButton.disabled = false;  // Re-enable button
-                runButton.textContent = "Run"; // Restore button text
+                runButton.disabled = false;
+                runButton.textContent = "Run";
             });
         }
+
+// Poll the task status
+function pollTaskStatus(taskId) {
+    fetch(`/task_status/${taskId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.done) {
+                document.getElementById("loading").style.display = "none";
+                runButton.disabled = false;
+                runButton.textContent = "Run";
+
+                if (data.download_url) {
+                    window.open(data.download_url, "_blank");
+                }
+            } else {
+                // If not done, check again in xx seconds
+                setTimeout(() => pollTaskStatus(taskId), 100);
+            }
+        })
+        .catch(error => {
+            console.error("Error checking task status:", error);
+            alert("An error occurred while checking task status.");
+            document.getElementById("loading").style.display = "none";
+            runButton.disabled = false;
+            runButton.textContent = "Run";
+        });
+}
+
 
 
         function uploadCSV() {

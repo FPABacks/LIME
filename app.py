@@ -5,6 +5,7 @@ import os
 import threading
 import shutil
 from mcak_explore import main as mcak_main
+from mcak_explore import DUMMY_RESULTS, color
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import simpleSplit
@@ -15,8 +16,45 @@ import pandas as pd
 import tempfile
 from jinja2 import Template
 import csv
+from celery import Celery, Task, shared_task
+import io
 
+
+def celery_init_app(app: Flask) -> Celery:
+    """Initialization of the Celery app
+    Taken from https://flask.palletsprojects.com/en/stable/patterns/celery/"""
+    class FlaskTask(Task):
+        def __call__(self, *args: object, **kwargs: object) -> object:
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=FlaskTask)
+    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.set_default()
+    celery_app.conf.worker_concurrency = 4
+    app.extensions["celery"] = celery_app
+    return celery_app
+
+
+# Initialize the website app
 app = Flask(__name__, static_folder='static', template_folder='templates')
+
+# Use redis as broker for the queueing system.
+app.config.from_mapping(
+    CELERY=dict(
+        broker_url="redis://localhost",
+        result_backend="redis://localhost",
+        task_ignore_result=True,
+    ),
+)
+
+# Server property setup
+app.config["SERVER_NAME"] = "0.0.0.0:8000"
+app.config["PREFERRED_URL_SCHEME"] = "http"
+app.config["APPLICATION_ROOT"] = ""
+
+# Start Celery for queueing
+celery = celery_init_app(app)
 
 MFORCE_DIR = os.getenv("MFORCE_DIR", ".")
 DATA_DIR = os.path.join(MFORCE_DIR, "DATA")
@@ -31,34 +69,7 @@ ATOMIC_MASSES = {
     'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690, 'CU': 63.546, 'ZN': 65.390
 }
 
-# This is a dictionary with dummy results in case things crash, so there is something to work with
-DUMMY_RESULTS = {"Iteration": -1,
-                 "rho": np.nan,
-                 "gamma_e*(1+qbar)": np.nan,
-                 "rel_mdot": np.nan,
-                 "rel_rho": np.nan,
-                 "kappa_e": np.nan,
-                 "Gamma_e": np.nan,
-                 "vesc": np.nan,
-                 "rat": np.nan,
-                 "phi_cook": np.nan,
-                 "R_star": np.nan,
-                 "log_g": np.nan,
-                 "Qbar": np.nan,
-                 "alpha": np.nan,
-                 "Q0": np.nan,
-                 "vinf": np.nan,
-                 "t_crit": np.nan,
-                 "v_crit": np.nan,
-                 "density": np.nan,
-                 "mdot": np.nan,
-                 "Zmass": np.nan,
-                 "Zscale": np.nan,
-                 "alphag": np.nan,
-                 "alpha2": np.nan,
-                 "warning": False,
-                 "fail": True,
-                 "fail_reason": ""}
+
 
 
 def calculate_metallicity_massb(mass_abundances):
@@ -120,7 +131,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
 
         if results_dict["fail"]:
             failure_reason = results_dict["fail_reason"]
-            print(f"Simulation failed: {failure_reason}")
+            print(f"{color.RED}Simulation failed: {failure_reason}{color.END}")
             pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
             c = canvas.Canvas(pdf_filename, pagesize=letter)
             c.setFont("Helvetica-Bold", 18)
@@ -335,25 +346,36 @@ def home():
 
 
 @app.route('/process_data', methods=['POST'])
-def process_data():
+def start_process():
+    """This starts the data processing task"""
+    data = request.json
+
+    # Check for issues before putting calculations in the queue
+    teff = float(data.get("teff", 0.0))
+    if teff > 60000 or teff < 15000:
+        return jsonify({"error": "Temperature beyond current coverage"}), 400
+
+    abundances = data.get("abundances", {})
+    if not abundances:
+        return jsonify({"error": "Abundances data is missing"}), 400
+
+    task = process_data.apply_async(args=[data])
+    return jsonify({"task_id": task.id}), 202
+
+
+@shared_task(ignore_result=False)
+def process_data(data):
     """Handles the communication with index.html"""
     try:
-        data = request.json
         print("Received data:", data)
 
         # Extract parameters
         luminosity = float(data.get("luminosity", 0.0))
         teff = float(data.get("teff", 0.0))
-      
-        if teff > 60000 or teff < 15000:
-            return jsonify ({"error": "Temparature beyond current coverage"}), 400
- 
+
         mstar = float(data.get("mstar", 0.0))
         zscale = float(data.get("zscale", 0.0))
         abundances = data.get("abundances", {})
-
-        if not abundances:
-            return jsonify({"error": "Abundances data is missing"}), 400
         
         recipient_email = data.get("email", "").strip()
 
@@ -374,7 +396,7 @@ def process_data():
         os.makedirs(output_dir, exist_ok=True)  
         pdf_path = os.path.join(output_dir, f"{pdf_name}.pdf")  
 
-        # plotting is true 
+        # In individual calculations always make the verification plots
         does_plot = True
 
         # Run computation in a separate thread
@@ -382,7 +404,8 @@ def process_data():
                                            pdf_name, session_tmp_dir, expert_mode, does_plot)
         # Check if the PDF exists at the correct path
         if not os.path.exists(pdf_path):
-            return jsonify({"error": f"PDF generation failed. Expected at {pdf_path}"}), 500
+            with app.app_context():
+                return {"error": f"PDF generation failed. Expected at {pdf_path}"}, 500
 
         # Schedule cleanup
         threading.Timer(600, shutil.rmtree, args=[session_tmp_dir], kwargs={"ignore_errors": True}).start()
@@ -414,8 +437,6 @@ def process_data():
                 else:
                     email_context = {"Result": results_dict["fail_reason"]}
                     email_body = load_dyn_email('./mailing/fail_template.j2', email_context)
-            
-            
 
             # Send the email using mailer.py
             subprocess.run([
@@ -424,12 +445,26 @@ def process_data():
                 "--s", "LIME Computation Results",
                 "--b", email_body])
 
-        return jsonify({"message": "Computation complete", "download_url": pdf_url}), 200
+        with app.app_context():
+            return {"message": "Computation complete", "download_url": pdf_url}, 200
     
     except ValueError as e:
-        return jsonify({"error": f"Invalid numerical input: {str(e)}"}), 400
+        with app.app_context():
+            return {"error": f"Invalid numerical input: {str(e)}"}, 400
     except Exception as e:
-        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+        with app.app_context():
+            return {"error": f"Unexpected error: {str(e)}"}, 500
+
+
+@app.route("/task_status/<task_id>", methods=["GET"])
+def get_processing_status(task_id):
+    """Check how the calculation is doing"""
+    task = celery.AsyncResult(task_id)
+    if task.state == "SUCCESS":
+        return jsonify({"status": task.state, "done": True, **task.result[0]}), task.result[1]
+    else:
+        return jsonify({"task_id": task.id, "status": task.state}), 202
+
 
 @app.route('/tmp/<session_id>/<path:filename>')
 def download_temp_file(session_id, filename):
@@ -458,174 +493,194 @@ def download_temp_file(session_id, filename):
 
 
 @app.route('/upload_csv', methods=['POST'])
-def upload_csv():
+def start_upload_csv():
+    """This starts the processing of the csv file"""
+
+    # First check if the file is uploaded and email address is supplied
+    if 'file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    # Read in the file and check the number of lines.
+    file = request.files["file"]
+    file_data = file.read().decode("utf-8")
+    num_rows = file_data.count("\n")
+    print(num_rows)
+    # file_data = base64.b64encode(file_data)  # Encode file as base64
+
+    if num_rows > 201:
+        return jsonify({
+            "error": "Too many entries! Please reduce the number of stars to 200 or split the CSV into smaller parts."
+        }), 400
+
+    user_email = request.form.get("email", "").strip()
+    if not user_email:
+        return jsonify({"error": "Email is required"}), 400
+
+    # Schedule the process
+    task = upload_csv.apply_async(args=[file_data, user_email])
+    return jsonify({"task_id": task.id}), 200
+
+
+@shared_task(ignore_result=True)
+def upload_csv(file_data, user_email):
     """Handles CSV file upload and batch computation"""
-    try:
-        if 'file' not in request.files:
-            return jsonify({"error": "No file provided"}), 400
-        
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({"error": "No selected file"}), 400
-        
-        df = pd.read_csv(file)
-        num_rows = len(df)
+    print("I am doing something!")
 
-        # **Check the number of rows in CSV**
-        if num_rows > 1000:
-            return jsonify({
-                "error": "Too many entries! Please reduce the number of stars to 200 or split the CSV into smaller parts."
-            }), 400
+    print("I REALLY AM!")
+    file_data = io.BytesIO(file_data.encode())
+    df = pd.read_csv(file_data)
+    print(df)
 
-        # Create a single batch directory for all results
-        base_dir = "./tmp"
-        os.makedirs(base_dir, exist_ok=True)
-        batch_output_dir = tempfile.mkdtemp(dir=base_dir)
-        os.makedirs(batch_output_dir, exist_ok=True)
+    # Create a single batch directory for all results
+    base_dir = "./tmp"
+    os.makedirs(base_dir, exist_ok=True)
+    batch_output_dir = tempfile.mkdtemp(dir=base_dir)
+    os.makedirs(batch_output_dir, exist_ok=True)
 
-        print(f"Batch directory created: {batch_output_dir}")  # Debugging
-        
-        user_email = request.form.get("email", "").strip()
-        if not user_email:
-            return jsonify({"error": "Email is required"}), 400
+    print(f"Batch directory created: {batch_output_dir}")  # Debugging
 
-        # **Return success response immediately**
-        response_message = {
-            "message": "CSV uploaded successfully. Your calculations will be processed and emailed to you shortly."
-        }
+    # **Return success response immediately**
+    response_message = {
+        "message": "CSV uploaded successfully. Your calculations will be processed and emailed to you shortly."
+    }
 
-        def process_batch():
-            """Function to process the batch asynchronously"""
-            try:
-                default_abundances = {
-                    "H": 0.7374078505762753, "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
-                    "B": 3.9638342804111373e-9, "C": 2.3649741118292409e-3, "N": 6.927752331287037e-4, "O": 5.7328054948662952e-3,  
-                    "F": 5.0460905860356957e-7, "NE": 1.2565170515587217e-3, "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
-                    "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4, "P": 5.8243105278933166e-6, "S": 3.0923740022022601e-4,  
-                    "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5, "K": 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
-                    "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6, "V": 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
-                    "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3, "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
-                    "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
-                }
+    def process_batch():
+        """Function to process the batch asynchronously"""
+        try:
+            default_abundances = {
+                "H": 0.7374078505762753, "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,
+                "B": 3.9638342804111373e-9, "C": 2.3649741118292409e-3, "N": 6.927752331287037e-4, "O": 5.7328054948662952e-3,
+                "F": 5.0460905860356957e-7, "NE": 1.2565170515587217e-3, "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,
+                "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4, "P": 5.8243105278933166e-6, "S": 3.0923740022022601e-4,
+                "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5, "K": 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,
+                "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6, "V": 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,
+                "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3, "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,
+                "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
+            }
 
-                results_csv_path = os.path.join(batch_output_dir, "results.csv")
-                csv_header_written = False
+            results_csv_path = os.path.join(batch_output_dir, "results.csv")
+            csv_header_written = False
 
-                pdf_paths = []
-                all_results = []
+            pdf_paths = []
+            all_results = []
 
-                for index, row in df.iterrows():
-                    pdf_name = str(row["name"])
-                    lum = float(row["luminosity"])
-                    teff = float(row["teff"])
-                    mstar = float(row["mstar"])
-                    zscale = float(row["zscale"])
+            for index, row in df.iterrows():
+                pdf_name = str(row["name"])
+                lum = float(row["luminosity"])
+                teff = float(row["teff"])
+                mstar = float(row["mstar"])
+                zscale = float(row["zscale"])
 
-                    # Create subdirectory inside batch directory
-                    result_dir = os.path.join(batch_output_dir, pdf_name)
-                    os.makedirs(result_dir, exist_ok=True)
-                    pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
+                # Create subdirectory inside batch directory
+                result_dir = os.path.join(batch_output_dir, pdf_name)
+                os.makedirs(result_dir, exist_ok=True)
+                pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
 
-                    abundances = {}
-                    total_metal_mass = 0
-                    for element, default_value in default_abundances.items():
-                        if element in ["H", "HE"]:
-                            abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value
-                        else:
-                            scaled_value = (float(row[element]) if element in row and not pd.isna(row[element]) else default_value) * zscale
-                            abundances[element] = scaled_value
-                            total_metal_mass += scaled_value
-                            
-                    zstar = calculate_metallicity_massb(abundances)
-                    
-                    #Keep He fixed and adjust H so the total remains 1
-                    helium_abundance = abundances["HE"]
-                    hydrogen_abundance = 1.0 - (total_metal_mass + helium_abundance)
+                abundances = {}
+                total_metal_mass = 0
+                for element, default_value in default_abundances.items():
+                    if element in ["H", "HE"]:
+                        abundances[element] = float(row[element]) if element in row and not pd.isna(row[element]) else default_value
+                    else:
+                        scaled_value = (float(row[element]) if element in row and not pd.isna(row[element]) else default_value) * zscale
+                        abundances[element] = scaled_value
+                        total_metal_mass += scaled_value
 
-                    if hydrogen_abundance >= 0:
-                        abundances["H"] = hydrogen_abundance
+                zstar = calculate_metallicity_massb(abundances)
 
-                    # No need to make figures when running working through a csv file.
-                    does_plot = False
+                #Keep He fixed and adjust H so the total remains 1
+                helium_abundance = abundances["HE"]
+                hydrogen_abundance = 1.0 - (total_metal_mass + helium_abundance)
 
-                    # Start the main calculation
-                    results_dict = process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances,
-                                                       pdf_name, batch_output_dir, False, does_plot)
-                    pdf_paths.append(pdf_path)
-                    all_results.append(results_dict)
+                if hydrogen_abundance >= 0:
+                    abundances["H"] = hydrogen_abundance
 
-                for index, row in df.iterrows():
-                    results_dict = all_results[index]
-                    pdf_name = str(row["name"])
-                    result_dir = os.path.join(batch_output_dir, pdf_name)
-                    mass_abundance_path = os.path.join(result_dir, "output", "mass_abundance")
+                # No need to make figures when running working through a csv file.
+                does_plot = False
 
-                    # Read abundances from the mass_abundance file
-                    abundances_data = {}
-                    if os.path.exists(mass_abundance_path):
-                        with open(mass_abundance_path, "r") as f:
-                            for line in f:
-                                parts = line.strip().split()
-                                if len(parts) >= 3:  
-                                    element_symbol = " ".join(parts[1:-1]).replace("'", "").strip()  
-                                    abundance_value = float(parts[-1])  
-                                    abundances_data[element_symbol] = abundance_value
-                    
-                    with open(results_csv_path, mode='a', newline='') as f:
-                        writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Rstar", "log g", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
-                        if not csv_header_written:
-                            writer.writeheader()
-                            csv_header_written = True
-                        if not results_dict["fail"]:
-                            writer.writerow({"Name": pdf_name,
-                                             "Luminosity": row["luminosity"],
-                                             "Teff": row["teff"],
-                                             "Mstar": row["mstar"],
-                                             "Rstar": "{:.2e}".format(results_dict["R_star"]),
-                                             "log g": "{:.2e}".format(results_dict["log_g"]),
-                                             "Zstar": "{:.3e}".format(results_dict["Zmass"]),
-                                             "Mass Loss Rate": "{:.3e}".format(results_dict["mdot"]),
-                                             "Qbar": "{:.2e}".format(results_dict["Qbar"]),
-                                             "Alpha": "{:.2e}".format(results_dict["alpha"]),
-                                             "Q0": "{:.2e}".format(results_dict["Q0"]),
-                                             "Vinf": "{:.2e}".format(results_dict["vinf"]),
-                                             "Remark": results_dict["fail_reason"],
-                                             **abundances_data})
-                        else:
-                            writer.writerow({"Name": pdf_name,
-                                             "Luminosity": row["luminosity"],
-                                             "Teff": row["teff"],
-                                             "Mstar": row["mstar"],
-                                             "Rstar": f"{np.nan}",
-                                             "log g": f"{np.nan}",
-                                             "Zstar": f"{np.nan}",
-                                             "Mass Loss Rate": f"{np.nan}",
-                                             "Qbar": f"{np.nan}",
-                                             "Alpha": f"{np.nan}",
-                                             "Q0": f"{np.nan}",
-                                             "Vinf": f"{np.nan}",
-                                             "Remark": results_dict["fail_reason"],
-                                             **abundances_data})
+                # Start the main calculation
+                results_dict = process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances,
+                                                   pdf_name, batch_output_dir, False, does_plot)
+                pdf_paths.append(pdf_path)
+                all_results.append(results_dict)
 
-                # Send email with ZIP
-                body = load_email_body('./mailing/mail_template.j2')
-                subprocess.run(["python3", "./mailing/mailer.py", "--t", user_email, "--s", "LIME Computation Results", "--b", body, "--a", results_csv_path])
+            for index, row in df.iterrows():
+                results_dict = all_results[index]
+                pdf_name = str(row["name"])
+                result_dir = os.path.join(batch_output_dir, pdf_name)
+                mass_abundance_path = os.path.join(result_dir, "output", "mass_abundance")
 
-            except Exception as e:
-                print(f"Unexpected error in batch processing: {str(e)}")
+                # Read abundances from the mass_abundance file
+                abundances_data = {}
+                if os.path.exists(mass_abundance_path):
+                    with open(mass_abundance_path, "r") as f:
+                        for line in f:
+                            parts = line.strip().split()
+                            if len(parts) >= 3:
+                                element_symbol = " ".join(parts[1:-1]).replace("'", "").strip()
+                                abundance_value = float(parts[-1])
+                                abundances_data[element_symbol] = abundance_value
 
-            finally:
-                # The batch directory is removed after processing
-                shutil.rmtree(batch_output_dir, ignore_errors=True)    
+                with open(results_csv_path, mode='a', newline='') as f:
+                    writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Rstar", "log g", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
+                    if not csv_header_written:
+                        writer.writeheader()
+                        csv_header_written = True
+                    if not results_dict["fail"]:
+                        writer.writerow({"Name": pdf_name,
+                                         "Luminosity": row["luminosity"],
+                                         "Teff": row["teff"],
+                                         "Mstar": row["mstar"],
+                                         "Rstar": "{:.2e}".format(results_dict["R_star"]),
+                                         "log g": "{:.2e}".format(results_dict["log_g"]),
+                                         "Zstar": "{:.3e}".format(results_dict["Zmass"]),
+                                         "Mass Loss Rate": "{:.3e}".format(results_dict["mdot"]),
+                                         "Qbar": "{:.2e}".format(results_dict["Qbar"]),
+                                         "Alpha": "{:.2e}".format(results_dict["alpha"]),
+                                         "Q0": "{:.2e}".format(results_dict["Q0"]),
+                                         "Vinf": "{:.2e}".format(results_dict["vinf"]),
+                                         "Remark": results_dict["fail_reason"],
+                                         **abundances_data})
+                    else:
+                        writer.writerow({"Name": pdf_name,
+                                         "Luminosity": row["luminosity"],
+                                         "Teff": row["teff"],
+                                         "Mstar": row["mstar"],
+                                         "Rstar": f"{np.nan}",
+                                         "log g": f"{np.nan}",
+                                         "Zstar": f"{np.nan}",
+                                         "Mass Loss Rate": f"{np.nan}",
+                                         "Qbar": f"{np.nan}",
+                                         "Alpha": f"{np.nan}",
+                                         "Q0": f"{np.nan}",
+                                         "Vinf": f"{np.nan}",
+                                         "Remark": results_dict["fail_reason"],
+                                         **abundances_data})
 
-        # **Start computation in a new thread**
-        batch_thread = threading.Thread(target=process_batch)
-        batch_thread.start()
+            # Send email with ZIP
+            body = load_email_body('./mailing/mail_template.j2')
+            subprocess.run(["python3", "./mailing/mailer.py", "--t", user_email, "--s", "LIME Computation Results", "--b", body, "--a", results_csv_path])
 
-        return jsonify(response_message), 200
+        except Exception as e:
+            print(f"Unexpected error in batch processing: {str(e)}")
 
-    except Exception as e:
-        return jsonify({"error": f"Unexpected error in upload_csv: {str(e)}"}), 500
+        finally:
+            # The batch directory is removed after processing
+            shutil.rmtree(batch_output_dir, ignore_errors=True)
+
+    # **Start computation in a new thread**
+    batch_thread = threading.Thread(target=process_batch)
+    batch_thread.start()
+
+    return jsonify(response_message), 200
+    #
+    # except Exception as e:
+    #     print(e)
+    #     return jsonify({"error": f"Unexpected error in upload_csv: {str(e)}"}), 500
 
 
 if __name__ == '__main__':

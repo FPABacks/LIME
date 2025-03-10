@@ -21,6 +21,35 @@ atomic_masses = {'H': 1.008,   'HE': 4.003, 'LI': 6.941,  'BE': 9.012,  'B':  10
                  'TI': 47.880, 'V': 50.941, 'CR': 51.996, 'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690,
                  'CU': 63.546, 'ZN': 65.390}
 
+# This is a dictionary with dummy results in case things crash, so there is something to work with
+DUMMY_RESULTS = {"Iteration": -1,
+                 "rho": np.nan,
+                 "gamma_e*(1+qbar)": np.nan,
+                 "rel_mdot": np.nan,
+                 "rel_rho": np.nan,
+                 "kappa_e": np.nan,
+                 "Gamma_e": np.nan,
+                 "vesc": np.nan,
+                 "rat": np.nan,
+                 "phi_cook": np.nan,
+                 "R_star": np.nan,
+                 "log_g": np.nan,
+                 "Qbar": np.nan,
+                 "alpha": np.nan,
+                 "Q0": np.nan,
+                 "vinf": np.nan,
+                 "t_crit": np.nan,
+                 "v_crit": np.nan,
+                 "density": np.nan,
+                 "mdot": np.nan,
+                 "Zmass": np.nan,
+                 "Zscale": np.nan,
+                 "alphag": np.nan,
+                 "alpha2": np.nan,
+                 "warning": False,
+                 "fail": True,
+                 "fail_reason": ""}
+
 
 class color:
    # Small class to help emphasize certain printed values
@@ -268,9 +297,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
     NOTE: The actual abundances used are taken from a separate input, which gets written to a temp file.
     """
     # Making a temporary directory
-    os.makedirs(random_subdir, exist_ok=True) 
-    # Create a log filename
-    log_file = os.path.join(random_subdir, "simlog.txt") 
+    os.makedirs(random_subdir, exist_ok=True)
     
     # Constant: scaling metallicity to solar
     Z_asplund = 0.01334462136084096e0
@@ -304,7 +331,9 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
     if gamma_e >= 1:
         failure_reason = f"FAILURE: Gamma_e = {np.around(gamma_e,2)} > 1, not implemented for these regimes"
         print(f"{color.RED}{color.BOLD}Failure: {failure_reason}{color.END}")
-        return f"FAILURE: {failure_reason}"
+        DUMMY_RESULTS["fail"] = True
+        DUMMY_RESULTS["fail_reason"] = failure_reason
+        return f"FAILURE: {failure_reason}", DUMMY_RESULTS
 
     cgas = np.sqrt(cgs.kb * T_eff / (mu * cgs.mass_p))
     v_esc = np.sqrt(2.0 * cgs.G * M_star / R_star * (1.0 - gamma_e))
