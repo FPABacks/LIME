@@ -18,6 +18,10 @@ from jinja2 import Template
 import csv
 from celery import Celery, Task, shared_task
 import io
+import socket
+
+# Get local IP for internal testing
+local_ip = socket.gethostbyname(socket.gethostname())
 
 
 def celery_init_app(app: Flask) -> Celery:
@@ -42,14 +46,14 @@ app = Flask(__name__, static_folder='static', template_folder='templates')
 # Use redis as broker for the queueing system.
 app.config.from_mapping(
     CELERY=dict(
-        broker_url="redis://localhost",
-        result_backend="redis://localhost",
+        broker_url="redis://localhost:6379/0",
+        result_backend="redis://localhost:6379/0",
         task_ignore_result=True,
     ),
 )
 
 # Server property setup
-app.config["SERVER_NAME"] = "0.0.0.0:8000"
+app.config["SERVER_NAME"] = f"{local_ip}:8000"
 app.config["PREFERRED_URL_SCHEME"] = "http"
 app.config["APPLICATION_ROOT"] = ""
 
@@ -177,7 +181,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 ("Input Parameter", "Value"),
                 ("Luminosity [solar luminosity]", f"{lum:.1f}"),
                 ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
-                ("Eddington Ratio ", "{:.2f}".format(results_dict["kappa_e"])),
+                ("Eddington Ratio ", "{:.2f}".format(results_dict["gamma_e"])),
                 ("Stellar Radius [solar radius] ","{:.2f}".format(results_dict["R_star"])),
                 ("log g ","{:.2f}".format(results_dict["log_g"])),
                 ("Effective Temperature [K]", f"{teff:.1f}"),
