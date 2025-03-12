@@ -181,7 +181,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 ("Input Parameter", "Value"),
                 ("Luminosity [solar luminosity]", f"{lum:.1f}"),
                 ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
-                ("Eddington Ratio ", "{:.2f}".format(results_dict["gamma_e"])),
+                ("Eddington Ratio ", "{:.2f}".format(results_dict["Gamma_e"])),
                 ("Stellar Radius [solar radius] ","{:.2f}".format(results_dict["R_star"])),
                 ("log g ","{:.2f}".format(results_dict["log_g"])),
                 ("Effective Temperature [K]", f"{teff:.1f}"),
@@ -232,8 +232,8 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                               ("Globally fitted alpha", "{:.3f}".format(results_dict["alphag"])),
                               ("Locally fitted alpha", "{:.3f}".format(results_dict["alpha2"])),
                               ("Effective v escape [km/s]", "{:.2f}".format(results_dict["vesc"])),
-                              ("Critical velocity", "{:.2f}".format(results_dict["v_crit"])),
-                              ("Critical density", "{:.2e}".format(results_dict["density"]))]
+                              ("Critical velocity [km/s]", "{:.2f}".format(results_dict["v_crit"])),
+                              ("Critical density [g/cm^3]", "{:.2e}".format(results_dict["density"]))]
 
                 c.setFont("Helvetica", 16)
                 table = Table(table_data)

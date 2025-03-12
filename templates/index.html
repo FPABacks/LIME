@@ -52,7 +52,7 @@
             font-size: 22px;
         }
         input, select {
-            width: 90%; 
+            width: 90%;
             padding: 10px;
             margin-top: 5px;
             border: 1px solid #e0e0e0;
@@ -295,16 +295,16 @@
              
             <h2>Enter Stellar Parameters</h2>
             <div class="input-container">
-                <label for="luminosity">Luminosity (\(L_\star\)):</label>
+                <label for="luminosity">Luminosity (\(\rm L_\odot\)):</label>
                 <input type="number" id="luminosity" step="any">
 
-                <label for="teff">Effective Temperature (\(T_{\rm eff}\)):</label>
+                <label for="teff">Effective Temperature (\(\rm K)\):</label>
                 <input type="number" id="teff" step="any">
 
-                <label for="mstar">Stellar Mass (\(M_\star\)):</label>
+                <label for="mstar">Stellar Mass (\(\rm M_\odot\)):</label>
                 <input type="number" id="mstar" step="any">
 
-                <label for="zscale">Metallicity (\(Z_{\rm scale}\)):</label>
+                <label for="zscale">Metallicity (\(\rm Z_{\odot}\)):</label>
                 <input type="number" id="zscale" step="any" onblur="updateAbundances()">
             </div>
             <div class="button-container">
@@ -551,11 +551,37 @@
             const mstar = parseFloat(document.getElementById("mstar").value);
             const zscale = parseFloat(document.getElementById("zscale").value);
 
+             if (luminosity <= 0) {
+                    alert("Please enter a higher luminosity.");
+                    runButton.disabled = false; // Re-enable button
+                    runButton.textContent = "Run"; // Restore button text
+                    return;
+                }
+             if (mstar <= 0) {
+                    alert("Please enter a valid mass of the star.");
+                    runButton.disabled = false; // Re-enable button
+                    runButton.textContent = "Run"; // Restore button text
+                    return;
+                }
+             if (zscale < 0) {
+                    alert("Please enter a valid metallicity of the star.");
+                    runButton.disabled = false; // Re-enable button
+                    runButton.textContent = "Run"; // Restore button text
+                    return;
+                }
+
+
             // Collect abundances
             const abundances = {};
             for (const element of Object.keys(defaultAbundances)) {
                 const value = parseFloat(document.getElementById(`abundance-${element}`).value);
                 abundances[element] = value;
+                if (value < 0) {
+                    alert(`Please enter valid abundances (e.g., no negative value). \n Check element: ${element}`)
+                    runButton.disabled = false; // Re-enable button
+                    runButton.textContent = "Run"; // Restore button text
+                    return;
+                }
             }
 
             let email = "";
@@ -642,6 +668,9 @@ function pollTaskStatus(taskId) {
             if (!email || !file) {
                 alert("Please enter an email and upload a CSV file.");
                 return;
+            }
+            else{
+                alert(`Successfully uploaded your file, you will get an email on ${email}`)
             }
         
             const formData = new FormData();

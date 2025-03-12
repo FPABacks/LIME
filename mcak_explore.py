@@ -328,12 +328,9 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
     kap_e = cgs.sigth / cgs.mass_p * (1. + Ihe * Yhe) / (1. + 4. * Yhe)
     gamma_e = kap_e * lum/(4. * np.pi * cgs.G * M_star * cgs.c)
 
-    if gamma_e >= 1:
-        failure_reason = f"FAILURE: Gamma_e = {np.around(gamma_e,2)} > 1, not implemented for these regimes"
-        print(f"{color.RED}{color.BOLD}Failure: {failure_reason}{color.END}")
-        DUMMY_RESULTS["fail"] = True
-        DUMMY_RESULTS["fail_reason"] = failure_reason
-        return f"FAILURE: {failure_reason}", DUMMY_RESULTS
+    # Make sure we always iterate at least once to get the real gamma_e
+    if gamma_e > 0.95:
+        gamma_e = 0.95
 
     cgas = np.sqrt(cgs.kb * T_eff / (mu * cgs.mass_p))
     v_esc = np.sqrt(2.0 * cgs.G * M_star / R_star * (1.0 - gamma_e))
@@ -411,7 +408,9 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
         if gamma_e >= 1:
             failure_reason = f" Gamma_e = {np.around(gamma_e, 2)} > 1, not implemented for these regimes"
             print(f"{color.RED}{color.BOLD}Failure: {failure_reason}{color.END}")
-            return f"{failure_reason}"
+            DUMMY_RESULTS["fail"] = True
+            DUMMY_RESULTS["fail_reason"] = failure_reason
+            return f"{failure_reason}", DUMMY_RESULTS
 
         # New escape velocity based on the new gamma is calculated
         v_esc = np.sqrt(2.0 * cgs.G * M_star / R_star * (1.0 - gamma_e))
@@ -549,7 +548,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
                    "Q0": q0,
                    "vinf": vinf,
                    "t_crit": t_cri,
-                   "v_crit": v_cri,
+                   "v_crit": v_cri * cgas * 1e-5,
                    "density": rho,
                    "mdot": mdot * cgs.year / cgs.Msun,
                    "Zmass": Z_star,
