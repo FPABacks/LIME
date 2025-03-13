@@ -33,6 +33,7 @@ except socket.gaierror:
     except OSError:
         local_ip = "127.0.0.1"
 
+
 def celery_init_app(app: Flask) -> Celery:
     """Initialization of the Celery app
     Taken from https://flask.palletsprojects.com/en/stable/patterns/celery/"""
@@ -81,6 +82,66 @@ ATOMIC_MASSES = {
     'K': 39.098, 'CA': 40.078, 'SC': 44.956, 'TI': 47.880, 'V': 50.941, 'CR': 51.996,
     'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690, 'CU': 63.546, 'ZN': 65.390
 }
+
+UPLOAD_FOLDER = "./tmp/uploads"
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {"png", "jpg", "jpeg"}
+
+@app.route("/send_contact_email", methods=["POST"])
+def send_contact_email():
+    name = request.form.get("name")
+    email_addr = request.form.get("email")
+    message = request.form.get("message")
+    attachment = request.files.get("attachment")
+
+    if not name or not email_addr or not message:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    # Validate attachment (PNG, JPG, JPEG only)
+    attachment_path = None
+    if attachment and allowed_file(attachment.filename):
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        attachment_path = os.path.join(UPLOAD_FOLDER, attachment.filename)
+        attachment.save(attachment_path)
+
+    # Render email bodies using Jinja2
+    admin_body = render_template("contact_help.j2", name=name, email=email_addr, message=message, attachment=attachment.filename if attachment else None, is_user=False)
+    user_body = render_template("contact_help.j2", name=name, email=email_addr, message=message, attachment=attachment.filename if attachment else None, is_user=True)
+
+    # Email subject
+    subject_admin = f"New Contact Form Submission from {name}"
+    subject_user = "LIME Contact Form - Confirmation"
+
+    # Send email to LIME team
+    admin_command = [
+        "python3", "./mailing/mailer.py",
+        "--t", "dwaipayan.debnath@kuleuven.be",
+        "--s", subject_admin,
+        "--b", admin_body
+    ]
+    if attachment_path:
+        admin_command.extend(["--a", attachment_path])
+
+    subprocess.run(admin_command)
+
+    # Send confirmation email to user
+    user_command = [
+        "python3", "./mailing/mailer.py",
+        "--t", email_addr,
+        "--s", subject_user,
+        "--b", user_body
+    ]
+    if attachment_path:
+        user_command.extend(["--a", attachment_path])
+
+    subprocess.run(user_command)
+
+    # Cleanup attachment
+    if attachment_path:
+        os.remove(attachment_path)
+
+    return jsonify({"success": True})
 
 
 def calculate_metallicity_massb(mass_abundances):

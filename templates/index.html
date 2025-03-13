@@ -241,6 +241,7 @@
             <button class="tab" onclick="showTab('example')">Example</button>
             <button class="tab" onclick="showTab('calculator')">Calculator</button>
             <button class="tab" onclick="showTab('grid')">Grid</button>
+            <button class="tab" onclick="showTab('contact')">Contact</button>
         </div>
 
         <!-- Tab contents -->
@@ -249,7 +250,7 @@
             <p>This online tool is designed to provide a fast, efficient, user-friendly, real-time mass-loss calculator for line-driven winds from hot, massive stars with given basic stellar parameters and arbitrary chemical compositions (as long as the theory allows for it).</p>
             <p>The line force is computed on-the-fly from excitation and ionization balance calculations using the “Munich Atomic Database”  
                   <span class="citation">
-                    (<a href="https://doi.org/10.1051/aas:2000312" target="_blank">Puls et al. 2000</a>;<a href="https://doi.org/10.1051/0004-6361:20010805" target="_blank">Pauldrach et al. 2001</a>) 
+                    (<a href="https://doi.org/10.1051/aas:2000312" target="_blank">Puls et al. 2000</a>; <a href="https://doi.org/10.1051/0004-6361:20010805" target="_blank">Pauldrach et al. 2001</a>) 
                 </span> consisting of more than 4 million spectral lines. Mass-loss rates are then derived from line-driven wind theory, including effects of a finite stellar disk and gas sound speed. The line-force parameters are calculated following the formalisms by              
                 <span class="citation">
                     <a href="https://doi.org/10.1086/176492" target="_blank">Gayley (1995)</a>; <a href="https://doi.org/10.48550/arXiv.2204.09981" target="_blank">Poniatowski et al. (2022)</a>.
@@ -258,7 +259,7 @@
             <p>In addition to its speed and simplicity, a strength of our mass-loss calculator is that it avoids uncertainties related to applying fit formulae to underlying model grids calculated for more restricted parameter ranges. Moreover, individual chemical abundances can be trivially modified, and their effects upon predicted mass-loss rates explored. This thus also allows for potential applications toward stars that are significantly chemically modified at the surface.</p>
 
             <h2>Usage</h2>
-            <p>To compute mass-loss rates, the user needs to input some basic stellar parameters: the luminosity of the star \(\rm L_\star\) (in terms of solar luminosity), mass of the star \(\rm M_\star\) (in solar mass), the effective temperature of the star \(\rm T_{ eff}\) (in Kelvin), and the metallicity of the star \(\rm Z_\star\) (for solar \(\rm Z_\star = Z_\odot =1 \)). Default scalings are provided from the solar abundance scale by 
+            <p>To compute mass-loss rates, the user needs to input some basic stellar parameters: the luminosity of the star, \(\rm L_\star\) (in terms of solar luminosity), mass of the star, \(\rm M_\star\) (in solar mass), the effective temperature of the star, \(\rm T_{ eff}\) (in Kelvin), and the metallicity of the star, \(\rm Z_\star\) (for solar \(\rm Z_\star = Z_\odot =1 \)). Default scalings are provided from the solar abundance scale by 
                 <span class="citation">
                     <a href="https://doi.org/10.48550/arXiv.0909.0948" target="_blank">Asplund et al. (2009)</a> 
                 </span>
@@ -326,6 +327,37 @@
                 such intrinsic uncertainties. Additionally, our approach allows us to directly tune individual abundances, whereas in the laternative recipes only general scalings with overall metallicity Z are provided and applied. <p>
 
         </div>
+
+        <div id="contact" class="tab-content">
+            <h2>Contact Us</h2>
+            <p>If you have any questions or feedback, feel free to reach out to us using the form below.</p>
+        
+            <div class="input-container">
+                <div>
+                    <label for="contact-name">Name:</label>
+                    <input type="text" id="contact-name" placeholder="Enter your name">
+                </div>
+                <div>
+                    <label for="contact-email">Email:</label>
+                    <input type="email" id="contact-email" placeholder="Enter your email">
+                </div>
+            </div>
+        
+            <div>
+                <label for="contact-message">Message:</label>
+                <textarea id="contact-message" placeholder="Write your message here" rows="7" style="width: 50%;"></textarea>
+            </div>
+        
+            <div>
+                <label for="contact-attachment">Attachment (optional):</label>
+                <input type="file" id="contact-attachment" accept=".png, .jpg, .jpeg">
+            </div>
+        
+            <div class="button-container">
+                <button onclick="sendContactForm()">Send Message</button>
+            </div>
+        </div>
+                
                           
         <div id="calculator" class="tab-content">
             <p> The data is reliable only for effective temperatures (\(\rm T_{eff}\)) between 18,000 K and 60,000 K. 
@@ -389,15 +421,12 @@
         </div>
         
         <div id="grid" class="tab-content">
-            <p> The data test should only be trusted for effective temperature (\(T_{\rm eff}\)) between 18000 to 60000 K. 
+            <p> The data test should only be trusted for effective temperature (\(\rm T_{eff}\)) between 18000 to 60000 K. 
                 Beyond this limit, the underlying Munich Atomic Database either lacks ionization stages or has limited data.
                 We are currently working on an extension to the Munich Atomic Database, and in a future update we will also extend to such parameter spaces.
             <p>
-            <p>You can submit a CSV (comma-separated values) file containing the stellar inputs and abundances.</p>
-            <ul>
-                <li>If the file contains more than 20 entries, only the final output CSV file will be sent; iteration details will not be included.</li>
-                <li>The processed results will be emailed back once completed.</li>
-            </ul>
+            <p>You can submit a CSV (comma-separated values) file containing the stellar inputs and abundances.
+            The processed results will be emailed back once completed.</p>
             <h2>User Info</h2>
             <div class="input-container">
                 <label for="email-grid">Enter your email id:</label>
@@ -407,15 +436,18 @@
             <h2>Upload CSV File</h2>
             <p>Please upload a CSV file containing stellar parameters. The first row should include the column names as follows:</p>
             <ul>
-                <li><strong>Required columns:</strong> name, luminosity \(L_\star\), effective temeparture (\(T_{\rm eff}\)), mass of the star \(M_\star\), scaling metallicity (\(Z_{\rm scale}\)), and mass fraction of helium</li>
-                <li><strong>Optional columns:</strong> Individual element abundances (e.g., H, C, N, O, Fe)</li>
+                <li><strong>Required columns:</strong> name, luminosity (in \(\rm L_\odot\)), effective temeparture (in \(\rm K \)), mass of the star (in \(\rm M_\odot\)), scaling metallicity (in \(\rm Z_{\odot}\)), and mass fraction of helium (HE)</li>
+                <li><strong>Optional columns:</strong> Individual mass fractions of elements (e.g., H, C, N, O, MN, FE etc.)</li>
             </ul>
-            <p>Example CSV format:</p>
+            <p style="color:#333232; font-weight: bold;">
+                ⚠️ Column names must be EXACTLY as shown below (case-sensitive).
+                Ensure HE, luminosity, teff, etc., are written with correct capitalization.
+            </p>
             <pre>
-            name,luminosity,teff,mstar,zscale,He,C,N,FE
-            Star1,500000,40000,52,1.0,0.243,0.0002,0.0000065, 0.00000045
+            name,luminosity,teff,mstar,zscale,HE,C,N,FE
+            Star1,500000,40000,52,1.0,0.243,0.0002,0.0000065,0.00000045
             Star2,200000,21000,20,0.2,0.280,0.00005,0.000000007,0.0000000013
-            </pre>
+            </pre>                        
             <div class="input-container">
                 <input type="file" id="csvFile" accept=".csv">
             </div>
@@ -436,17 +468,15 @@
     
     <script>
         const defaultAbundances = {
-    "H" : 0.7374078505762753,  "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
-    "B" : 3.9638342804111373e-9, "C" : 2.3649741118292409e-3,  "N" : 6.927752331287037e-4,  "O" : 5.7328054948662952e-3,  
-    "F" : 5.0460905860356957e-7, "NE": 1.2565170515587217e-3,  "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
-    "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4,  "P" : 5.8243105278933166e-6, "S" : 3.0923740022022601e-4,  
-    "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5,  "K" : 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
-    "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6,  "V" : 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
-    "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3,  "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
-    "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
-}
-
-;
+        "H" : 0.7374078505762753,  "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
+        "B" : 3.9638342804111373e-9, "C" : 2.3649741118292409e-3,  "N" : 6.927752331287037e-4,  "O" : 5.7328054948662952e-3,  
+        "F" : 5.0460905860356957e-7, "NE": 1.2565170515587217e-3,  "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
+        "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4,  "P" : 5.8243105278933166e-6, "S" : 3.0923740022022601e-4,  
+        "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5,  "K" : 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
+        "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6,  "V" : 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
+        "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3,  "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
+        "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
+        } ;
 
         function createAbundanceInputs() {
             const abundancesDiv = document.getElementById("abundances");
@@ -692,34 +722,74 @@
             });
         }
 
-// Poll the task status
-function pollTaskStatus(taskId) {
-    fetch(`/task_status/${taskId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.done) {
-                document.getElementById("loading").style.display = "none";
-                runButton.disabled = false;
-                runButton.textContent = "Run";
+        // Poll the task status
+        function pollTaskStatus(taskId) {
+            fetch(`/task_status/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.done) {
+                        document.getElementById("loading").style.display = "none";
+                        runButton.disabled = false;
+                        runButton.textContent = "Run";
+        
+                        if (data.download_url) {
+                            window.open(data.download_url, "_blank");
+                        }
+                    } else {
+                        // If not done, check again in xx seconds
+                        setTimeout(() => pollTaskStatus(taskId), 100);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error checking task status:", error);
+                    alert("An error occurred while checking task status.");
+                    document.getElementById("loading").style.display = "none";
+                    runButton.disabled = false;
+                    runButton.textContent = "Run";
+                });
+        }
 
-                if (data.download_url) {
-                    window.open(data.download_url, "_blank");
-                }
-            } else {
-                // If not done, check again in xx seconds
-                setTimeout(() => pollTaskStatus(taskId), 100);
+        // CSV validation before upload
+        document.getElementById("csvFile").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+        
+            if (!file) {
+                alert("Please select a file.");
+                return;
             }
-        })
-        .catch(error => {
-            console.error("Error checking task status:", error);
-            alert("An error occurred while checking task status.");
-            document.getElementById("loading").style.display = "none";
-            runButton.disabled = false;
-            runButton.textContent = "Run";
+        
+            if (!file.name.endsWith(".csv")) {
+                alert("Invalid file type. Please upload a CSV file.");
+                event.target.value = "";
+                return;
+            }
+        
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const rows = content.split("\n").map(row => row.trim().split(","));  
+        
+                if (rows.length < 2) {
+                    alert("CSV file is empty or has no data.");
+                    event.target.value = "";
+                    return;
+                }
+        
+                const headers = rows[0].map(h => h.trim());  
+        
+                // REQUIRED COLUMNS (CASE-SENSITIVE)
+                const requiredColumns = ["name", "luminosity", "teff", "mstar", "zscale", "HE"];
+                const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+        
+                if (missingColumns.length > 0) {
+                    alert(" Missing required columns: " + missingColumns.join(", "));
+                    event.target.value = "";  
+                    return;
+                }
+            };
+        
+            reader.readAsText(file);
         });
-}
-
-
 
         function uploadCSV() {
             const email = document.getElementById('email-grid').value;
@@ -752,6 +822,44 @@ function pollTaskStatus(taskId) {
                 }
             })
         }
+
+        function sendContactForm() {
+            const name = document.getElementById("contact-name").value.trim();
+            const email = document.getElementById("contact-email").value.trim();
+            const message = document.getElementById("contact-message").value.trim();
+            const attachment = document.getElementById("contact-attachment").files[0];
+        
+            if (!name || !email || !message) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+        
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("email", email);
+            formData.append("message", message);
+            if (attachment) {
+                formData.append("attachment", attachment);
+            }
+        
+            fetch("/send_contact_email", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Message sent successfully! You will receive a confirmation email.");
+                } else {
+                    alert("Error sending message: " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("There was an issue submitting the form.");
+            });
+        }
+
     </script>
     <!-- Footer -->
     <div style="text-align: center; margin-top: 50px; padding: 20px; background-color: #a0cfa5; color: #2c3e50; font-size: 18px;">
