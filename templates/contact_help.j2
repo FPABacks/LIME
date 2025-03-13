@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact Form Submission</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .container {
+            width: 100%;
+            margin: auto;
+            padding: 20px;
+            background-color: #FFFFFF;
+            border-radius: 5px;
+        }
+        .footer {
+            font-size: 12px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if is_user %}
+            <p>Dear {{ name }},</p>
+            <p>Thank you for reaching out to LIME. We have received your message and will get back to you as soon as possible.</p>
+        {% else %}
+            <p>A new contact form submission has been received:</p>
+        {% endif %}
+        
+        <p><strong>Name:</strong> {{ name }}</p>
+        <p><strong>Email:</strong> {{ email }}</p>
+        <p><strong>Message:</strong></p>
+        <p style="white-space: pre-line; background-color: #fff; padding: 10px; border-radius: 5px;">{{ message }}</p>
+
+        {% if attachment %}
+            <p><strong>Attachment:</strong> {{ attachment }}</p>
+        {% endif %}
+
+        {% if is_user %}
+            <p>We will get back to you shortly.</p>
+            <p>Best regards,</p>
+            <p><strong>The LIME Team</strong></p>
+        {% else %}
+            <p>Please review and respond accordingly.</p>
+        {% endif %}
+    </div>
+
+    <p class="footer">This is an automated email. Please do not reply.</p>
+</body>
+</html>

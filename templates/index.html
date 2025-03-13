@@ -241,6 +241,7 @@
             <button class="tab" onclick="showTab('example')">Example</button>
             <button class="tab" onclick="showTab('calculator')">Calculator</button>
             <button class="tab" onclick="showTab('grid')">Grid</button>
+            <button class="tab" onclick="showTab('contact')">Contact</button>
         </div>
 
         <!-- Tab contents -->
@@ -326,6 +327,37 @@
                 such intrinsic uncertainties. Additionally, our approach allows us to directly tune individual abundances, whereas in the laternative recipes only general scalings with overall metallicity Z are provided and applied. <p>
 
         </div>
+
+        <div id="contact" class="tab-content">
+            <h2>Contact Us</h2>
+            <p>If you have any questions or feedback, feel free to reach out to us using the form below.</p>
+        
+            <div class="input-container">
+                <div>
+                    <label for="contact-name">Name:</label>
+                    <input type="text" id="contact-name" placeholder="Enter your name">
+                </div>
+                <div>
+                    <label for="contact-email">Email:</label>
+                    <input type="email" id="contact-email" placeholder="Enter your email">
+                </div>
+            </div>
+        
+            <div>
+                <label for="contact-message">Message:</label>
+                <textarea id="contact-message" placeholder="Write your message here" rows="7" style="width: 50%;"></textarea>
+            </div>
+        
+            <div>
+                <label for="contact-attachment">Attachment (optional):</label>
+                <input type="file" id="contact-attachment" accept=".png, .jpg, .jpeg">
+            </div>
+        
+            <div class="button-container">
+                <button onclick="sendContactForm()">Send Message</button>
+            </div>
+        </div>
+                
                           
         <div id="calculator" class="tab-content">
             <p> The data is reliable only for effective temperatures (\(\rm T_{eff}\)) between 18,000 K and 60,000 K. 
@@ -692,32 +724,32 @@
             });
         }
 
-// Poll the task status
-function pollTaskStatus(taskId) {
-    fetch(`/task_status/${taskId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.done) {
-                document.getElementById("loading").style.display = "none";
-                runButton.disabled = false;
-                runButton.textContent = "Run";
-
-                if (data.download_url) {
-                    window.open(data.download_url, "_blank");
-                }
-            } else {
-                // If not done, check again in xx seconds
-                setTimeout(() => pollTaskStatus(taskId), 100);
-            }
-        })
-        .catch(error => {
-            console.error("Error checking task status:", error);
-            alert("An error occurred while checking task status.");
-            document.getElementById("loading").style.display = "none";
-            runButton.disabled = false;
-            runButton.textContent = "Run";
-        });
-}
+        // Poll the task status
+        function pollTaskStatus(taskId) {
+            fetch(`/task_status/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.done) {
+                        document.getElementById("loading").style.display = "none";
+                        runButton.disabled = false;
+                        runButton.textContent = "Run";
+        
+                        if (data.download_url) {
+                            window.open(data.download_url, "_blank");
+                        }
+                    } else {
+                        // If not done, check again in xx seconds
+                        setTimeout(() => pollTaskStatus(taskId), 100);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error checking task status:", error);
+                    alert("An error occurred while checking task status.");
+                    document.getElementById("loading").style.display = "none";
+                    runButton.disabled = false;
+                    runButton.textContent = "Run";
+                });
+        }
 
 
 
@@ -752,6 +784,44 @@ function pollTaskStatus(taskId) {
                 }
             })
         }
+
+        function sendContactForm() {
+            const name = document.getElementById("contact-name").value.trim();
+            const email = document.getElementById("contact-email").value.trim();
+            const message = document.getElementById("contact-message").value.trim();
+            const attachment = document.getElementById("contact-attachment").files[0];
+        
+            if (!name || !email || !message) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+        
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("email", email);
+            formData.append("message", message);
+            if (attachment) {
+                formData.append("attachment", attachment);
+            }
+        
+            fetch("/send_contact_email", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Message sent successfully! You will receive a confirmation email.");
+                } else {
+                    alert("Error sending message: " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("There was an issue submitting the form.");
+            });
+        }
+
     </script>
     <!-- Footer -->
     <div style="text-align: center; margin-top: 50px; padding: 20px; background-color: #a0cfa5; color: #2c3e50; font-size: 18px;">
