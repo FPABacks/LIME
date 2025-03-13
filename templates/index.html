@@ -421,15 +421,12 @@
         </div>
         
         <div id="grid" class="tab-content">
-            <p> The data test should only be trusted for effective temperature (\(T_{\rm eff}\)) between 18000 to 60000 K. 
+            <p> The data test should only be trusted for effective temperature (\(\rm T_{eff}\)) between 18000 to 60000 K. 
                 Beyond this limit, the underlying Munich Atomic Database either lacks ionization stages or has limited data.
                 We are currently working on an extension to the Munich Atomic Database, and in a future update we will also extend to such parameter spaces.
             <p>
-            <p>You can submit a CSV (comma-separated values) file containing the stellar inputs and abundances.</p>
-            <ul>
-                <li>If the file contains more than 20 entries, only the final output CSV file will be sent; iteration details will not be included.</li>
-                <li>The processed results will be emailed back once completed.</li>
-            </ul>
+            <p>You can submit a CSV (comma-separated values) file containing the stellar inputs and abundances.
+            The processed results will be emailed back once completed.</p>
             <h2>User Info</h2>
             <div class="input-container">
                 <label for="email-grid">Enter your email id:</label>
@@ -439,15 +436,18 @@
             <h2>Upload CSV File</h2>
             <p>Please upload a CSV file containing stellar parameters. The first row should include the column names as follows:</p>
             <ul>
-                <li><strong>Required columns:</strong> name, luminosity \(L_\star\), effective temeparture (\(T_{\rm eff}\)), mass of the star \(M_\star\), scaling metallicity (\(Z_{\rm scale}\)), and mass fraction of helium</li>
-                <li><strong>Optional columns:</strong> Individual element abundances (e.g., H, C, N, O, Fe)</li>
+                <li><strong>Required columns:</strong> name, luminosity (in \(\rm L_\odot\)), effective temeparture (in \(\rm K \)), mass of the star (in \(\rm M_\odot\)), scaling metallicity (in \(\rm Z_{\odot}\)), and mass fraction of helium (HE)</li>
+                <li><strong>Optional columns:</strong> Individual mass fractions of elements (e.g., H, C, N, O, MN, FE etc.)</li>
             </ul>
-            <p>Example CSV format:</p>
+            <p style="color:#333232; font-weight: bold;">
+                ⚠️ Column names must be EXACTLY as shown below (case-sensitive).
+                Ensure HE, luminosity, teff, etc., are written with correct capitalization.
+            </p>
             <pre>
-            name,luminosity,teff,mstar,zscale,He,C,N,FE
-            Star1,500000,40000,52,1.0,0.243,0.0002,0.0000065, 0.00000045
+            name,luminosity,teff,mstar,zscale,HE,C,N,FE
+            Star1,500000,40000,52,1.0,0.243,0.0002,0.0000065,0.00000045
             Star2,200000,21000,20,0.2,0.280,0.00005,0.000000007,0.0000000013
-            </pre>
+            </pre>                        
             <div class="input-container">
                 <input type="file" id="csvFile" accept=".csv">
             </div>
@@ -468,17 +468,15 @@
     
     <script>
         const defaultAbundances = {
-    "H" : 0.7374078505762753,  "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
-    "B" : 3.9638342804111373e-9, "C" : 2.3649741118292409e-3,  "N" : 6.927752331287037e-4,  "O" : 5.7328054948662952e-3,  
-    "F" : 5.0460905860356957e-7, "NE": 1.2565170515587217e-3,  "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
-    "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4,  "P" : 5.8243105278933166e-6, "S" : 3.0923740022022601e-4,  
-    "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5,  "K" : 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
-    "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6,  "V" : 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
-    "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3,  "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
-    "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
-}
-
-;
+        "H" : 0.7374078505762753,  "HE": 0.24924865007787272, "LI": 5.687053212055474e-11, "BE": 1.5816072816463046e-10,  
+        "B" : 3.9638342804111373e-9, "C" : 2.3649741118292409e-3,  "N" : 6.927752331287037e-4,  "O" : 5.7328054948662952e-3,  
+        "F" : 5.0460905860356957e-7, "NE": 1.2565170515587217e-3,  "NA": 2.9227131182144098e-6, "MG": 7.0785262928672096e-4,  
+        "AL": 5.5631575894102415e-5, "SI": 6.6484690760698845e-4,  "P" : 5.8243105278933166e-6, "S" : 3.0923740022022601e-4,  
+        "CL": 8.2016309032581489e-6, "AR": 7.3407809644158897e-5,  "K" : 3.0647973602772301e-6, "CA": 6.4143590291084783e-5,  
+        "SC": 4.6455339921264288e-8, "TI": 3.1217731998425617e-6,  "V" : 3.1718648298183506e-7, "CR": 1.6604169480383736e-5,  
+        "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3,  "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
+        "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
+        } ;
 
         function createAbundanceInputs() {
             const abundancesDiv = document.getElementById("abundances");
@@ -751,7 +749,47 @@
                 });
         }
 
-
+        // CSV validation before upload
+        document.getElementById("csvFile").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+        
+            if (!file) {
+                alert("Please select a file.");
+                return;
+            }
+        
+            if (!file.name.endsWith(".csv")) {
+                alert("Invalid file type. Please upload a CSV file.");
+                event.target.value = "";
+                return;
+            }
+        
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const rows = content.split("\n").map(row => row.trim().split(","));  
+        
+                if (rows.length < 2) {
+                    alert("CSV file is empty or has no data.");
+                    event.target.value = "";
+                    return;
+                }
+        
+                const headers = rows[0].map(h => h.trim());  
+        
+                // REQUIRED COLUMNS (CASE-SENSITIVE)
+                const requiredColumns = ["name", "luminosity", "teff", "mstar", "zscale", "HE"];
+                const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+        
+                if (missingColumns.length > 0) {
+                    alert(" Missing required columns: " + missingColumns.join(", "));
+                    event.target.value = "";  
+                    return;
+                }
+            };
+        
+            reader.readAsText(file);
+        });
 
         function uploadCSV() {
             const email = document.getElementById('email-grid').value;
