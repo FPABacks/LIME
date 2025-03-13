@@ -98,14 +98,17 @@
         .active-content {
             display: block;
         }
-        .citation {
-            color: #1e5b85;
-        }  
+        .citation a {
+            text-decoration: none;  /* Removes underline */
+            color: #3643f3;  /* Keeps citation color */
+        }
+        .citation a:hover {
+            text-decoration: underline;  /* Underlines on hover for clarity */
+        }    
         .mathjax {
             font-family: 'Times New Roman', serif;
             font-size: 18px;
         }
-
         .button-container {
             display: flex;
             align-items: left;
@@ -147,7 +150,15 @@
         }
 
         .input-container {
-            margin-right: 20px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .input-container div {
+            flex: 1;
+            min-width: 200px; 
         }
 
         .logos-container {
@@ -236,22 +247,50 @@
         <div id="info" class="tab-content active-content">
             <h2>Overview</h2>
             <p>This online tool is designed to provide a fast, efficient, user-friendly, real-time mass-loss calculator for line-driven winds from hot, massive stars with given basic stellar parameters and arbitrary chemical compositions (as long as the theory allows for it).</p>
-            <p>The line force is computed on-the-fly from excitation and ionization balance calculations using the <span class="citation">“Munich Atomic Database” (Pauldrach et al. 2001; Puls et al. 2000)</span> consisting of more than 4 million spectral lines. Mass-loss rates are then derived from line-driven wind theory, including effects of a finite stellar disk and gas sound speed. The line-force parameters are calculated following the formalisms by <span class="citation">Gayley 1995; Poniatowski et al. 2022</span>. For a given set of stellar parameters and chemical composition, we obtain predictions for mass-loss rates and the three line-force parameters \(\bar{Q}\), \(Q_0\), and \(\alpha\) at the wind critical point, and also an estimate of the terminal wind speed.</p>
+            <p>The line force is computed on-the-fly from excitation and ionization balance calculations using the “Munich Atomic Database”  
+                  <span class="citation">
+                    (<a href="https://doi.org/10.1051/aas:2000312" target="_blank">Puls et al. 2000</a>;<a href="https://doi.org/10.1051/0004-6361:20010805" target="_blank">Pauldrach et al. 2001</a>) 
+                </span> consisting of more than 4 million spectral lines. Mass-loss rates are then derived from line-driven wind theory, including effects of a finite stellar disk and gas sound speed. The line-force parameters are calculated following the formalisms by              
+                <span class="citation">
+                    <a href="https://doi.org/10.1086/176492" target="_blank">Gayley (1995)</a>; <a href="https://doi.org/10.48550/arXiv.2204.09981" target="_blank">Poniatowski et al. (2022)</a>.
+                </span>
+                For a given set of stellar parameters and chemical composition, we obtain predictions for mass-loss rates and the three line-force parameters \(\rm \bar{Q}\), \(\rm Q_0\), and \(\rm \alpha\) at the wind critical point, and also an estimate of the terminal wind speed.</p>
             <p>In addition to its speed and simplicity, a strength of our mass-loss calculator is that it avoids uncertainties related to applying fit formulae to underlying model grids calculated for more restricted parameter ranges. Moreover, individual chemical abundances can be trivially modified, and their effects upon predicted mass-loss rates explored. This thus also allows for potential applications toward stars that are significantly chemically modified at the surface.</p>
 
             <h2>Usage</h2>
-            <p>To compute mass-loss rates, the user needs to input some basic stellar parameters: the luminosity of the star \(L_\star\) (in terms of solar luminosity), mass of the star \(M_\star\) (in solar mass), the effective temperature of the star \(T_{\rm eff}\) (in Kelvin), and the metallicity of the star \(Z_\star\) (for solar \(Z_\star = 1\)). Default scalings are provided from the solar abundance scale by <span class="citation">(Asplund et al. 2009)</span>, but the user is free to change ths mass fractions as they wish. A change only in scaling metallicity scales all the metals (i.e., from Li-Zn). If you use LIME for your work, please cite <span class="citation">Sundqvist et al. 2025</span> and also provide a footnote with the URL of this website.</p>
+            <p>To compute mass-loss rates, the user needs to input some basic stellar parameters: the luminosity of the star \(\rm L_\star\) (in terms of solar luminosity), mass of the star \(\rm M_\star\) (in solar mass), the effective temperature of the star \(\rm T_{ eff}\) (in Kelvin), and the metallicity of the star \(\rm Z_\star\) (for solar \(\rm Z_\star = Z_\odot =1 \)). Default scalings are provided from the solar abundance scale by 
+                <span class="citation">
+                    <a href="https://doi.org/10.48550/arXiv.0909.0948" target="_blank">Asplund et al. (2009)</a> 
+                </span>
+                but the user is free to change ths mass fractions as they wish. A change only in scaling metallicity scales all the metals (i.e., from Li-Zn). If you use LIME for your work, please cite <span class="citation">Sundqvist et al. 2025</span> and also provide a footnote with the URL of this website.</p>
 
             <h2>Credits</h2>
-            <p>This tool has been developed by the EQUATION group (led by Prof. Jon Sunqvist) with funding from KU Leuven, European Research Council (ERC) and Fonds voor Wetenschappelijk Onderzoek – Vlaanderen (FWO).</p>
+            <p>This tool has been developed by the 
+                <span class="citation">
+                    <a href="https://fys.kuleuven.be/ster/research-projects/equation-folder/equation-home" target="_blank">EQUATION</a> 
+                </span>
+                group (led by Prof. Jon Sunqvist) with funding from KU Leuven, European Research Council (ERC) and Fonds voor Wetenschappelijk Onderzoek – Vlaanderen (FWO).</p>
         </div>
         <div id="example" class="tab-content">           
             <h2>Brief methodology</h2>
             <p> The tool uses (a modified version of) CAK theory as
-                formulated by <span class="citation"> Gayley (1995) </span> 
-                to calculate mass-loss rates, incorporating a high-opacity cut-off in line strength <span class="citation"> (Owocki et al. 1988) </span>. 
-                Additionally, the finite disk angle effect <span class="citation"> (Pauldrach et al. 1986) </span> is accounted for by following <span class="citation"> Kudritzki et al. (1989) </span>. 
-                It also includes a finite sound speed correction based on <span class="citation"> Owocki & ud-Doula (2004) </span>. 
+                formulated by 
+                <span class="citation">
+                        <a href="https://doi.org/10.1086/176492" target="_blank">Gayley (1995)</a>
+                    </span> to calculate mass-loss rates, incorporating a high-opacity cut-off in line strength 
+                    <span class="citation">
+                        <a href="https://doi.org/10.1086/166977" target="_blank">Owocki et al. 1988</a>
+                    </span>.
+                Additionally, the finite disk angle effect 
+                <span class="citation">
+                    (<a href="https://ui.adsabs.harvard.edu/abs/1986A%26A...164...86P/abstract" target="_blank">Pauldrach et al. 1986</a>)
+                </span>
+                is accounted for by following  <span class="citation">
+                    <a href="https://ui.adsabs.harvard.edu/abs/1989A%26A...219..205K/abstract" target="_blank">Kudritzki et al. (1989)</a>
+                </span>. It also includes a finite sound speed correction based on 
+                <span class="citation">
+                    <a href="https://doi.org/10.1086/380123" target="_blank">Owocki & ud-Doula (2004) </a>
+                </span>. 
                 For the explicit mass loss rate formula please check Eq (1) in <span class="citation"> Sundqvist et al. (2025) </span>. </p>   
             <div style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
                 <div style="flex: 1; max-width: 45%; text-align: center;">
@@ -263,10 +302,12 @@
                     <p><strong>Figure 2:</strong> Iteration</p>
                 </div>
             </div>
-            <p> For a given (\(\rho,T\)) LIME computes the line-force multiplier directly based on the millions of lines in the atomic data base. This line force multiplier 
-              is then fitted using 3 parameters \(\bar{Q}, Q_0\) and \(\alpha\), where the fitting is tuned to always include the estimated critical t parameter, see <span class="citation"> Sundqvist et al. (2025) </span> for details. This procedure is then iterated until the critical point density and mass-loss rate are converged to a certain tolerance. In <span class="citation"> Figure 2 </span> it can be seen that such convergence is typically reached within a few iterations. <span class="citation"> Figure 1</span> displays examples of force multipliers and corresponding fits, including the position of critical t. 
+            <p> For a given \( \rm (\rho, T) \), LIME computes the line-force multiplier directly based on the millions of lines in the atomic data base. This line force multiplier 
+              is then fitted using 3 parameters \( \rm \bar{Q}, Q_0\) and \(\rm \alpha\), where the fitting is tuned to always include the estimated critical t parameter, see <span class="citation"> Sundqvist et al. (2025) </span> for details. This procedure is then iterated until the critical point density and mass-loss rate are converged to a certain tolerance. In <span class="citation"> Figure 2 </span> it can be seen that such convergence is typically reached within a few iterations. <span class="citation"> Figure 1</span> displays examples of force multipliers and corresponding fits, including the position of critical t. 
             <h2>Comparison with existing empirical rates and prescirptions</h2>     
-            <p> Here below we show empirically derived mass-loss rates  <span class="citation">(Brands et al.; Backs et al.; Verhamme et al.)</span> for OB stars as compared to LIME predictions. Further details are again given in  <span class="citation"> Sundqvist et al. (2025) </span>. <p>   
+            <p> Here below we show empirically derived mass-loss rates  <span class="citation">
+                (<a href="https://doi.org/10.1051/0004-6361/202142742" target="_blank">Brands et al.</a>;<a href="https://doi.org/10.1051/0004-6361/202451893" target="_blank">Backs et al.</a>;<a href="https://doi.org/10.48550/arXiv.2410.14937" target="_blank">Verhamme et al.</a>) 
+            </span> for OB stars as compared to LIME predictions. Further details are again given in  <span class="citation"> Sundqvist et al. (2025) </span>. <p>   
             <div style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
                 <div style="flex: 1; max-width: 45%; text-align: center;">
                     <img src="{{ url_for('static', filename='massloss.png') }}" alt="Mass loss rate" style="width: 100%; height: auto;">
@@ -277,36 +318,45 @@
                     <p><strong>Figure 4:</strong> Line force parameters obtained for the dataset using our method</p>
                 </div>
             </div>
-            <p> Figure 4 displays the logarithmic ratio of the mass loss rates obtained from some different alternative prescriptions (<span class="citation">Vink et al. 2001; 
-                Krti&ccaron;ka et al.2024; Bjorklund et al. 2022</span>) compared to the emprically obtained mass loss rates. Across this range, LIME performs as well or even better than these alternative recipes based on more elaborate line-driven wind models. In part this might be because these recipes are actually fit-formulae 
-                (typically assuming power-law scaling of \(\dot{M}\) with stellar parameters) based on underlying grid-calculations for a restricted number of models. This introduces scatter and
+            <p> Figure 4 displays the logarithmic ratio of the mass loss rates obtained from some different alternative prescriptions <span class="citation">
+                (<a href="https://doi.org/10.48550/arXiv.astro-ph/0101509 " target="_blank">Vink et al. 2001</a>;<a href="https://doi.org/10.48550/arXiv.2203.08218" target="_blank">Bjorklund et al. 2022</a>;<a href="https://doi.org/10.48550/arXiv.2311.01257" target="_blank"> Krti&ccaron;ka et al.2024</a>)
+                compared to the emprically obtained mass loss rates. Across this range, LIME performs as well or even better than these alternative recipes based on more elaborate line-driven wind models. In part this might be because these recipes are actually fit-formulae 
+                (typically assuming power-law scaling of \((\rm\dot{M}\)) with stellar parameters) based on underlying grid-calculations for a restricted number of models. This introduces scatter and
                 uncertainties when applied to actual stars (and even more when extrapolated outside the domains of the original calculations). By contrast, LIME computes everything on-the-fly for any given set of input stellar parameters,removing
                 such intrinsic uncertainties. Additionally, our approach allows us to directly tune individual abundances, whereas in the laternative recipes only general scalings with overall metallicity Z are provided and applied. <p>
 
         </div>
                           
         <div id="calculator" class="tab-content">
-            <p>The data is reliable only for effective temperatures (\(T_{\rm eff}\)) between 18,000 K and 70,000 K. 
-                Beyond this range, the underlying Munich Atomic Database either lacks ionization stages or has limited data.</p>
+            <p> The data is reliable only for effective temperatures (\(\rm T_{eff}\)) between 18,000 K and 60,000 K. 
+                Outside this range, the available ionization stages in the Munich Atomic Database become more limited. </p>
              
-            <p>We are actively working on expanding the Munich Atomic Database, and future updates will extend coverage to these parameter spaces.</p>
+            <p> We are actively working on extending the database, and future updates will aim to expand coverage to these parameter spaces.</p>
              
             <p>Additionally, please ensure that pop-ups are enabled in your browser for the results to display correctly.</p>
              
             <h2>Enter Stellar Parameters</h2>
             <div class="input-container">
-                <label for="luminosity">Luminosity (\(\rm L_\odot\)):</label>
-                <input type="number" id="luminosity" step="any">
-
-                <label for="teff">Effective Temperature (\(\rm K)\):</label>
-                <input type="number" id="teff" step="any">
-
-                <label for="mstar">Stellar Mass (\(\rm M_\odot\)):</label>
-                <input type="number" id="mstar" step="any">
-
-                <label for="zscale">Metallicity (\(\rm Z_{\odot}\)):</label>
-                <input type="number" id="zscale" step="any" onblur="updateAbundances()">
-            </div>
+                <div>
+                    <label for="luminosity">Luminosity (\(\rm L_\odot\)):</label>
+                    <input type="number" id="luminosity" step="any">
+                </div>
+            
+                <div>
+                    <label for="teff">Effective Temperature (\(\rm K)\):</label>
+                    <input type="number" id="teff" step="any">
+                </div>
+            
+                <div>
+                    <label for="mstar">Stellar Mass (\(\rm M_\odot\)):</label>
+                    <input type="number" id="mstar" step="any">
+                </div>
+            
+                <div>
+                    <label for="zscale">Metallicity (\(\rm Z_{\odot}\)):</label>
+                    <input type="number" id="zscale" step="any" onblur="updateAbundances()">
+                </div>
+            </div>            
             <div class="button-container">
                 <button id="runButton" onclick="runCalculation()">Run</button>
                 <div id="loading" class="loading-container">
@@ -339,7 +389,7 @@
         </div>
         
         <div id="grid" class="tab-content">
-            <p> The data should only be trusted for effective temperature (\(T_{\rm eff}\)) between 18000 to 70000 K. 
+            <p> The data test should only be trusted for effective temperature (\(T_{\rm eff}\)) between 18000 to 60000 K. 
                 Beyond this limit, the underlying Munich Atomic Database either lacks ionization stages or has limited data.
                 We are currently working on an extension to the Munich Atomic Database, and in a future update we will also extend to such parameter spaces.
             <p>
@@ -471,9 +521,7 @@
             const newHydrogenFraction = 1 - totalMassFraction;
             if (newHydrogenFraction >= 0) {
                 document.getElementById("abundance-H").value = newHydrogenFraction.toExponential(8);
-            } else {
-                alert("Error: The sum of abundances exceeds 1. Please adjust values.");
-            }
+            } 
         }
         
         // Attach event listeners to all abundance inputs except hydrogen
@@ -572,17 +620,30 @@
 
 
             // Collect abundances
+            let totalMassFraction = 0;
             const abundances = {};
+        
             for (const element of Object.keys(defaultAbundances)) {
                 const value = parseFloat(document.getElementById(`abundance-${element}`).value);
-                abundances[element] = value;
-                if (value < 0) {
-                    alert(`Please enter valid abundances (e.g., no negative value). \n Check element: ${element}`)
+                
+                if (isNaN(value) || value < 0) {
+                    alert(`Invalid abundance for element ${element}. Please enter a valid non-negative number.`);
                     runButton.disabled = false; // Re-enable button
                     runButton.textContent = "Run"; // Restore button text
                     return;
                 }
+        
+                abundances[element] = value;
+                totalMassFraction += value;
             }
+        
+            // Ensure the total mass fraction sums to exactly 1 with small tolerance for rounding errors
+            if (Math.abs(totalMassFraction - 1) > 1e-8) { 
+                alert(`The sum of all mass fractions must be exactly 1. Your current sum is ${totalMassFraction.toFixed(8)}.`);
+                runButton.disabled = false; // Re-enable button
+                runButton.textContent = "Run"; // Restore button text
+                return;
+            }    
 
             let email = "";
             if (document.getElementById("email-toggle").checked) {
