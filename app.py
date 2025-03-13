@@ -21,8 +21,17 @@ import io
 import socket
 
 # Get local IP for internal testing
-local_ip = socket.gethostbyname(socket.gethostname())
-
+try:
+    local_ip = socket.gethostbyname(socket.gethostname())
+# this alternative requires internet connection
+except socket.gaierror:
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 1))  # connect() for UDP doesn't send packets
+        local_ip = s.getsockname()[0]
+    # if no internet is available resort to the default
+    except OSError:
+        local_ip = "127.0.0.1"
 
 def celery_init_app(app: Flask) -> Celery:
     """Initialization of the Celery app
@@ -72,8 +81,6 @@ ATOMIC_MASSES = {
     'K': 39.098, 'CA': 40.078, 'SC': 44.956, 'TI': 47.880, 'V': 50.941, 'CR': 51.996,
     'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690, 'CU': 63.546, 'ZN': 65.390
 }
-
-
 
 
 def calculate_metallicity_massb(mass_abundances):
@@ -496,6 +503,20 @@ def download_temp_file(session_id, filename):
     return response
 
 
+def check_csv_input_file(df):
+    """
+    Checks if the required columns are present in the dataframe (generate from the csv file)
+    Returns any missing columns
+    """
+    required_names = ["name", "teff", "luminosity", "mstar", "zscale"]
+    column_names = df.columns.values.tolist()
+    missing = []
+    for column in required_names:
+        if column not in column_names:
+            missing.append(column)
+    return missing
+
+
 @app.route('/upload_csv', methods=['POST'])
 def start_upload_csv():
     """This starts the processing of the csv file"""
@@ -512,13 +533,17 @@ def start_upload_csv():
     file = request.files["file"]
     file_data = file.read().decode("utf-8")
     num_rows = file_data.count("\n")
-    print(num_rows)
-    # file_data = base64.b64encode(file_data)  # Encode file as base64
 
     if num_rows > 201:
         return jsonify({
             "error": "Too many entries! Please reduce the number of stars to 200 or split the CSV into smaller parts."
         }), 400
+
+    # Read in the data to check if all the columns are there
+    df = pd.read_csv(io.BytesIO(file_data.encode()))
+    missing_columns = check_csv_input_file(df)
+    if len(missing_columns) > 0:
+        return jsonify({"error": f"Missing columns! Missing: {missing_columns}"}), 400
 
     user_email = request.form.get("email", "").strip()
     if not user_email:
@@ -532,12 +557,8 @@ def start_upload_csv():
 @shared_task(ignore_result=True)
 def upload_csv(file_data, user_email):
     """Handles CSV file upload and batch computation"""
-    print("I am doing something!")
-
-    print("I REALLY AM!")
     file_data = io.BytesIO(file_data.encode())
     df = pd.read_csv(file_data)
-    print(df)
 
     # Create a single batch directory for all results
     base_dir = "./tmp"
