@@ -199,7 +199,14 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             for i, (element, value) in enumerate(abundances.items(), start=1):
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
 
-        generated_file, results_dict = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir, does_plot)
+        try:
+            generated_file, results_dict = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir,
+                                                     does_plot)
+        except SystemExit as message:
+            print(f"{color.RED}Mforce crashed with message: {message}{color.END}")
+            results_dict = DUMMY_RESULTS
+            results_dict["fail"] = True
+            results_dict["fail_message"] = f"Mforce crashed: {message}"
 
         if results_dict["fail"]:
             failure_reason = results_dict["fail_reason"]
@@ -222,7 +229,8 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         # make some diagnostic plots and informative tables for the pdf output.
         if does_plot == True :
             pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
-            figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith(".png")]
+            figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir)
+                            if (f.endswith(".png") and not f.startswith("._"))]
 
             # Initialize
             c = canvas.Canvas(pdf_filename, pagesize=letter)
