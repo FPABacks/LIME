@@ -19,6 +19,30 @@ import csv
 from celery import Celery, Task, shared_task
 import io
 import socket
+import logging
+from logging.handlers import SysLogHandler
+
+logging_level = logging.INFO
+
+# Set up the logging of information, warning, and errors
+logger = logging.getLogger("LIME_app")
+logger.setLevel(logging_level)
+formatter = logging.Formatter(
+        fmt="%(asctime)s - %(filename)s:%(funcName)s:%(lineno)d %(levelname)s - '%(message)s'",
+        datefmt="%Y-%m-%d %H:%M:%S"
+        )
+# For now keep the log file in the main directory
+file_handler = logging.FileHandler("LIME_app.log")
+file_handler.setFormatter(formatter)
+file_handler.setLevel(logging.INFO)
+logger.addHandler(file_handler)
+
+logger.info("Starting up LIME!")
+
+# Dummy(ish) syslog for now
+# syslog_handler = logging.FileHandler("dummy_syslog")
+# syslog_handler.setFormatter(formatter)
+# syslog_handler.setLevel(logging_level)
 
 # Get local IP for internal testing
 try:
@@ -33,6 +57,7 @@ except socket.gaierror:
     except OSError:
         local_ip = "127.0.0.1"
 
+logging.info(f"Using address:{local_ip}")
 
 def celery_init_app(app: Flask) -> Celery:
     """Initialization of the Celery app
@@ -67,6 +92,11 @@ app.config["SERVER_NAME"] = f"{local_ip}:8000"
 app.config["PREFERRED_URL_SCHEME"] = "http"
 app.config["APPLICATION_ROOT"] = ""
 
+# Make Flask log the in the log file
+app.logger.addHandler(file_handler)
+# app.logger.addHandler(syslog_handler)
+app.logger.setLevel(logging_level)
+
 # Start Celery for queueing
 celery = celery_init_app(app)
 
@@ -86,7 +116,7 @@ ATOMIC_MASSES = {
 UPLOAD_FOLDER = "./tmp/uploads"
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {"png", "jpg", "jpeg"}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {"csv", "pdf"}
 
 @app.route("/send_contact_email", methods=["POST"])
 def send_contact_email():
@@ -96,6 +126,7 @@ def send_contact_email():
     attachment = request.files.get("attachment")
 
     if not name or not email_addr or not message:
+        logger.warning("Failed contact form entry.")
         return jsonify({"error": "Missing required fields"}), 400
 
     # Validate attachment (PNG, JPG, JPEG only)
@@ -141,6 +172,7 @@ def send_contact_email():
     if attachment_path:
         os.remove(attachment_path)
 
+    logger.info("Contact form filled in and emails sent!")
     return jsonify({"success": True})
 
 
@@ -203,6 +235,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             generated_file, results_dict = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir,
                                                      does_plot)
         except SystemExit as message:
+            logger.error(f"Computation failed with SystemExit in mcak_main: {message}")
             print(f"{color.RED}Mforce crashed with message: {message}{color.END}")
             results_dict = DUMMY_RESULTS
             results_dict["fail"] = True
@@ -210,6 +243,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
 
         if results_dict["fail"]:
             failure_reason = results_dict["fail_reason"]
+            logger.info(f"Computation failed: {failure_reason}")
             print(f"{color.RED}Simulation failed: {failure_reason}{color.END}")
             pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
             c = canvas.Canvas(pdf_filename, pagesize=letter)
@@ -228,6 +262,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
 
         # make some diagnostic plots and informative tables for the pdf output.
         if does_plot == True :
+            logger.info("Making result pdf")
             pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
             figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir)
                             if (f.endswith(".png") and not f.startswith("._"))]
@@ -409,11 +444,13 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
     
                 c.setFont("Helvetica", 10)
 
-            c.save()  
+            c.save()
+            logger.info("PDF made!")
 
         return results_dict
 
     except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         print(f"Unexpected error: {str(e)}")
 
     print("Process Computation failed!")
@@ -422,33 +459,37 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
 
 @app.route('/')
 def home():
+    logger.info("We have a visitor!")
     return render_template("index.html")
 
 
 @app.route('/process_data', methods=['POST'])
 def start_process():
     """This starts the data processing task"""
+    logger.info("Starting single model calculation initialization")
     data = request.json
 
     # Check for issues before putting calculations in the queue
     teff = float(data.get("teff", 0.0))
     if teff > 60000 or teff < 15000:
+        logger.error("Incorrect temperature selected!")
         return jsonify({"error": "Temperature beyond current coverage"}), 400
 
     abundances = data.get("abundances", {})
     if not abundances:
+        logger.error("Abundances are missing!")
         return jsonify({"error": "Abundances data is missing"}), 400
 
     task = process_data.apply_async(args=[data])
+    logger.info(f"Started single model calculation task with task_id: {task.id}")
     return jsonify({"task_id": task.id}), 202
 
 
 @shared_task(ignore_result=False)
 def process_data(data):
     """Handles the communication with index.html"""
+    logger.info("Starting model calculation")
     try:
-        print("Received data:", data)
-
         # Extract parameters
         luminosity = float(data.get("luminosity", 0.0))
         teff = float(data.get("teff", 0.0))
@@ -484,6 +525,7 @@ def process_data(data):
                                            pdf_name, session_tmp_dir, expert_mode, does_plot)
         # Check if the PDF exists at the correct path
         if not os.path.exists(pdf_path):
+            logger.error(f"Did not find the PDF at {pdf_path}")
             with app.app_context():
                 return {"error": f"PDF generation failed. Expected at {pdf_path}"}, 500
 
@@ -500,6 +542,7 @@ def process_data(data):
             if results_dict is None:
                 email_context = {"Result": "Failed to calculate a model"}
             else:
+                logging.info("Sending email!")
                 if not results_dict["fail"]:
                     email_context = {
                         "luminosity": f"{luminosity:.1f}",
@@ -526,12 +569,15 @@ def process_data(data):
                 "--b", email_body])
 
         with app.app_context():
+            logger.info(f"Model calculation done PDF available at {pdf_url}")
             return {"message": "Computation complete", "download_url": pdf_url}, 200
     
     except ValueError as e:
+        logger.error(f"Invalid numerical input: {e}")
         with app.app_context():
             return {"error": f"Invalid numerical input: {str(e)}"}, 400
     except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         with app.app_context():
             return {"error": f"Unexpected error: {str(e)}"}, 500
 
@@ -592,10 +638,12 @@ def start_upload_csv():
 
     # First check if the file is uploaded and email address is supplied
     if 'file' not in request.files:
+        logging.error("No CSV file provided for grid calculation")
         return jsonify({"error": "No file provided"}), 400
 
     file = request.files['file']
     if file.filename == '':
+        logging.error("No file provided for grid calculation")
         return jsonify({"error": "No selected file"}), 400
 
     # Read in the file and check the number of lines.
@@ -604,6 +652,7 @@ def start_upload_csv():
     num_rows = file_data.count("\n")
 
     if num_rows > 201:
+        logging.error("Too long CSV file provided")
         return jsonify({
             "error": "Too many entries! Please reduce the number of stars to 200 or split the CSV into smaller parts."
         }), 400
@@ -612,14 +661,17 @@ def start_upload_csv():
     df = pd.read_csv(io.BytesIO(file_data.encode()))
     missing_columns = check_csv_input_file(df)
     if len(missing_columns) > 0:
+        logging.error(f"Missing columns in CSV file! Missing: {missing_columns}")
         return jsonify({"error": f"Missing columns! Missing: {missing_columns}"}), 400
 
     user_email = request.form.get("email", "").strip()
     if not user_email:
+        logging.error("No email provided for CSV calculation results")
         return jsonify({"error": "Email is required"}), 400
 
     # Schedule the process
     task = upload_csv.apply_async(args=[file_data, user_email])
+    logging.info(f"Queueing grid calculation with ID: {task.id}")
     return jsonify({"task_id": task.id}), 200
 
 
@@ -760,16 +812,19 @@ def upload_csv(file_data, user_email):
             subprocess.run(["python3", "./mailing/mailer.py", "--t", user_email, "--s", "LIME Computation Results", "--b", body, "--a", results_csv_path])
 
         except Exception as e:
+            logging.error(f"Ran into an unexpected error in batch processing: {e}")
             print(f"Unexpected error in batch processing: {str(e)}")
 
         finally:
             # The batch directory is removed after processing
+            logging.info("Cleaning batch process folder")
             shutil.rmtree(batch_output_dir, ignore_errors=True)
 
     # **Start computation in a new thread**
     batch_thread = threading.Thread(target=process_batch)
     batch_thread.start()
 
+    logging.info("Finished batch process computation. ")
     return jsonify(response_message), 200
     #
     # except Exception as e:
