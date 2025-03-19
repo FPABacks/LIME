@@ -101,12 +101,12 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    ALLOCATE(tt_list(N_tt))
    CALL linspace(lgttmin, lgttmax,tt_list)
 
-   IF(ANY(ISNAN(tt_list))) STOP '---- tt is nan ----'
-   IF(ANY(ISNAN(lgT_list))) STOP '---- lgT is nan ----'
-   IF(ANY(ISNAN(lgD_list))) STOP '---- lgD is nan ----'
-   IF(SIZE(tt_list).NE.N_tt) STOP '---- tt Length mismatch ----'
-   IF(SIZE(lgT_list).NE.N_lgT) STOP '---- lgT Length mismatch ----'
-   IF(SIZE(lgD_list).NE.N_lgD) STOP '---- lgD Length mismatch ----'
+!   IF(ANY(ISNAN(tt_list))) STOP '---- tt is nan ----'
+!   IF(ANY(ISNAN(lgT_list))) STOP '---- lgT is nan ----'
+!   IF(ANY(ISNAN(lgD_list))) STOP '---- lgD is nan ----'
+!   IF(SIZE(tt_list).NE.N_tt) STOP '---- tt Length mismatch ----'
+!   IF(SIZE(lgT_list).NE.N_lgT) STOP '---- lgT Length mismatch ----'
+!   IF(SIZE(lgD_list).NE.N_lgD) STOP '---- lgD Length mismatch ----'
    !WRITE(*,*)'Grid - dine'
    !WRITE(*,*) " "
    CALL  flush(stdout) 
@@ -179,7 +179,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
          CALL  flush(stdout)
 
          CALL Ilumination_finction(T,nu_i0,W_i)
-         IF(ANY(ISNAN(W_i))) STOP '---- Wi is nan ----'
+!         IF(ANY(ISNAN(W_i))) STOP '---- Wi is nan ----'
          
          CALL NUMB_DENS%Clear()
          CALL NUMB_DENS%Set(rho=D, T=T, verbose=ver)
@@ -204,7 +204,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
             Nlines(Z,I) = Nlines(Z,I)+1
 
             ! check if the given level is available in atomic data
-            IF (Ll.GT.ATOM_DATA%List_L(I,Z)) STOP '---- exceeding the available level ----'
+!            IF (Ll.GT.ATOM_DATA%List_L(I,Z)) STOP '---- exceeding the available level ----'
             gl = ATOM_DATA%Degeneracy(Ll,I,Z)
 
             nl = NUMB_DENS%Occupation(Ll,I,Z)
@@ -226,7 +226,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
             ! Check that the line strength is computed correctly 
             IF(ISNAN(q_i(ind1)).OR.(q_i(ind1).LT.0.0d0)) THEN
                WRITE(*,*) chi_i,nl,T,gl,Lam
-               STOP '---- qi is nan ----'
+!               STOP '---- qi is nan ----'
             ENDIF
 
             barQ_list(T_gird_counter) = barQ_list(T_gird_counter) + q_i(ind1)*W_i(ind1)
@@ -263,7 +263,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
                   Mt = Mt + q_i(ind2)*W_i(ind2) * (1.0d0 - EXP(-tau_s))/tau_s
                END IF
             END DO
-            IF(ISNAN(Mt)) STOP '---- Mt is nan ----'
+!            IF(ISNAN(Mt)) STOP '---- Mt is nan ----'
             
             ! write the CAK t and M(t)
             WRITE(ID_Mt,*) tt_list(ind1), Mt
@@ -311,7 +311,7 @@ CONTAINS
       REAL(DP), PARAMETER :: C2 = plnk_const/bolz_const
       REAL(DP) :: F
 
-      IF(ANY( nu_i0_io.EQ.0)) STOP '---- Nu = 0 ----'
+!      IF(ANY( nu_i0_io.EQ.0)) STOP '---- Nu = 0 ----'
 
       F = sigma_stef*T**4.0d0
 

@@ -237,7 +237,7 @@ MODULE LTE_Line_module
  
      ! Get the destination ot the data location (check if the enviroment was set)
      CALL get_environment_variable("MFORCE_DIR", DATA_DIR)
-     IF (LEN_TRIM(DATA_DIR).EQ.0) STOP '---- Error: MFORCE_DIR not set -----'
+     IF (LEN_TRIM(DATA_DIR).EQ.0) write(*,*) '---- Error: MFORCE_DIR not set -----'
      DATA_DIR = TRIM(DATA_DIR)//'/DATA'
  
      ! Pars the input optianal variables
@@ -489,7 +489,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
      ! Get the destination ot the data location (check if the enviroment was set)
      CALL get_environment_variable("MFORCE_DIR", DATA_DIR)
-     IF (LEN_TRIM(DATA_DIR).EQ.0) STOP '---- Error: MFORCE_DIR not set -----'
+     IF (LEN_TRIM(DATA_DIR).EQ.0) write(*,*) '---- Error: MFORCE_DIR not set -----'
      DATA_DIR = TRIM(DATA_DIR)//'/DATA'
  
      ! Pars the input optianal variables
@@ -598,7 +598,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      IF(ver) PRINT*,' '
      IF(ver) PRINT*,'Find index called'
  
-     IF(.NOT.ALLOCATED(OBJ%Lambda)) STOP '---- Terminating: Line Data Not Initialized ----'
+     IF(.NOT.ALLOCATED(OBJ%Lambda)) write(*,*) '---- Terminating: Line Data Not Initialized ----'
  
      ! Deallocate the OBJ%Index array for allocation of new matches
      IF(ALLOCATED(OBJ%Index))DEALLOCATE(OBJ%Index)
@@ -750,7 +750,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
      ! Get the destination ot the data location (check if the enviroment was set)
      CALL get_environment_variable("MFORCE_DIR", DATA_DIR)
-     IF (LEN_TRIM(DATA_DIR).EQ.0) STOP '---- Error: MFORCE_DIR not set -----'
+     IF (LEN_TRIM(DATA_DIR).EQ.0) write(*,*) '---- Error: MFORCE_DIR not set -----'
      DATA_DIR = TRIM(DATA_DIR)//'/DATA'
      
  
@@ -765,7 +765,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
  
      ! Chech if ATOMIC_DATA is allocated - if not Stop
-     IF(.NOT.ALLOCATED(ATOMIC_DATA%List_I)) STOP '---- Terminating: Atomic data not Initialised ----'
+     IF(.NOT.ALLOCATED(ATOMIC_DATA%List_I)) write(*,*) '---- Terminating: Atomic data not Initialised ----'
  
  
      ! create short-hands
@@ -942,11 +942,11 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
  
      ! Chech if the OCCUPATION_NUMBER_TYPE is allocated
-     IF(.NOT.ALLOCATED(OBJ%Aboundance)) STOP '---- Terminating: Occupation Numbre Type not Initialised ----'
+     IF(.NOT.ALLOCATED(OBJ%Aboundance)) write(*,*) '---- Terminating: Occupation Numbre Type not Initialised ----'
  
      ! Check input dencity and temperature
-     IF(.NOT.(rho.GT.0)) STOP '---- Terminating: Dencity not specified ---- '
-     IF(.NOT.(T.GT.0)) STOP '---- Terminating: Temperature not specified ---- '
+     IF(.NOT.(rho.GT.0)) write(*,*) '---- Terminating: Dencity not specified ---- '
+     IF(.NOT.(T.GT.0)) write(*,*) '---- Terminating: Temperature not specified ---- '
  
      IF(ver) PRINT*,' '
      IF(ver) PRINT*, 'Set Temperature and Dencity CALLED'
@@ -991,7 +991,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      ! DO Z = 1,30
      !    PRINT*,OBJ%Nuclei(Z)
      ! END DO
-     IF(ANY(ISNAN(OBJ%Nuclei(:)))) STOP '---- Nuclei Is NaN ----'
+     IF(ANY(ISNAN(OBJ%Nuclei(:)))) write(*,*) '---- Nuclei Is NaN ----'
      
      !IF (ANY(ISNAN(OBJ%Nuclei(:)))) THEN
      ! PRINT*, 'WARNING: Nuclei number density contained NaN, replacing with 1e-10'
@@ -1020,7 +1020,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
      ! ----- Executing 3)
      CALL Comput_Partition_Functions(OBJ,ATOMIC_DATA,T,verbose = ver)
-     IF(ANY(ISNAN(OBJ%Partition))) STOP '---- Partition function Is NaN ----'
+     IF(ANY(ISNAN(OBJ%Partition))) write(*,*) '---- Partition function Is NaN ----'
      IF(ver) PRINT*, '  - Partition Functions READY'
  
  
@@ -1039,7 +1039,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
            N_electron_old = OBJ%Electron
  
            CALL Comput_Ionisation_Fractions(OBJ,ATOMIC_DATA,T,iterative,verbose = ver)
-           IF(ISNAN(OBJ%Electron).OR.(OBJ%Electron.EQ.0.0d0)) STOP '---- Electrons Is NaN/Zero ----'
+!           IF(ISNAN(OBJ%Electron).OR.(OBJ%Electron.EQ.0.0d0)) write(*,*) '---- Electrons Is NaN/Zero ----'
            N_electron_new = OBJ%Electron
  
            ! chech if the change in the numberdencity is less then 0.1%
@@ -1053,7 +1053,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
         END DO
  
         ! if the maximum number of iterations was reached terminate
-        IF(ind.GT.99) STOP '---- Electron Number Density NOT converged ----'
+!        IF(ind.GT.99) write(*,*) '---- Electron Number Density NOT converged ----'
      ELSE
  
         ! compute the ionisation structure using the input electrone number density
@@ -1067,7 +1067,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      !    PRINT*,I, OBJ%Ions(I,Z)
      !  END DO
      ! END DO
-     IF(ANY(ISNAN(OBJ%Ions(:,:)))) STOP '---- Ions Is NaN ----'
+!     IF(ANY(ISNAN(OBJ%Ions(:,:)))) write(*,*) '---- Ions Is NaN ----'
      IF(ver) PRINT*, '  - Ionisation Fructions READY'
  
  
@@ -1098,8 +1098,8 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
               SUM_Excitation_numb_frac = SUM_Excitation_numb_frac + Excitation_numb_frac(L)
  
-              IF(ISNAN(Excitation_numb_frac(L))) STOP '---- Ef is nan ----'
-              IF(ISNAN(SUM_Excitation_numb_frac)) STOP '---- SUM Ef is nan ----'
+!              IF(ISNAN(Excitation_numb_frac(L))) write(*,*) '---- Ef is nan ----'
+!              IF(ISNAN(SUM_Excitation_numb_frac)) write(*,*) '---- SUM Ef is nan ----'
            END DO
  
            ! --------------------------------------------------------
@@ -1145,13 +1145,13 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
      ! ----- Executing 6b)
      ! cheking the total number dencity
-     DO Z = 1,ATOMIC_DATA%MaxZ
-        DO I = 1,ATOMIC_DATA%List_I(Z)-1
-           IF ( SUM(OBJ%Occupation(:,I,Z))/OBJ%Ions(I,Z) - 1 .GT. 1.0d-6 ) THEN
-              STOP '---- Number Dencities NOT conserved ----'
-           END IF
-        END DO
-     END DO
+!     DO Z = 1,ATOMIC_DATA%MaxZ
+!        DO I = 1,ATOMIC_DATA%List_I(Z)-1
+!           IF ( SUM(OBJ%Occupation(:,I,Z))/OBJ%Ions(I,Z) - 1 .GT. 1.0d-6 ) THEN
+!              write(*,*) '---- Number Dencities NOT conserved ----'
+!           END IF
+!        END DO
+!     END DO
  
     !  DEALLOCATE(OBJ%Partition) this is a bug PArtition function shoud not be deallocated 
      IF(ver) PRINT*,'  - Occupation Numbers READY'
@@ -1318,7 +1318,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
            END DO
         END DO
      END IF
-     IF(ISNAN(OBJ%Electron)) STOP '---- Error With Electron number density (NAN) ----'
+!     IF(ISNAN(OBJ%Electron)) write(*,*) '---- Error With Electron number density (NAN) ----'
    END SUBROUTINE Comput_Ionisation_Fractions
    !=============================================================================
  

@@ -20,6 +20,7 @@ from celery import Celery, Task, shared_task
 import io
 import socket
 import logging
+import signal
 from logging.handlers import SysLogHandler
 
 logging_level = logging.INFO
@@ -34,7 +35,7 @@ formatter = logging.Formatter(
 # For now keep the log file in the main directory
 file_handler = logging.FileHandler("LIME_app.log")
 file_handler.setFormatter(formatter)
-file_handler.setLevel(logging.INFO)
+file_handler.setLevel(logging_level)
 logger.addHandler(file_handler)
 
 logger.info("Starting up LIME!")
@@ -115,8 +116,10 @@ ATOMIC_MASSES = {
 
 UPLOAD_FOLDER = "./tmp/uploads"
 
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {"csv", "pdf"}
+
 
 @app.route("/send_contact_email", methods=["POST"])
 def send_contact_email():
@@ -176,6 +179,16 @@ def send_contact_email():
     return jsonify({"success": True})
 
 
+def sigterm_handler(signum, frame):
+    """Small function to deal with fortran crashes (STOP statements)"""
+    logger.error(f"Mforce crashed! Got this info: {signum}, {frame}")
+    raise RuntimeError(f"Mforce crashed! Got this info: {signum}, {frame}")
+
+
+# Start the sigterm handler
+signal.signal(signal.SIGTERM, sigterm_handler)
+
+
 def calculate_metallicity_massb(mass_abundances):
     """Calculates the actual metallicity from the number abundances input by the user"""
     metals = {e for e in ATOMIC_MASSES if e not in {'H', 'HE'}}
@@ -220,6 +233,7 @@ def load_dyn_email(filename, context):
 def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, pdf_name,
                         batch_output_dir, expert_mode, does_plot):
     """Runs mcak_explore and generates a pdf with the results if desired. """
+    error_message = ""
     try:
         output_dir = os.path.join(batch_output_dir, pdf_name)
         os.makedirs(output_dir, exist_ok=True)
@@ -231,32 +245,30 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             for i, (element, value) in enumerate(abundances.items(), start=1):
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
 
-        try:
-            generated_file, results_dict = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir,
-                                                     does_plot)
-        except SystemExit as message:
-            logger.error(f"Computation failed with SystemExit in mcak_main: {message}")
-            print(f"{color.RED}Mforce crashed with message: {message}{color.END}")
-            results_dict = DUMMY_RESULTS
-            results_dict["fail"] = True
-            results_dict["fail_message"] = f"Mforce crashed: {message}"
+        # Run the main calculation!
+        logger.debug(f"Starting calculation with L={lum:.3g}, T={teff:.3g}, M={mstar:.3g}, Z={zstar:.3g}")
+        generated_file, results_dict = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir,
+                                                 does_plot, logger=logger)
 
         if results_dict["fail"]:
             failure_reason = results_dict["fail_reason"]
             logger.info(f"Computation failed: {failure_reason}")
             print(f"{color.RED}Simulation failed: {failure_reason}{color.END}")
-            pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
-            c = canvas.Canvas(pdf_filename, pagesize=letter)
-            c.setFont("Helvetica-Bold", 18)
-            c.drawString(220, 700, "Simulation Failed")
-            c.setFont("Helvetica", 14)
-            c.drawString(100, 650, "Reason for failure:")
-            wrapped_text = simpleSplit(failure_reason, "Helvetica", 12, 400)
-            y_pos = 620
-            for line in wrapped_text:
-                c.drawString(120, y_pos, line)
-                y_pos -= 20
-            c.save()
+
+            if does_plot:
+                pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
+                c = canvas.Canvas(pdf_filename, pagesize=letter)
+                c.setFont("Helvetica-Bold", 18)
+                c.drawString(220, 700, "Simulation Failed")
+                c.setFont("Helvetica", 14)
+                c.drawString(100, 650, "Reason for failure:")
+                wrapped_text = simpleSplit(failure_reason, "Helvetica", 12, 400)
+                y_pos = 620
+                for line in wrapped_text:
+                    c.drawString(120, y_pos, line)
+                    y_pos -= 20
+                c.save()
+                logger.info("Made a failed calculation pdf")
             # Leave it at this if the calculation failed
             return results_dict
 
@@ -450,11 +462,15 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         return results_dict
 
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        print(f"Unexpected error: {str(e)}")
+        error_message = str(e)
+        logger.error(f"Unexpected error: {error_message}")
+        print(f"Unexpected error: {str(error_message)}")
+
+    results_dict = dict(DUMMY_RESULTS)
+    results_dict["fail_reason"] = f"Unknown crash! Check your input. Got Unexpected error: {error_message}"
 
     print("Process Computation failed!")
-    return DUMMY_RESULTS
+    return results_dict
 
 
 @app.route('/')
@@ -503,7 +519,7 @@ def process_data(data):
         # To allow additional output:
         expert_mode = data.get("expert_mode", False)  # by default false
         
-        # Calculate values
+        # Calculate the metallicity and helium number abundance based on the input mass fractions
         zstar = calculate_metallicity_massb(abundances)
         helium_abundance = He_number_abundance(abundances)
 
@@ -681,13 +697,15 @@ def upload_csv(file_data, user_email):
     file_data = io.BytesIO(file_data.encode())
     df = pd.read_csv(file_data)
 
+    logger.info(f"Starting batch calculation with size {len(df.index)}")
+
     # Create a single batch directory for all results
     base_dir = "./tmp"
     os.makedirs(base_dir, exist_ok=True)
     batch_output_dir = tempfile.mkdtemp(dir=base_dir)
     os.makedirs(batch_output_dir, exist_ok=True)
 
-    print(f"Batch directory created: {batch_output_dir}")  # Debugging
+    logger.debug(f"Batch directory created: {batch_output_dir}")  # Debugging
 
     # **Return success response immediately**
     response_message = {
@@ -711,7 +729,7 @@ def upload_csv(file_data, user_email):
             results_csv_path = os.path.join(batch_output_dir, "results.csv")
             csv_header_written = False
 
-            pdf_paths = []
+            # pdf_paths = []
             all_results = []
 
             for index, row in df.iterrows():
@@ -724,7 +742,7 @@ def upload_csv(file_data, user_email):
                 # Create subdirectory inside batch directory
                 result_dir = os.path.join(batch_output_dir, pdf_name)
                 os.makedirs(result_dir, exist_ok=True)
-                pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
+                # pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
 
                 abundances = {}
                 total_metal_mass = 0
@@ -751,7 +769,7 @@ def upload_csv(file_data, user_email):
                 # Start the main calculation
                 results_dict = process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances,
                                                    pdf_name, batch_output_dir, False, does_plot)
-                pdf_paths.append(pdf_path)
+                # pdf_paths.append(pdf_path)
                 all_results.append(results_dict)
 
             for index, row in df.iterrows():
@@ -772,7 +790,9 @@ def upload_csv(file_data, user_email):
                                 abundances_data[element_symbol] = abundance_value
 
                 with open(results_csv_path, mode='a', newline='') as f:
-                    writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Rstar", "log g", "Zstar", "Mass Loss Rate", "Qbar", "Alpha", "Q0", "Vinf", "Remark", *abundances_data.keys()])
+                    writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Rstar", "log g",
+                                                           "Zstar", "Mass Loss Rate", "Gamma_e", "Qbar", "Alpha",
+                                                           "Q0", "Vinf", "Success", "Remark", *abundances_data.keys()])
                     if not csv_header_written:
                         writer.writeheader()
                         csv_header_written = True
@@ -785,10 +805,12 @@ def upload_csv(file_data, user_email):
                                          "log g": "{:.2e}".format(results_dict["log_g"]),
                                          "Zstar": "{:.3e}".format(results_dict["Zmass"]),
                                          "Mass Loss Rate": "{:.3e}".format(results_dict["mdot"]),
+                                         "Gamma_e": "{:.3f}".format(results_dict["Gamma_e"]),
                                          "Qbar": "{:.2e}".format(results_dict["Qbar"]),
                                          "Alpha": "{:.2e}".format(results_dict["alpha"]),
                                          "Q0": "{:.2e}".format(results_dict["Q0"]),
                                          "Vinf": "{:.2e}".format(results_dict["vinf"]),
+                                         "Success": str(not results_dict["fail"]),
                                          "Remark": results_dict["fail_reason"],
                                          **abundances_data})
                     else:
@@ -800,10 +822,12 @@ def upload_csv(file_data, user_email):
                                          "log g": f"{np.nan}",
                                          "Zstar": f"{np.nan}",
                                          "Mass Loss Rate": f"{np.nan}",
+                                         "Gamma_e": f"{np.nan}",
                                          "Qbar": f"{np.nan}",
                                          "Alpha": f"{np.nan}",
                                          "Q0": f"{np.nan}",
                                          "Vinf": f"{np.nan}",
+                                         "Success": "False",
                                          "Remark": results_dict["fail_reason"],
                                          **abundances_data})
 
