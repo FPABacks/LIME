@@ -361,7 +361,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
     t_cri = kap_e * cgs.c * rho_initial / (v_cri * cgas / R_star)
 
     if log:
-        logger.debug('rho_initial, t_cri:', rho_initial, t_cri)
+        logger.debug(f'rho_initial: {rho_initial}, t_cri: {t_cri}')
 
     lgTeff = np.log10(T_eff)
     lgrho_ini = np.log10(rho_initial)
@@ -410,7 +410,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
         directory = parameters["DIR"].strip("'")
         file_path = directory + '/' + output_file
         if log:
-            logger.debug('Constructed file path:', file_path)
+            logger.debug(f"Constructed file path: {file_path}")
             logger.debug("Running Mforce!")
 
         # Write updated parameters and (re)run MForce

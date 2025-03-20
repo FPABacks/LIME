@@ -224,10 +224,10 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
             ENDIF 
             
             ! Check that the line strength is computed correctly 
-            IF(ISNAN(q_i(ind1)).OR.(q_i(ind1).LT.0.0d0)) THEN
-               WRITE(*,*) chi_i,nl,T,gl,Lam
+!            IF(ISNAN(q_i(ind1)).OR.(q_i(ind1).LT.0.0d0)) THEN
+!               WRITE(*,*) chi_i,nl,T,gl,Lam
 !               STOP '---- qi is nan ----'
-            ENDIF
+!            ENDIF
 
             barQ_list(T_gird_counter) = barQ_list(T_gird_counter) + q_i(ind1)*W_i(ind1)
             ! notQ_list(T_gird_counter) = notQ_list(T_gird_counter) + q_i(ind1)*q_i(ind1)*W_i(ind1)

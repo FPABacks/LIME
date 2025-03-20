@@ -21,6 +21,7 @@ import io
 import socket
 import logging
 import signal
+from time import time
 from logging.handlers import SysLogHandler
 
 logging_level = logging.INFO
@@ -29,7 +30,7 @@ logging_level = logging.INFO
 logger = logging.getLogger("LIME_app")
 logger.setLevel(logging_level)
 formatter = logging.Formatter(
-        fmt="%(asctime)s - %(filename)s:%(funcName)s:%(lineno)d %(levelname)s - '%(message)s'",
+        fmt="%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - '%(message)s'",
         datefmt="%Y-%m-%d %H:%M:%S"
         )
 # For now keep the log file in the main directory
@@ -246,10 +247,11 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 f.write(f"{i:2d}  '{element.upper():2s}'   {value:.14f}\n")
 
         # Run the main calculation!
-        logger.debug(f"Starting calculation with L={lum:.3g}, T={teff:.3g}, M={mstar:.3g}, Z={zstar:.3g}")
+        start = time()
+        logger.info(f"Starting calculation with L={lum:.3g}, T={teff:.3g}, M={mstar:.3g}, Z={zstar:.3g}")
         generated_file, results_dict = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir,
                                                  does_plot, logger=logger)
-
+        logger.info(f"Calculation done! It took {results_dict['Iteration']} iterations in {time() - start:.2f} seconds")
         if results_dict["fail"]:
             failure_reason = results_dict["fail_reason"]
             logger.info(f"Computation failed: {failure_reason}")
@@ -546,7 +548,7 @@ def process_data(data):
                 return {"error": f"PDF generation failed. Expected at {pdf_path}"}, 500
 
         # Schedule cleanup
-        threading.Timer(600, shutil.rmtree, args=[session_tmp_dir], kwargs={"ignore_errors": True}).start()
+        threading.Timer(20, shutil.rmtree, args=[session_tmp_dir], kwargs={"ignore_errors": True}).start()
 
         # Generate a downloadable link
         relative_session_id = os.path.relpath(session_tmp_dir, base_tmp_dir)

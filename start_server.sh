@@ -17,4 +17,4 @@ celery -A app.celery worker --loglevel=info --concurrency=4 --without-gossip --w
 
 echo "Starting Gunicorn!"
 # Start the WSGI server to get the website up.
-gunicorn -w 4 -b 0.0.0.0:8000 app:app
+gunicorn -w 4 -b 0.0.0.0:8000 app:app --log-level info --timeout 120
