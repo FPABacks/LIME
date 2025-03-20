@@ -39,7 +39,7 @@ file_handler.setFormatter(formatter)
 file_handler.setLevel(logging_level)
 logger.addHandler(file_handler)
 
-logger.info("Starting up LIME!")
+logger.info(f"Starting up LIME! ({__name__})")
 
 # Dummy(ish) syslog for now
 # syslog_handler = logging.FileHandler("dummy_syslog")
@@ -133,12 +133,14 @@ def send_contact_email():
         logger.warning("Failed contact form entry.")
         return jsonify({"error": "Missing required fields"}), 400
 
-    # Validate attachment (PNG, JPG, JPEG only)
+    # Validate attachment (csv and pdf only)
     attachment_path = None
     if attachment and allowed_file(attachment.filename):
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
         attachment_path = os.path.join(UPLOAD_FOLDER, attachment.filename)
         attachment.save(attachment_path)
+    elif attachment and not allowed_file(attachment.filename):
+        return jsonify({"success": True, "attachment_oke": False})
 
     # Render email bodies using Jinja2
     admin_body = render_template("contact_help.j2", name=name, email=email_addr, message=message, attachment=attachment.filename if attachment else None, is_user=False)
@@ -177,7 +179,7 @@ def send_contact_email():
         os.remove(attachment_path)
 
     logger.info("Contact form filled in and emails sent!")
-    return jsonify({"success": True})
+    return jsonify({"success": True, "attachment_oke": True})
 
 
 def sigterm_handler(signum, frame):
@@ -217,6 +219,10 @@ def He_number_abundance(mass_abundances):
     else:
         NHe = N_He/N_H    
     return NHe
+
+
+def check_mass_fractions(mass_fractions):
+    """Checks if the total mass fraction """
 
 
 def load_email_body(filename):
@@ -466,10 +472,10 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
     except Exception as e:
         error_message = str(e)
         logger.error(f"Unexpected error: {error_message}")
-        print(f"Unexpected error: {str(error_message)}")
+        # print(f"Unexpected error: {str(error_message)}")
 
     results_dict = dict(DUMMY_RESULTS)
-    results_dict["fail_reason"] = f"Unknown crash! Check your input. Got Unexpected error: {error_message}"
+    results_dict["fail_reason"] = f"Unknown crash! Make sure input is physical. "
 
     print("Process Computation failed!")
     return results_dict
@@ -484,12 +490,12 @@ def home():
 @app.route('/process_data', methods=['POST'])
 def start_process():
     """This starts the data processing task"""
-    logger.info("Starting single model calculation initialization")
+    logger.info("Receiving single calculation request")
     data = request.json
 
     # Check for issues before putting calculations in the queue
     teff = float(data.get("teff", 0.0))
-    if teff > 60000 or teff < 15000:
+    if teff > 60000 or teff < 18000:
         logger.error("Incorrect temperature selected!")
         return jsonify({"error": "Temperature beyond current coverage"}), 400
 
@@ -499,7 +505,7 @@ def start_process():
         return jsonify({"error": "Abundances data is missing"}), 400
 
     task = process_data.apply_async(args=[data])
-    logger.info(f"Started single model calculation task with task_id: {task.id}")
+    logger.info(f"Queued single calculation task with task_id: {task.id}")
     return jsonify({"task_id": task.id}), 202
 
 
@@ -733,6 +739,7 @@ def upload_csv(file_data, user_email):
 
             # pdf_paths = []
             all_results = []
+            all_mass_fractions = []
 
             for index, row in df.iterrows():
                 pdf_name = str(row["name"])
@@ -764,8 +771,19 @@ def upload_csv(file_data, user_email):
 
                 if hydrogen_abundance >= 0:
                     abundances["H"] = hydrogen_abundance
+                    all_mass_fractions.append(abundances)
+                else:
+                    logger.info("Invalid input mass fractions, total mass (without hydrogen) > 1")
+                    results_dict = dict(DUMMY_RESULTS)
+                    results_dict["fail"] = True
+                    results_dict["fail_reason"] = (f"Invalid input mass fractions,"
+                                                   f" total mass without hydrogen > 1"
+                                                   f" ({total_metal_mass + helium_abundance:.3f})")
+                    all_results.append(results_dict)
+                    all_mass_fractions.append(abundances)
+                    continue  # Skip the rest of this iteration, no need to calculate further.
 
-                # No need to make figures when running working through a csv file.
+                # No need to make figures when running working through a batch calculation.
                 does_plot = False
 
                 # Start the main calculation
@@ -781,15 +799,16 @@ def upload_csv(file_data, user_email):
                 mass_abundance_path = os.path.join(result_dir, "output", "mass_abundance")
 
                 # Read abundances from the mass_abundance file
-                abundances_data = {}
-                if os.path.exists(mass_abundance_path):
-                    with open(mass_abundance_path, "r") as f:
-                        for line in f:
-                            parts = line.strip().split()
-                            if len(parts) >= 3:
-                                element_symbol = " ".join(parts[1:-1]).replace("'", "").strip()
-                                abundance_value = float(parts[-1])
-                                abundances_data[element_symbol] = abundance_value
+                abundances_data = all_mass_fractions[index]
+                # abundances_data = {}
+                # if os.path.exists(mass_abundance_path):
+                #     with open(mass_abundance_path, "r") as f:
+                #         for line in f:
+                #             parts = line.strip().split()
+                #             if len(parts) >= 3:
+                #                 element_symbol = " ".join(parts[1:-1]).replace("'", "").strip()
+                #                 abundance_value = float(parts[-1])
+                #                 abundances_data[element_symbol] = abundance_value
 
                 with open(results_csv_path, mode='a', newline='') as f:
                     writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Rstar", "log g",
