@@ -44,6 +44,10 @@
             color: #2c3e50;
             font-size: 28px;
         }
+        h3 {
+            color: #ee4b2b;
+            font-size: 28px;
+        }
         label {
             display: block;
             margin-top: 10px;
@@ -232,6 +236,34 @@
         -moz-appearance: textfield;
     }
 
+    table {
+        width: 50%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 20px auto;
+        font-size: 22px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #2C3E50;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #ECF0F1;
+    }
+
+    tr:hover {
+        background-color: #BDC3C7;
+    }
 
     </style>
     <script type="text/javascript" async
@@ -414,6 +446,47 @@
                     <img src="{{ url_for('static', filename='loading.gif') }}" alt="Loading">
                 </div>
             </div>
+
+<!--            A table to show the output-->
+
+            <h3> <span id="extra_info" > </span> </h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mass-loss rate (\(\dot{M}\))</td>
+                        <td id="mass_loss_rate"> </td>
+<!--                        <td> {{ data.mass_loss_rate }} </td>-->
+                    </tr>
+                    <tr>
+                        <td>Terminal velocity (\(v_{\infty}\))</td>
+                        <td id="terminal_velocity"> </td>
+<!--                        <td> {{ data.terminal_velocity }} </td>-->
+                    </tr>
+                    <tr>
+                        <td>Eddington ratio (\(\Gamma\))</td>
+                        <td id="gamma_e"> </td>
+                    </tr>
+                    <tr>
+                        <td>\(\bar{Q}\) (Qbar)</td>
+                        <td id="qbar"> </td>
+                    </tr>
+                    <tr>
+                        <td>\(\alpha\)</td>
+                        <td id="alpha"> </td>
+                    </tr>
+                    <tr>
+                        <td>\(Q_0\)</td>
+                        <td id="q0"> </td>
+                    </tr>
+                </tbody>
+            </table>
+
             <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px;">
                 <label class="switch">
                     <input type="checkbox" id="email-toggle" onchange="toggleEmailInput()">
@@ -756,12 +829,21 @@
                         document.getElementById("loading").style.display = "none";
                         runButton.disabled = false;
                         runButton.textContent = "Run";
-        
+
+                        document.getElementById("mass_loss_rate").textContent = data.mass_loss_rate;
+                        document.getElementById("terminal_velocity").textContent = data.terminal_velocity;
+                        document.getElementById("gamma_e").textContent = data.gamma_e;
+                        document.getElementById("qbar").textContent = data.qbar;
+                        document.getElementById("alpha").textContent = data.alpha;
+                        document.getElementById("q0").textContent = data.q0;
+                        document.getElementById("extra_info").textContent = data.info;
+                        console.log(data.info)
+
                         if (data.download_url) {
                             window.open(data.download_url, "_blank");
                         }
                     } else {
-                        // If not done, check again in xx seconds
+                        // If not done, check again in 0.1 seconds
                         setTimeout(() => pollTaskStatus(taskId), 100);
                     }
                 })

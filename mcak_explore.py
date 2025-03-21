@@ -456,7 +456,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
         # Calculate the terminal velocity
         vinf = vinf_Kudritzki(alpha,v_esc) / 1e5  # in km/s
 
-        if np.isnan(rho_target):
+        if not np.isfinite(rho_target):
             if log:
                 logger.error(f"NaN in Rho at iteration: {iteration}")
             result_dict = dict(DUMMY_RESULTS)
@@ -510,7 +510,7 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
         # Fail reason 1, cannot drive wind
         if iteration >= 3 and mdot_lim < 1:
             fail = True
-            failure_reason = "Line-driven mass loss is not possible. Consider increasing luminosity/mass ratio or metallicity."
+            failure_reason = "Line-driven mass loss is not possible. Too low luminosity-mass ratio or metallicity."
             break
 
         # Convergence Criteria
@@ -531,12 +531,11 @@ def main(lum, T_eff, M_star, Z_star, Z_scale, Yhe, random_subdir, does_plot, max
                 logger.info(f"{color.YELLOW}{color.BOLD}"
                             f"WARNING: Not converged to required tolerance (1e-3), please inspect final values before use"
                             f"{color.END}")
-            # print(mdot * cgs.year / cgs.Msun, qbar, alpha, q0, vinf, Z_star, alpha_g, alpha_2,
-            #           v_esc / 1.e5, v_cri, rho, R_star / cgs.Rsun, np.log10(cgs.G * M_star / R_star**2))
 
         if iteration == max_iterations - 1 and (abs(rel_rho) > 2.e-1 and abs(rel_mdot) > 2.e-1):
-            fail = True
-            failure_reason = "The model did not converge after the maximum allowed iterations."
+            fail = False
+            failure_reason = ("The model did not converge after the maximum allowed iterations. Use values with care!" 
+                              " Consider using expert mode for more insight.")
             break
         
         # Update the density to the target density for the next iteration

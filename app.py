@@ -61,6 +61,7 @@ except socket.gaierror:
 
 logging.info(f"Using address:{local_ip}")
 
+
 def celery_init_app(app: Flask) -> Celery:
     """Initialization of the Celery app
     Taken from https://flask.palletsprojects.com/en/stable/patterns/celery/"""
@@ -114,6 +115,14 @@ ATOMIC_MASSES = {
     'K': 39.098, 'CA': 40.078, 'SC': 44.956, 'TI': 47.880, 'V': 50.941, 'CR': 51.996,
     'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690, 'CU': 63.546, 'ZN': 65.390
 }
+
+base_table_data = {"mass_loss_rate": "-",
+                   "terminal_velocity": "-",
+                   "gamma_e": "-",
+                   "qbar": "-",
+                   "alpha": "-",
+                   "q0": "-",
+                   "info": ""}
 
 UPLOAD_FOLDER = "./tmp/uploads"
 
@@ -237,6 +246,20 @@ def load_dyn_email(filename, context):
     return template.render(context)
 
 
+def make_data_dict(results_dict):
+    """
+    Makes a dictionary to be passed to the HTML side of the code to update the table
+    """
+    data = {"mass_loss_rate": f"{results_dict['mdot']:.3g} Msun / yr",
+            "terminal_velocity": f"{results_dict['vinf']:.0f} km / s",
+            "gamma_e": f"{results_dict['Gamma_e']:.2f}",
+            "qbar": f"{results_dict['Qbar']:.4g}",
+            "alpha": f"{results_dict['alpha']:.2f}",
+            "q0": f"{results_dict['Q0']:.4g}",
+            "info": f"{results_dict["fail_reason"]}"}
+    return data
+
+
 def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, pdf_name,
                         batch_output_dir, expert_mode, does_plot):
     """Runs mcak_explore and generates a pdf with the results if desired. """
@@ -281,7 +304,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             return results_dict
 
         # make some diagnostic plots and informative tables for the pdf output.
-        if does_plot == True :
+        if does_plot:
             logger.info("Making result pdf")
             pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
             figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir)
@@ -484,7 +507,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
 @app.route('/')
 def home():
     logger.info("We have a visitor!")
-    return render_template("index.html")
+    return render_template("index.html", data=base_table_data)
 
 
 @app.route('/process_data', methods=['POST'])
@@ -526,6 +549,10 @@ def process_data(data):
 
         # To allow additional output:
         expert_mode = data.get("expert_mode", False)  # by default false
+
+        # Always send the expert mode output per email.
+        if recipient_email != "":
+            expert_mode = True
         
         # Calculate the metallicity and helium number abundance based on the input mass fractions
         zstar = calculate_metallicity_massb(abundances)
@@ -542,24 +569,30 @@ def process_data(data):
         pdf_path = os.path.join(output_dir, f"{pdf_name}.pdf")  
 
         # In individual calculations always make the verification plots
-        does_plot = True
+        if expert_mode:
+            does_plot = True
+        else:
+            does_plot = False
 
         # Run computation in a separate thread
         results_dict = process_computation(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances,
                                            pdf_name, session_tmp_dir, expert_mode, does_plot)
+
+        table_data = make_data_dict(results_dict)
+
         # Check if the PDF exists at the correct path
-        if not os.path.exists(pdf_path):
+        if expert_mode and not os.path.exists(pdf_path):
             logger.error(f"Did not find the PDF at {pdf_path}")
             with app.app_context():
-                return {"error": f"PDF generation failed. Expected at {pdf_path}"}, 500
+                return {"error": f"PDF generation failed. Expected at {pdf_path}", **base_table_data}, 500
 
         # Schedule cleanup
         threading.Timer(20, shutil.rmtree, args=[session_tmp_dir], kwargs={"ignore_errors": True}).start()
 
-        # Generate a downloadable link
-        relative_session_id = os.path.relpath(session_tmp_dir, base_tmp_dir)
-
-        pdf_url = url_for("download_temp_file", session_id=relative_session_id, filename=f"{pdf_name}/result.pdf", _external=True)
+        if expert_mode:
+            # Generate a downloadable link
+            relative_session_id = os.path.relpath(session_tmp_dir, base_tmp_dir)
+            pdf_url = url_for("download_temp_file", session_id=relative_session_id, filename=f"{pdf_name}/result.pdf", _external=True)
 
         # **Send Email if recipient email is provided**
         if recipient_email:
@@ -592,18 +625,21 @@ def process_data(data):
                 "--s", "LIME Computation Results",
                 "--b", email_body])
 
-        with app.app_context():
-            logger.info(f"Model calculation done PDF available at {pdf_url}")
-            return {"message": "Computation complete", "download_url": pdf_url}, 200
+        if expert_mode:
+            with app.app_context():
+                logger.info(f"Model calculation done PDF available at {pdf_url}")
+                return {"message": "Computation complete", "download_url": pdf_url, **table_data}, 200
+        else:
+            return {"message": "Computation complete", **table_data}, 200
     
     except ValueError as e:
         logger.error(f"Invalid numerical input: {e}")
         with app.app_context():
-            return {"error": f"Invalid numerical input: {str(e)}"}, 400
+            return {"error": f"Invalid numerical input: {str(e)}", **base_table_data}, 400
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         with app.app_context():
-            return {"error": f"Unexpected error: {str(e)}"}, 500
+            return {"error": f"Unexpected error: {str(e)}", **base_table_data}, 500
 
 
 @app.route("/task_status/<task_id>", methods=["GET"])
