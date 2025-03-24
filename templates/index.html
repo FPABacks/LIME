@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MCAK-Mforce Mass Loss Calculator</title>
@@ -25,25 +26,42 @@
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            background-color: #a0cfa5;  /* Header background color */
+            align-items: flex-start;
+            background-color: #a0cfa5;
             padding: 20px;
-            border-radius: 10px 10px 0 0;  /* Rounded top corners */
-            margin: -20px -20px 20px -20px; /* Remove any space around the header */
-            z-index: 1;  /* Ensure header is above tabs */
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 20px -20px;
+            z-index: 1;
         }
-
+        
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }   
+        .logo {
+            width: 65px;
+            height: auto;
+            display: block;
+        }
 
         h1 {
-            color:#444544;
-            flex-grow: 1;
-            text-align: left;
-            font-size: 100px; 
+            color: #444544;
+            font-size: 70px; /* Slightly reduced for better spacing */
+            margin: 0;        /* Remove default spacing */
+            padding: 0;
+            line-height: 1.1; /* Tighter line spacing */
         }
+        
         h2 {
             color: #2c3e50;
-            font-size: 28px;
+            font-size: 24px;  
+            flex-grow: 1;
+            margin: 5px 0 0 0; 
+            line-height: 1.2;
         }
+
         h3 {
             color: #ee4b2b;
             font-size: 28px;
@@ -69,36 +87,33 @@
         input:read-only {
             background-color: #e9ecef;
         }
-        .logo {
-            width: 200px;
-            height: auto;
-            margin-left: 20px;
+        .tabs-container {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
         }
-
+        
         .tabs {
             display: flex;
-            justify-content: left;
-            margin-bottom: 20px;
+            gap: 10px;
         }
-
+        
         .tab {
             padding: 10px 20px;
             cursor: pointer;
-            background-color: #7a8c97;
+            background-color: #46754a;
             color: white;
             border: none;
             border-radius: 5px;
-            margin: 0 10px;
+            font-size: 18px;
         }
-
-        .tab-content {
-            display: none;
-        }
-
+        
         .active-tab {
             background-color: #5f6d7e;
         }
-
+        .tab-content {
+            display: none;
+        }
         .active-content {
             display: block;
         }
@@ -170,13 +185,6 @@
             justify-content: center;
             margin-top: 40px;
         }
-
-        .logos-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 40px;
-        }
-
         .logos-container img {
             margin: 0 20px;
         }
@@ -273,22 +281,22 @@
 <body>
     <div class="container">
         <div class="header">
-            <div>
-                <h1 style="margin-bottom: 5px;">LIME</h1>
-                <h2 style="margin-top: 0; font-size: 30px; font-weight: normal;">Line-driven Iterative Mass-loss Estimator</h2>
+            <div class="header-left">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="MCAK-Mforce Logo" class="logo">
+                <h1>LIME</h1>
+                <h2>Line-driven Iterative Mass-loss Estimator</h2>
             </div>
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="MCAK-Mforce Logo" class="logo">
+        
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab active-tab" onclick="showTab('info')">Tool Info</button>
+                    <button class="tab" onclick="showTab('calculator')">Calculator</button>
+                    <button class="tab" onclick="showTab('grid')">Grid</button>
+                    <button class="tab" onclick="showTab('contact')">Contact</button>
+                </div>
+            </div>
         </div>
-
-        <!-- Tab navigation -->
-        <div class="tabs">
-            <button class="tab active-tab" onclick="showTab('info')">Tool Info</button>
-<!--            <button class="tab" onclick="showTab('example')">Example</button>-->
-            <button class="tab" onclick="showTab('calculator')">Calculator</button>
-            <button class="tab" onclick="showTab('grid')">Grid</button>
-            <button class="tab" onclick="showTab('contact')">Contact</button>
-        </div>
-
+        
         <!-- Tab contents -->
         <div id="info" class="tab-content active-content">
             <h2>Overview</h2>
