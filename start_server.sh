@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Make sure the local version of MForce is used.
 export MFORCE_DIR="MForce-LTE"
