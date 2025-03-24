@@ -23,6 +23,7 @@ import logging
 import signal
 from time import time
 from logging.handlers import SysLogHandler
+from config import ServerConfig
 
 logging_level = logging.INFO
 
@@ -46,20 +47,8 @@ logger.info(f"Starting up LIME! ({__name__})")
 # syslog_handler.setFormatter(formatter)
 # syslog_handler.setLevel(logging_level)
 
-# Get local IP for internal testing
-try:
-    local_ip = socket.gethostbyname(socket.gethostname())
-# this alternative requires internet connection
-except socket.gaierror:
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 1))  # connect() for UDP doesn't send packets
-        local_ip = s.getsockname()[0]
-    # if no internet is available resort to the default
-    except OSError:
-        local_ip = "127.0.0.1"
 
-logging.info(f"Using address:{local_ip}")
+logging.info(f"Using address:{ServerConfig.FLASK_LISTENING_IP}")
 
 
 def celery_init_app(app: Flask) -> Celery:
@@ -73,7 +62,7 @@ def celery_init_app(app: Flask) -> Celery:
     celery_app = Celery(app.name, task_cls=FlaskTask)
     celery_app.config_from_object(app.config["CELERY"])
     celery_app.set_default()
-    celery_app.conf.worker_concurrency = 4
+    celery_app.conf.worker_concurrency = ServerConfig.FLASK_WORKERS
     app.extensions["celery"] = celery_app
     return celery_app
 
@@ -84,16 +73,16 @@ app = Flask(__name__, static_folder='static', template_folder='templates')
 # Use redis as broker for the queueing system.
 app.config.from_mapping(
     CELERY=dict(
-        broker_url="redis://localhost:6379/0",
-        result_backend="redis://localhost:6379/0",
+        broker_url=f"redis://{ServerConfig.REDIS_HOST}:{ServerConfig.REDIS_PORT}/{ServerConfig.REDIS_INDEX}",
+        result_backend=f"redis://{ServerConfig.REDIS_HOST}:{ServerConfig.REDIS_PORT}/{ServerConfig.REDIS_INDEX}",
         task_ignore_result=True,
     ),
 )
 
 # Server property setup
-app.config["SERVER_NAME"] = f"{local_ip}:8000"
-app.config["PREFERRED_URL_SCHEME"] = "http"
-app.config["APPLICATION_ROOT"] = ""
+app.config["SERVER_NAME"] = f"{ServerConfig.FLASK_LISTENING_IP}:{ServerConfig.FLASK_PORT}"
+app.config["PREFERRED_URL_SCHEME"] = ServerConfig.FLASK_URL_SCHEME
+app.config["APPLICATION_ROOT"] = ServerConfig.FLASK_ROOT
 
 # Make Flask log the in the log file
 app.logger.addHandler(file_handler)
@@ -103,8 +92,8 @@ app.logger.setLevel(logging_level)
 # Start Celery for queueing
 celery = celery_init_app(app)
 
-MFORCE_DIR = os.getenv("MFORCE_DIR", ".")
-DATA_DIR = os.path.join(MFORCE_DIR, "DATA")
+MFORCE_DIR = ServerConfig.MFORCE_DIR
+DATA_DIR = os.path.join(MFORCE_DIR, ServerConfig.MFORCE_DATA_SUBDIR)
 os.makedirs(DATA_DIR, exist_ok=True)  
 
 # Atomic masses for elements
@@ -124,7 +113,7 @@ base_table_data = {"mass_loss_rate": "-",
                    "q0": "-",
                    "info": ""}
 
-UPLOAD_FOLDER = "./tmp/uploads"
+UPLOAD_FOLDER = os.path.join(ServerConfig.BASE_TMP_DIR, ServerConfig.UPLOAD_SUBDIR)
 
 
 def allowed_file(filename):
@@ -162,7 +151,7 @@ def send_contact_email():
     # Send email to LIME team
     admin_command = [
         "python3", "./mailing/mailer.py",
-        "--t", "dwaipayan.debnath@kuleuven.be",
+        "--t", ServerConfig.ADMIN_MAIL_ADDRESS,
         "--s", subject_admin,
         "--b", admin_body
     ]
@@ -559,7 +548,7 @@ def process_data(data):
         helium_abundance = He_number_abundance(abundances)
 
         # Create a temporary directory
-        base_tmp_dir = "./tmp"
+        base_tmp_dir = ServerConfig.BASE_TMP_DIR
         os.makedirs(base_tmp_dir, exist_ok=True)
         session_tmp_dir = tempfile.mkdtemp(dir=base_tmp_dir)
 
@@ -654,7 +643,7 @@ def get_processing_status(task_id):
 
 @app.route('/tmp/<session_id>/<path:filename>')
 def download_temp_file(session_id, filename):
-    session_tmp_dir = os.path.join("./tmp", session_id)  
+    session_tmp_dir = os.path.join(ServerConfig.BASE_TMP_DIR, session_id)  
     file_path = os.path.abspath(os.path.join(session_tmp_dir, filename))  
 
     # Security check: Prevent directory traversal
@@ -744,7 +733,7 @@ def upload_csv(file_data, user_email):
     logger.info(f"Starting batch calculation with size {len(df.index)}")
 
     # Create a single batch directory for all results
-    base_dir = "./tmp"
+    base_dir = ServerConfig.BASE_TMP_DIR
     os.makedirs(base_dir, exist_ok=True)
     batch_output_dir = tempfile.mkdtemp(dir=base_dir)
     os.makedirs(batch_output_dir, exist_ok=True)
