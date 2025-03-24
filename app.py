@@ -256,7 +256,7 @@ def make_data_dict(results_dict):
             "qbar": f"{results_dict['Qbar']:.4g}",
             "alpha": f"{results_dict['alpha']:.2f}",
             "q0": f"{results_dict['Q0']:.4g}",
-            "info": f"{results_dict["fail_reason"]}"}
+            "info": f"{results_dict['fail_reason']}"}
     return data
 
 
