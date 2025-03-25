@@ -48,7 +48,7 @@ logger.info(f"Starting up LIME! ({__name__})")
 # syslog_handler.setLevel(logging_level)
 
 
-logging.info(f"Using address:{ServerConfig.FLASK_LISTENING_IP}")
+logging.info(f"Using address:{ServerConfig.FLASK_SERVER_NAME}")
 
 
 def celery_init_app(app: Flask) -> Celery:
@@ -80,7 +80,7 @@ app.config.from_mapping(
 )
 
 # Server property setup
-app.config["SERVER_NAME"] = f"{ServerConfig.FLASK_LISTENING_IP}:{ServerConfig.FLASK_PORT}"
+app.config["SERVER_NAME"] = ServerConfig.FLASK_SERVER_NAME
 app.config["PREFERRED_URL_SCHEME"] = ServerConfig.FLASK_URL_SCHEME
 app.config["APPLICATION_ROOT"] = ServerConfig.FLASK_ROOT
 

@@ -1,8 +1,7 @@
 # Server config
 # Copy this file to config.py and edit accordingly
 class ServerConfig:
-    FLASK_LISTENING_IP = "127.0.0.1"
-    FLASK_PORT = 8000
+    FLASK_SERVER_NAME = "127.0.0.1:8000" # or "lime.ster.kuleuven.be"
     FLASK_WORKERS = 4
     FLASK_ROOT = ""
     FLASK_URL_SCHEME = "http"
