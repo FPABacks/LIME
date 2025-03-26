@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 CodeDir="${MFORCE_DIR:-$PWD/MForce-LTE/}"
 # There is a bug in f2py that causes it not to be able to read files in different locations.

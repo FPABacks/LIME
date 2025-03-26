@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Make sure the local version of MForce is used.
-export MFORCE_DIR="MForce-LTE"
+export MFORCE_DIR="${MFORCE_DIR:-$PWD/MForce-LTE/}"
 # For the Pleiads the local installations of the software is to be used. 
-export PATH=$PATH:/home/frankb/.local/bin:/home/frankb/redis/redis-stable/src/
+export PATH=$PATH:/home/$USER/.local/bin:/home/$USER/redis/redis-stable/src/
 
 echo "Path check:"
 echo $PATH
