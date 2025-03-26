@@ -14,6 +14,11 @@
             color: #2c3e50;
             text-align: left;
             font-size: 22px; 
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+        body.loaded {
+            opacity: 1;
         }
         .container {
             margin: 10px auto;
@@ -66,6 +71,7 @@
             color: #ee4b2b;
             font-size: 28px;
         }
+        
         label {
             display: block;
             margin-top: 10px;
@@ -267,7 +273,7 @@
     }
 
     th {
-        background-color: #2C3E50;
+        background-color: #46754a;
         color: white;
     }
 
@@ -283,6 +289,7 @@
     <script type="text/javascript" async
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>    
+           
 </head>
 <body>
     <div class="container">
@@ -295,10 +302,10 @@
         
             <div class="tabs-container">
                 <div class="tabs">
-                    <button class="tab active-tab" onclick="showTab('info')">Tool Info</button>
-                    <button class="tab" onclick="showTab('calculator')">Calculator</button>
-                    <button class="tab" onclick="showTab('grid')">Grid</button>
-                    <button class="tab" onclick="showTab('contact')">Contact</button>
+                    <button class="tab" onclick="navigateToTab('info')">Tool Info</button>
+                    <button class="tab" onclick="navigateToTab('calculator')">Calculator</button>
+                    <button class="tab" onclick="navigateToTab('grid')">Grid</button>
+                    <button class="tab" onclick="navigateToTab('contact')">Contact</button>
                 </div>
             </div>
         </div>
@@ -330,13 +337,13 @@
 <!--                but the user is free to change ths mass fractions as they wish. A change only in scaling metallicity scales all the metals (i.e., from Li-Zn). If you use LIME for your work, please cite <span class="citation">Sundqvist et al. 2025</span> and also provide a footnote with the URL of this website.</p>-->
 
             <h2>Credits</h2>
-            <p> <strong> If you use LIME for your work, please cite <span class="citation">Sundqvist et al. 2025</span> and also provide a footnote with the URL of this website. </strong> </p>
+            <p> <strong> If you use LIME for your work, please cite <span class="citation">Sundqvist, Debnath, Backs et al. 2025</span> and also provide a footnote with the URL of this website. </strong> </p>
 
             <p>This tool has been developed by the 
                 <span class="citation">
                     <a href="https://fys.kuleuven.be/ster/research-projects/equation-folder/equation-home" target="_blank">EQUATION</a> 
                 </span>
-                group (led by Prof. Jon Sunqvist) with funding from KU Leuven, European Research Council (ERC) and Fonds voor Wetenschappelijk Onderzoek – Vlaanderen (FWO).</p>
+                group (led by Prof. Jon Sundqvist) with funding from KU Leuven, European Research Council (ERC) and Fonds voor Wetenschappelijk Onderzoek – Vlaanderen (FWO).</p>
         </div>
 <!--        <div id="example" class="tab-content">           -->
 <!--            <h2>Brief methodology</h2>-->
@@ -589,6 +596,11 @@
         "MN": 1.0817329760692272e-5, "FE": 1.2919540666812507e-3,  "CO": 4.2131387804051672e-6, "NI": 7.1254342166372973e-5,  
         "CU": 7.2000506248032108e-7, "ZN": 1.7368347374506484e-6
         } ;
+        
+        function navigateToTab(tabId) {
+            // Update the hash in the URL (this also triggers hashchange event)
+            window.location.hash = tabId;
+        }
 
         function createAbundanceInputs() {
             const abundancesDiv = document.getElementById("abundances");
@@ -712,15 +724,17 @@
             }
         }        
 
-        function showTab(tabId) {
+        function showTabFromHash() {
+            const tabId = window.location.hash.substring(1) || 'info'; // default to 'info'
+        
             const tabs = document.querySelectorAll('.tab');
             const contents = document.querySelectorAll('.tab-content');
-
+        
             tabs.forEach(tab => tab.classList.remove('active-tab'));
             contents.forEach(content => content.classList.remove('active-content'));
-
-            document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active-tab');
-            document.getElementById(tabId).classList.add('active-content');
+        
+            document.querySelector(`.tab[onclick="navigateToTab('${tabId}')"]`)?.classList.add('active-tab');
+            document.getElementById(tabId)?.classList.add('active-content');
         }
 
         // Call after creating the abundance inputs
@@ -986,10 +1000,18 @@
             });
         }
 
+        window.addEventListener("load", () => {
+              document.body.classList.add("loaded");
+              showTabFromHash();
+          });
+        
+          // Handle hash changes when user clicks or uses browser back/forward
+          window.addEventListener("hashchange", showTabFromHash);    
+
     </script>
     <!-- Footer -->
     <div style="text-align: center; margin-top: 50px; padding: 20px; background-color: #a0cfa5; color: #2c3e50; font-size: 18px;">
-        <p>For more information, contact <a href="https://www.kuleuven.be/wieiswie/nl/person/00141604">Dwaipayan Debnath</a></p>
+        <p>For more information, contact <a href="https://www.kuleuven.be/wieiswie/nl/person/00141604">Dwaipayan Debnath</a>, <a href="https://www.kuleuven.be/wieiswie/nl/person/00168452">Frank Backs</a></p>
         <p>&copy; LIME. All rights reserved.</p>
     </div>
 </body>
