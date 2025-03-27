@@ -219,10 +219,6 @@ def He_number_abundance(mass_abundances):
     return NHe
 
 
-def check_mass_fractions(mass_fractions):
-    """Checks if the total mass fraction """
-
-
 def load_email_body(filename):
     with open(filename, 'r') as file:
         return file.read()
@@ -495,7 +491,6 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
 
 @app.route('/')
 def home():
-    logger.info("We have a visitor!")
     return render_template("index.html", data=base_table_data)
 
 
@@ -823,17 +818,7 @@ def upload_csv(file_data, user_email):
                 result_dir = os.path.join(batch_output_dir, pdf_name)
                 mass_abundance_path = os.path.join(result_dir, "output", "mass_abundance")
 
-                # Read abundances from the mass_abundance file
                 abundances_data = all_mass_fractions[index]
-                # abundances_data = {}
-                # if os.path.exists(mass_abundance_path):
-                #     with open(mass_abundance_path, "r") as f:
-                #         for line in f:
-                #             parts = line.strip().split()
-                #             if len(parts) >= 3:
-                #                 element_symbol = " ".join(parts[1:-1]).replace("'", "").strip()
-                #                 abundance_value = float(parts[-1])
-                #                 abundances_data[element_symbol] = abundance_value
 
                 with open(results_csv_path, mode='a', newline='') as f:
                     writer = csv.DictWriter(f, fieldnames=["Name", "Luminosity", "Teff", "Mstar", "Rstar", "log g",

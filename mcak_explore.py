@@ -109,7 +109,6 @@ def fit_data(file_path, t_cri):
     lgt_filtered = lgt[indices]
     Mt_filtered = Mt[indices]
     fit_max = max(lgt_filtered)
-    print("lgt Fitted until:", fit_max)
     lgMt_filtered = np.log10(Mt_filtered / Qb)
     p0 = (0.67, 200)
     # Limits on alpha and Q0
@@ -126,7 +125,6 @@ def fit_data(file_path, t_cri):
 
     alpha, Q0 = popt
     alpha_g = alpha
-    print("Q0, alpha:",Q0,alpha)
     # Compute alternative alpha_2 as local finite-difference slope around t_cri.
     # We use the two points in lgt_filtered whose values are closest to log10(t_cri)
     target = np.log10(t_cri)
@@ -142,12 +140,11 @@ def fit_data(file_path, t_cri):
         # Compute the finite difference slope
         delta = lgt_filtered[i2] - lgt_filtered[i1]
         alpha_2 = (lgMt_filtered[i1] - lgMt_filtered[i2]) / delta
-        print("alternative local finite difference alpha =",alpha_2)
 
     if alpha > 0.985:
         if alpha_2 <= 0.985:
-            print("global alpha too close to diverging limit, resorting")
-            print("to local alpha at t_cri:", alpha_2)
+            print("global alpha too close to diverging limit, resorting"
+                "to local alpha at t_cri:", alpha_2)
             alpha = alpha_2
         else:
             alpha = 0.99
