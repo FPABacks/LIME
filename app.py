@@ -224,6 +224,28 @@ def load_dyn_email(filename, context):
     return template.render(context)
 
 
+def batch_tracker(num_stars):
+    """Adds a line to the batch counter file, with the number of stars requested"""
+    with open("batch_tracker.log", "a") as counter:
+        counter.write(f"{num_stars}\n")
+
+
+def get_request_count():
+    """Gets the total number of requests so far, return 0 if the file does not exist"""
+    try:
+        with open("request_counter.log", "r") as f:
+            return int(f.read().strip())
+    except IOError:
+        return 0
+
+
+def increment_request_count():
+    """Increases the total number of requests"""
+    count = get_request_count() + 1
+    with open("request_counter.log", "w") as f:
+        f.write(str(count))
+
+
 def make_data_dict(results_dict):
     """
     Makes a dictionary to be passed to the HTML side of the code to update the table
@@ -238,12 +260,204 @@ def make_data_dict(results_dict):
     return data
 
 
-def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances, pdf_name,
-                        batch_output_dir, expert_mode, does_plot):
+def make_fail_pdf(output_dir, pdf_name, failure_reason):
+    """Makes a simple PDF file that shows the reason of the failed calculation"""
+    pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
+    c = canvas.Canvas(pdf_filename, pagesize=letter)
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(220, 700, "Simulation Failed")
+    c.setFont("Helvetica", 14)
+    c.drawString(100, 650, "Reason for failure:")
+    wrapped_text = simpleSplit(failure_reason, "Helvetica", 12, 400)
+    y_pos = 620
+    for line in wrapped_text:
+        c.drawString(120, y_pos, line)
+        y_pos -= 20
+    c.save()
+
+
+def make_output_pdf(output_dir, pdf_name, results_dict, abundances, input_parameters):
+    """
+    Makes a pdf with more detailed output of the results.
+    """
+    lum, mstar, teff, zstar, zscale = input_parameters
+
+    table_style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgreen),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.lavender),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ])
+
+    pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
+    figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir)
+                    if (f.endswith(".png") and not f.startswith("._"))]
+
+    # Initialize
+    c = canvas.Canvas(pdf_filename, pagesize=letter)
+    page_width, page_height = letter
+
+    logo_path = "./static/logo_2.png"
+    title = "LIME Results"
+
+    if os.path.exists(logo_path):
+        c.drawImage(logo_path, 50, page_height - 150, width=120, height=120, preserveAspectRatio=True, anchor='c')
+
+    # Add a warning at the top of the pdf file if there is a potential issue
+    warning_path = "./static/warning.png"
+    if results_dict["warning"]:
+        c.setFont("Helvetica", 10)
+        c.drawString(130, page_height - 15, results_dict["warning_message"])
+        if os.path.exists(warning_path):
+            c.drawImage(warning_path, 113, page_height - 17.5, width=15, height=15, preserveAspectRatio=True,
+                        anchor='c')
+
+    c.setFont("Helvetica-Bold", 30)
+    c.drawString(220, page_height - 150, title)
+
+    table_data = [
+        ("Input Parameter", "Value"),
+        ("Luminosity [solar luminosity]", f"{lum:.1f}"),
+        ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
+        ("Eddington Ratio ", "{:.2f}".format(results_dict["Gamma_e"])),
+        ("Stellar Radius [solar radius] ", "{:.2f}".format(results_dict["R_star"])),
+        ("log g ", "{:.2f}".format(results_dict["log_g"])),
+        ("Effective Temperature [K]", f"{teff:.1f}"),
+        ("Z star (Calculated)", f"{zstar:.3e}")]
+
+    c.setFont("Helvetica", 16)
+    table = Table(table_data)
+    table.setStyle(table_style)
+    table.wrapOn(c, page_width, page_height)
+    table.drawOn(c, 70, page_height - 350)
+
+    # Make the main results table
+    table_data = [("Output", "Value"),
+                  ("Mass loss rate [solar mass/year]", "{:.3e}".format(results_dict["mdot"])),
+                  ("vinf [km/s]", "{:.2f}".format(results_dict["vinf"])),
+                  ("Electron scattering opacity ", "{:.2f}".format(results_dict["kappa_e"])),
+                  ("Critical depth", "{:.2f}".format(results_dict["t_crit"])),
+                  ("Q bar", "{:.2f}".format(results_dict["Qbar"])),
+                  ("alpha", "{:.2f}".format(results_dict["alpha"])),
+                  ("Q0", "{:.2f}".format(results_dict["Q0"]))]
+
+    c.setFont("Helvetica", 16)
+    table = Table(table_data)
+    table.setStyle(table_style)
+    table.wrapOn(c, page_width, page_height)
+    table.drawOn(c, 70, page_height - 530)
+
+    # Make a table with some more advanced and specific output information
+    table_data = [("Extra Output", "Value"),
+                  ("Z scaled to solar (input)", f"{zscale:.2e}"),
+                  ("Globally fitted alpha", "{:.3f}".format(results_dict["alphag"])),
+                  ("Locally fitted alpha", "{:.3f}".format(results_dict["alphal"])),
+                  ("Effective v escape [km/s]", "{:.2f}".format(results_dict["vesc"])),
+                  ("Critical velocity [km/s]", "{:.2f}".format(results_dict["v_crit"])),
+                  ("Critical density [g/cm^3]", "{:.2e}".format(results_dict["density"]))]
+
+    c.setFont("Helvetica", 16)
+    table = Table(table_data)
+    table.setStyle(table_style)
+    table.wrapOn(c, page_width, page_height)
+    table.drawOn(c, 70, page_height - 690)
+
+    # Abundances Table
+    abundance_table_data = [("Element", "Abundance")] + [(el, f"{abundances[el]:.4e}") for el in abundances]
+    abundance_table = Table(abundance_table_data, colWidths=[100, 150])
+    abundance_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    abundance_table.wrapOn(c, page_width, page_height)
+    abundance_table.drawOn(c, 300, page_height - 760)
+
+    # --- 1. Display "sim_log.png" with a title ---
+    sim_log_image_path = os.path.join(output_dir, "sim_log.png")
+    if sim_log_image_path in figures_list:
+        c.showPage()
+        c.setFont("Helvetica-Bold", 30)
+        c.drawString(150, page_height - 50, "Simulation Log Figures")
+
+        img = Image.open(sim_log_image_path)
+        img_width, img_height = img.size
+        aspect_ratio = img_width / img_height
+        new_width = page_width - 100
+        new_height = new_width / aspect_ratio
+
+        if new_height > page_height - 100:
+            new_height = page_height - 50
+            new_width = new_height * aspect_ratio
+
+        x_position = (page_width - new_width) / 2
+        y_position = (page_height - new_height) / 2
+
+        c.drawImage(sim_log_image_path, x_position, y_position, width=new_width, height=new_height)
+
+        c.setFont("Helvetica", 14)
+        description = "This figure shows the evolution of various physical parameters over the iterations until convergence."
+        text_x, text_y = 50, 80
+
+        wrapped_text = simpleSplit(description, "Helvetica", 14, page_width - 100)
+        for line in wrapped_text:
+            c.drawString(text_x, text_y, line)
+            text_y -= 16
+
+        figures_list.remove(sim_log_image_path)
+
+    # --- 2. Arrange Remaining Figures in Pages with Titles ---
+    images_per_row, images_per_col = 2, 3
+    images_per_page = images_per_row * images_per_col
+    max_width = (page_width - 100) / images_per_row
+    max_height = (page_height - 150) / images_per_col
+    x_start, y_start = 50, page_height - 300
+
+    for i, fig_path in enumerate(figures_list):
+        if i % images_per_page == 0:
+            c.showPage()
+
+        c.setFont("Helvetica-Bold", 30)
+        c.drawString(140, page_height - 50, "Line force multiplier v t")
+
+        row = (i % images_per_page) // images_per_row
+        col = (i % images_per_page) % images_per_row
+        x_position = x_start + col * max_width
+        y_position = y_start - row * max_height
+
+        # Load image to get actual dimensions
+        with Image.open(fig_path) as img:
+            img_width, img_height = img.size
+
+        # Compute scaling factor while maintaining aspect ratio
+        scale_factor = min(max_width / img_width, max_height / img_height)
+        new_width = img_width * scale_factor
+        new_height = img_height * scale_factor
+
+        # Center the image within its allocated space
+        x_adjusted = x_position + (max_width - new_width) / 2
+        y_adjusted = y_position + (max_height - new_height) / 2
+
+        c.drawImage(fig_path, x_adjusted, y_adjusted, width=new_width, height=new_height)
+
+        c.setFont("Helvetica", 10)
+
+    c.save()
+
+
+def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances,
+                        batch_output_dir, does_plot):
     """Runs mcak_explore and generates a pdf with the results if desired. """
-    error_message = ""
+
     try:
-        output_dir = os.path.join(batch_output_dir, pdf_name)
+        output_dir = os.path.join(batch_output_dir, "result")
         os.makedirs(output_dir, exist_ok=True)
         massabun_loc = os.path.join(output_dir, "output")
         os.makedirs(massabun_loc, exist_ok=True)
@@ -263,209 +477,16 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
             logger.info(f"Computation failed: {failure_reason}")
 
             if does_plot:
-                pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
-                c = canvas.Canvas(pdf_filename, pagesize=letter)
-                c.setFont("Helvetica-Bold", 18)
-                c.drawString(220, 700, "Simulation Failed")
-                c.setFont("Helvetica", 14)
-                c.drawString(100, 650, "Reason for failure:")
-                wrapped_text = simpleSplit(failure_reason, "Helvetica", 12, 400)
-                y_pos = 620
-                for line in wrapped_text:
-                    c.drawString(120, y_pos, line)
-                    y_pos -= 20
-                c.save()
+                make_fail_pdf(output_dir, "result", failure_reason)
                 logger.info("Made a failed calculation pdf")
-            # Leave it at this if the calculation failed
             return results_dict
 
         # make some diagnostic plots and informative tables for the pdf output.
         if does_plot:
             logger.info("Making result pdf")
-            pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
-            figures_list = [os.path.join(output_dir, f) for f in os.listdir(output_dir)
-                            if (f.endswith(".png") and not f.startswith("._"))]
-
-            # Initialize
-            c = canvas.Canvas(pdf_filename, pagesize=letter)
-            page_width, page_height = letter
-    
-            logo_path = "./static/logo_2.png"
-            title = "LIME Results"
-            
-            if os.path.exists(logo_path):
-                c.drawImage(logo_path, 50, page_height - 150, width=120, height=120, preserveAspectRatio=True, anchor='c')
-
-            # Add a warning at the top of the pdf file if there is a potential issue
-            warning_path = "./static/warning.png"
-            if results_dict["warning"]:
-                c.setFont("Helvetica", 10)  
-                c.drawString(130, page_height - 15, results_dict["warning_message"])
-                if os.path.exists(warning_path):
-                    c.drawImage(warning_path, 113, page_height - 17.5, width=15, height=15, preserveAspectRatio=True, anchor='c')
-
-            c.setFont("Helvetica-Bold", 30)
-            c.drawString(220, page_height - 150, title)
-    
-            table_data = [
-                ("Input Parameter", "Value"),
-                ("Luminosity [solar luminosity]", f"{lum:.1f}"),
-                ("Stellar Mass [solar mass]", f"{mstar:.1f}"),
-                ("Eddington Ratio ", "{:.2f}".format(results_dict["Gamma_e"])),
-                ("Stellar Radius [solar radius] ","{:.2f}".format(results_dict["R_star"])),
-                ("log g ","{:.2f}".format(results_dict["log_g"])),
-                ("Effective Temperature [K]", f"{teff:.1f}"),
-                ("Z star (Calculated)", f"{zstar:.3e}")]
-            
-            c.setFont("Helvetica", 16)
-            table = Table(table_data)
-            table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgreen),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.lavender),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ]))
-            table.wrapOn(c, page_width, page_height)
-            table.drawOn(c, 70, page_height - 350)
-
-            # Make the results table
-            table_data = [("Output", "Value"),
-                          ("Mass loss rate [solar mass/year]", "{:.3e}".format(results_dict["mdot"])),
-                          ("vinf [km/s]",  "{:.2f}".format(results_dict["vinf"])),
-                          ("Electron scattering opacity ",  "{:.2f}".format(results_dict["kappa_e"])),
-                          ("Critical depth", "{:.2f}".format(results_dict["t_crit"])),
-                          ("Q bar", "{:.2f}".format(results_dict["Qbar"])),
-                          ("alpha", "{:.2f}".format(results_dict["alpha"])),
-                          ("Q0", "{:.2f}".format(results_dict["Q0"]))]
-
-            c.setFont("Helvetica", 16)
-            table = Table(table_data)
-            table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgreen),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.lavender),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ]))
-            table.wrapOn(c, page_width, page_height)
-            table.drawOn(c, 70, page_height - 530)
-
-            # If desired produce more information in the output
-            if expert_mode:
-                table_data = [("Extra Output", "Value"),
-                              ("Z scaled to solar (input)", f"{zscale:.2e}"),
-                              ("Globally fitted alpha", "{:.3f}".format(results_dict["alphag"])),
-                              ("Locally fitted alpha", "{:.3f}".format(results_dict["alphal"])),
-                              ("Effective v escape [km/s]", "{:.2f}".format(results_dict["vesc"])),
-                              ("Critical velocity [km/s]", "{:.2f}".format(results_dict["v_crit"])),
-                              ("Critical density [g/cm^3]", "{:.2e}".format(results_dict["density"]))]
-
-                c.setFont("Helvetica", 16)
-                table = Table(table_data)
-                table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.lightgreen),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.lavender),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                ]))
-                table.wrapOn(c, page_width, page_height)
-                table.drawOn(c, 70, page_height - 690)
-
-            # Abundances Table
-            abundance_table_data = [("Element", "Abundance")] + [(el, f"{abundances[el]:.4e}") for el in abundances]
-            abundance_table = Table(abundance_table_data, colWidths=[100, 150])
-            abundance_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ]))
-            
-            abundance_table.wrapOn(c, page_width, page_height)
-            abundance_table.drawOn(c, 300, page_height - 760)
-    
-            # --- 1. Display "sim_log.png" with a title ---
-            sim_log_image_path = os.path.join(output_dir, "sim_log.png")
-            if sim_log_image_path in figures_list:
-                c.showPage()
-                c.setFont("Helvetica-Bold", 30)
-                c.drawString(150, page_height - 50, "Simulation Log Figures")
-    
-                img = Image.open(sim_log_image_path)
-                img_width, img_height = img.size
-                aspect_ratio = img_width / img_height
-                new_width = page_width - 100
-                new_height = new_width / aspect_ratio
-    
-                if new_height > page_height - 100:
-                    new_height = page_height - 50
-                    new_width = new_height * aspect_ratio
-    
-                x_position = (page_width - new_width) / 2
-                y_position = (page_height - new_height) / 2
-    
-                c.drawImage(sim_log_image_path, x_position, y_position, width=new_width, height=new_height)
-    
-                c.setFont("Helvetica", 14)
-                description = "This figure shows the evolution of various physical parameters over the iterations until convergence."
-                text_x, text_y = 50, 80
-    
-                wrapped_text = simpleSplit(description, "Helvetica", 14, page_width - 100)
-                for line in wrapped_text:
-                    c.drawString(text_x, text_y, line)
-                    text_y -= 16
-    
-                figures_list.remove(sim_log_image_path)
-    
-            # --- 2. Arrange Remaining Figures in Pages with Titles ---
-            images_per_row, images_per_col = 2, 3
-            images_per_page = images_per_row * images_per_col
-            max_width = (page_width - 100) / images_per_row
-            max_height = (page_height - 150) / images_per_col
-            x_start, y_start = 50, page_height - 300
-    
-            for i, fig_path in enumerate(figures_list):
-                if i % images_per_page == 0:
-                    c.showPage()
-    
-                c.setFont("Helvetica-Bold", 30)
-                c.drawString(140, page_height - 50, "Line force multiplier v t")
-    
-                row = (i % images_per_page) // images_per_row
-                col = (i % images_per_page) % images_per_row
-                x_position = x_start + col * max_width
-                y_position = y_start - row * max_height
-    
-                # Load image to get actual dimensions
-                with Image.open(fig_path) as img:
-                    img_width, img_height = img.size
-    
-                # Compute scaling factor while maintaining aspect ratio
-                scale_factor = min(max_width / img_width, max_height / img_height)
-                new_width = img_width * scale_factor
-                new_height = img_height * scale_factor
-    
-                # Center the image within its allocated space
-                x_adjusted = x_position + (max_width - new_width) / 2
-                y_adjusted = y_position + (max_height - new_height) / 2
-    
-                c.drawImage(fig_path, x_adjusted, y_adjusted, width=new_width, height=new_height)
-    
-                c.setFont("Helvetica", 10)
-
-            c.save()
+            input_parameters = [lum, mstar, teff, zstar, zscale]
+            make_output_pdf(output_dir, "result", results_dict, abundances, input_parameters)
             logger.info("PDF made!")
-
         return results_dict
 
     except Exception as e:
@@ -509,6 +530,8 @@ def start_process():
 def process_data(data):
     """Handles the communication with index.html"""
     logger.info("Starting model calculation")
+    # Keep track of the number of requests
+    increment_request_count()
     try:
         # Extract parameters
         luminosity = float(data.get("luminosity", 0.0))
@@ -549,7 +572,7 @@ def process_data(data):
 
         # Run computation in a separate thread
         results_dict = process_computation(luminosity, teff, mstar, zscale, zstar, helium_abundance, abundances,
-                                           pdf_name, session_tmp_dir, expert_mode, does_plot)
+                                           session_tmp_dir, does_plot)
 
         table_data = make_data_dict(results_dict)
 
@@ -702,6 +725,7 @@ def start_upload_csv():
         logging.error("No email provided for CSV calculation results")
         return jsonify({"error": "Email is required"}), 400
 
+    batch_tracker(num_rows - 1)
     # Schedule the process
     task = upload_csv.apply_async(args=[file_data, user_email])
     logging.info(f"Queueing grid calculation with ID: {task.id}")
@@ -795,7 +819,7 @@ def upload_csv(file_data, user_email):
 
                 # Start the main calculation
                 results_dict = process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances,
-                                                   pdf_name, batch_output_dir, False, does_plot)
+                                                   batch_output_dir, does_plot)
                 all_results.append(results_dict)
 
             for index, row in df.iterrows():
