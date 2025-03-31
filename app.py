@@ -5,7 +5,7 @@ import os
 import threading
 import shutil
 from mcak_explore import main as mcak_main
-from mcak_explore import DUMMY_RESULTS, color
+from mcak_explore import DUMMY_RESULTS
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import simpleSplit
@@ -18,11 +18,10 @@ from jinja2 import Template
 import csv
 from celery import Celery, Task, shared_task
 import io
-import socket
 import logging
 import signal
 from time import time
-from logging.handlers import SysLogHandler
+# from logging.handlers import SysLogHandler
 from config import ServerConfig
 
 logging_level = logging.INFO
@@ -31,7 +30,7 @@ logging_level = logging.INFO
 logger = logging.getLogger("LIME_app")
 logger.setLevel(logging_level)
 formatter = logging.Formatter(
-        fmt="%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - '%(message)s'",
+        fmt="%(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - '%(message)s'",
         datefmt="%Y-%m-%d %H:%M:%S"
         )
 # For now keep the log file in the main directory
@@ -97,13 +96,7 @@ DATA_DIR = os.path.join(MFORCE_DIR, ServerConfig.MFORCE_DATA_SUBDIR)
 os.makedirs(DATA_DIR, exist_ok=True)  
 
 # Atomic masses for elements
-ATOMIC_MASSES = {
-    'H': 1.008, 'HE': 4.0026, 'LI': 6.941, 'BE': 9.012, 'B': 10.811, 'C': 12.011,
-    'N': 14.007, 'O': 16.000, 'F': 18.998, 'NE': 20.180, 'NA': 22.990, 'MG': 24.305,
-    'AL': 26.982, 'SI': 28.085, 'P': 30.974, 'S': 32.066, 'CL': 35.453, 'AR': 39.948,
-    'K': 39.098, 'CA': 40.078, 'SC': 44.956, 'TI': 47.880, 'V': 50.941, 'CR': 51.996,
-    'MN': 54.938, 'FE': 55.847, 'CO': 58.933, 'NI': 58.690, 'CU': 63.546, 'ZN': 65.390
-}
+ATOMIC_MASSES = dict(np.genfromtxt("atom_masses.txt", delimiter=",", dtype=None, encoding="utf"))
 
 base_table_data = {"mass_loss_rate": "-",
                    "terminal_velocity": "-",
@@ -263,13 +256,11 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
         # Run the main calculation!
         start = time()
         logger.info(f"Starting calculation with L={lum:.3g}, T={teff:.3g}, M={mstar:.3g}, Z={zstar:.3g}")
-        generated_file, results_dict = mcak_main(lum, teff, mstar, zstar, zscale, helium_abundance, output_dir,
-                                                 does_plot, logger=logger)
+        results_dict = mcak_main(lum, teff, mstar, zstar, helium_abundance, output_dir, does_plot, logger=logger)
         logger.info(f"Calculation done! It took {results_dict['Iteration']} iterations in {time() - start:.2f} seconds")
         if results_dict["fail"]:
             failure_reason = results_dict["fail_reason"]
             logger.info(f"Computation failed: {failure_reason}")
-            print(f"{color.RED}Simulation failed: {failure_reason}{color.END}")
 
             if does_plot:
                 pdf_filename = os.path.join(output_dir, f"{pdf_name}.pdf")
@@ -369,7 +360,7 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
                 table_data = [("Extra Output", "Value"),
                               ("Z scaled to solar (input)", f"{zscale:.2e}"),
                               ("Globally fitted alpha", "{:.3f}".format(results_dict["alphag"])),
-                              ("Locally fitted alpha", "{:.3f}".format(results_dict["alpha2"])),
+                              ("Locally fitted alpha", "{:.3f}".format(results_dict["alphal"])),
                               ("Effective v escape [km/s]", "{:.2f}".format(results_dict["vesc"])),
                               ("Critical velocity [km/s]", "{:.2f}".format(results_dict["v_crit"])),
                               ("Critical density [g/cm^3]", "{:.2e}".format(results_dict["density"]))]
@@ -480,12 +471,10 @@ def process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abund
     except Exception as e:
         error_message = str(e)
         logger.error(f"Unexpected error: {error_message}")
-        # print(f"Unexpected error: {str(error_message)}")
 
     results_dict = dict(DUMMY_RESULTS)
     results_dict["fail_reason"] = f"Unknown crash! Make sure input is physical. "
 
-    print("Process Computation failed!")
     return results_dict
 
 
@@ -646,10 +635,10 @@ def download_temp_file(session_id, filename):
         return jsonify({"error": "Invalid file path."}), 403
 
     # Debugging: Print expected path
-    print(f"Looking for file at: {file_path}")
+    logger.debug(f"Looking for file at: {file_path}")
 
     if not os.path.exists(file_path):
-        print(f"File NOT FOUND: {file_path}")  # Debugging output
+        logger.error(f"File NOT FOUND: {file_path}")
         return jsonify({"error": f"File {filename} not found"}), 404
 
     response = send_file(file_path, mimetype='application/pdf')
@@ -757,7 +746,6 @@ def upload_csv(file_data, user_email):
             results_csv_path = os.path.join(batch_output_dir, "results.csv")
             csv_header_written = False
 
-            # pdf_paths = []
             all_results = []
             all_mass_fractions = []
 
@@ -771,7 +759,6 @@ def upload_csv(file_data, user_email):
                 # Create subdirectory inside batch directory
                 result_dir = os.path.join(batch_output_dir, pdf_name)
                 os.makedirs(result_dir, exist_ok=True)
-                # pdf_path = os.path.join(result_dir, f"{pdf_name}.pdf")
 
                 abundances = {}
                 total_metal_mass = 0
@@ -809,14 +796,12 @@ def upload_csv(file_data, user_email):
                 # Start the main calculation
                 results_dict = process_computation(lum, teff, mstar, zscale, zstar, helium_abundance, abundances,
                                                    pdf_name, batch_output_dir, False, does_plot)
-                # pdf_paths.append(pdf_path)
                 all_results.append(results_dict)
 
             for index, row in df.iterrows():
                 results_dict = all_results[index]
                 pdf_name = str(row["name"])
                 result_dir = os.path.join(batch_output_dir, pdf_name)
-                mass_abundance_path = os.path.join(result_dir, "output", "mass_abundance")
 
                 abundances_data = all_mass_fractions[index]
 
@@ -868,7 +853,6 @@ def upload_csv(file_data, user_email):
 
         except Exception as e:
             logging.error(f"Ran into an unexpected error in batch processing: {e}")
-            print(f"Unexpected error in batch processing: {str(e)}")
 
         finally:
             # The batch directory is removed after processing
