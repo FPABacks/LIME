@@ -817,7 +817,7 @@ def upload_csv(file_data, user_email):
 
                 zstar = calculate_metallicity_massb(abundances)
 
-                #Keep He fixed and adjust H so the total remains 1
+                #  Keep He fixed and adjust H so the total remains 1
                 helium_abundance = abundances["HE"]
                 hydrogen_abundance = 1.0 - (total_metal_mass + helium_abundance)
 
@@ -910,10 +910,7 @@ def upload_csv(file_data, user_email):
 
     logging.info("Finished batch process computation. ")
     return jsonify(response_message), 200
-    #
-    # except Exception as e:
-    #     print(e)
-    #     return jsonify({"error": f"Unexpected error in upload_csv: {str(e)}"}), 500
+
 
 
 if __name__ == '__main__':
