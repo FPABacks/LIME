@@ -307,7 +307,7 @@ def make_success_pdf(output_dir, pdf_name, results_dict, abundances, input_param
         width = page_width - 200
         height = 400
         para.wrapOn(c, width, height)
-            para.drawOn(c, 150, page_height - 130)
+        para.drawOn(c, 150, page_height - 130)
 
     if results_dict["fail"]:
 
