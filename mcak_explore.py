@@ -258,20 +258,18 @@ def run_mforce(parameters):
     Translates the dictionary of parameters to the input of the get_force_multiplier function and calls the function.
     Note that the order can be confusing, do not assume what it would be, check it if you feel the need to change things
     """
-    get_force_multiplier(parameters["lgTmin"],
-                         parameters["lgTmax"],
-                         parameters["lgDmin"],
-                         parameters["lgDmax"],
-                         parameters["lgttmin"],
-                         parameters["lgttmax"],
-                         parameters["Ke_norm"],
-                         parameters["X_mass"],
-                         parameters["Z_mass"],
-                         parameters["N_tt"],
-                         parameters["N_lgT"],
-                         parameters["N_lgD"],
-                         parameters["ver"],
-                         parameters["DIR"])
+    return get_force_multiplier(parameters["lgTmin"],
+                                parameters["lgTmax"],
+                                parameters["lgDmin"],
+                                parameters["lgDmax"],
+                                parameters["lgttmin"],
+                                parameters["lgttmax"],
+                                parameters["Ke_norm"],
+                                parameters["N_tt"],
+                                parameters["N_lgT"],
+                                parameters["N_lgD"],
+                                parameters["ver"],
+                                parameters["DIR"])
 
 
 def main(lum, T_eff, M_star, Z_star, Yhe, random_subdir, does_plot=False, max_iterations=15, tolerance=1e-3, logger=None):
@@ -369,8 +367,6 @@ def main(lum, T_eff, M_star, Z_star, Yhe, random_subdir, does_plot=False, max_it
                    "lgttmax": "10",
                    "N_tt": "50",
                    "Ke_norm": "-10",
-                   "X_mass": "0.7",
-                   "Z_mass": f"{Z_star:.5E}",
                    "ver": False,
                    "DIR": f"{random_subdir}/output"}
 

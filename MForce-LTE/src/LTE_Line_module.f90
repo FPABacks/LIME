@@ -726,12 +726,12 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
  
  
  
-   SUBROUTINE Read_Composition(OBJ,ATOMIC_DATA,X_frac,Y_frac,DIR,verbose)
+   SUBROUTINE Read_Composition(OBJ,ATOMIC_DATA,DIR,verbose)
      ! In-Out and optional variables
      CLASS(OCCUPATION_NUMBER_TYPE), INTENT(INOUT) :: OBJ
      CLASS(ATOMIC_DATA_TYPE),TARGET, INTENT(IN)   :: ATOMIC_DATA
-     REAL(DP), OPTIONAL :: X_frac
-     REAL(DP), OPTIONAL :: Y_frac
+     REAL(DP) :: X_frac
+     REAL(DP) :: Y_frac
      LOGICAL, OPTIONAL :: verbose
      LOGICAL :: ver, USE_solar_composition, USE_H_normalisation
  
@@ -896,7 +896,7 @@ SUBROUTINE Read_Line_Data_ascii(OBJ,verbose)
      OBJ%X_frac = X_frac
      OBJ%Y_frac = Y_frac
 
-     WRITE(*,*) 'X=',X_frac,'Y=',Y_frac,'Z=',Z_frac
+     !WRITE(*,*) 'X=',X_frac,'Y=',Y_frac,'Z=',Z_frac
      
 
      !OBJ%Aboundance(:) = OBJ%Aboundance(:)

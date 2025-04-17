@@ -1,5 +1,5 @@
 subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_norm,&
-X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
+N_tt,N_lgT,N_lgD,ver,DIR, tt_list, Mt_list, kape_list)
 
 !   use f90getopt
    use LTE_Line_module
@@ -10,13 +10,18 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
 !   real, intent(in) :: dummy1
 
    REAL(DP), intent(in) :: lgTmin,lgTmax,lgDmin, lgDmax, lgttmin, lgttmax
-   REAL(DP), intent(in) :: Ke_norm, X_mass, Z_mass
+   REAL(DP), intent(in) :: Ke_norm
    INTEGER(I4B), intent(in) :: N_tt, N_lgT, N_lgD
    CHARACTER(100), intent(in) :: DIR
    LOGICAL, intent(in) :: ver
 
+   ! Make output variables
+   REAL(DP), DIMENSION(N_tt), intent(out):: tt_list
+   REAL(DP), DIMENSION(N_tt), intent(out):: Mt_list
+   REAL(DP), DIMENSION(N_lgT), intent(out) :: kape_list
+
    ! Removed from input:
-   REAL(DP) :: Y_mass
+   REAL(DP) :: Y_mass, X_mass, Z_mass
 
    ! setup Fortran IO variables 
    INTEGER, PARAMETER :: stdin  = 5
@@ -28,11 +33,10 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    REAL(DP), DIMENSION(:), ALLOCATABLE :: q_i
    REAL(DP), DIMENSION(:), ALLOCATABLE, save :: nu_i0
 
-   REAL(DP), DIMENSION(:), ALLOCATABLE :: tt_list
+!   REAL(DP), DIMENSION(:), ALLOCATABLE :: tt_list
    REAL(DP), DIMENSION(:), ALLOCATABLE :: lgT_list
    REAL(DP), DIMENSION(:), ALLOCATABLE :: lgD_list
 
-   REAL(DP), DIMENSION(:), ALLOCATABLE :: kape_list
    REAL(DP), DIMENSION(:), ALLOCATABLE :: barQ_list
    ! REAL(DP), DIMENSION(:), ALLOCATABLE :: notQ_list
 
@@ -82,8 +86,8 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    !ELSE
    !   WRITE(*,*)'Normalisation set to fiducioal Ke = ', Ke_norm
    !ENDIF
-   WRITE(*,*)'Verbose = ',ver
-   WRITE(*,*)'Output destination -',DIR
+   !WRITE(*,*)'Verbose = ',ver
+   !WRITE(*,*)'Output destination -',DIR
    !WRITE(*,*) " "
    CALL  flush(stdout) 
 
@@ -92,13 +96,13 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    
    ALLOCATE(barQ_list(N_lgT))
    ! ALLOCATE(notQ_list(N_lgT))
-   ALLOCATE(kape_list(N_lgT))
+!   ALLOCATE(kape_list(N_lgT))
    
    ALLOCATE(lgT_list(N_lgT))
    CALL linspace(lgTmin, lgTmax,lgT_list)
    ALLOCATE(lgD_list(N_lgD))
    CALL linspace(lgDmin, lgDmax,lgD_list)
-   ALLOCATE(tt_list(N_tt))
+!   ALLOCATE(tt_list(N_tt))
    CALL linspace(lgttmin, lgttmax,tt_list)
 
 !   IF(ANY(ISNAN(tt_list))) STOP '---- tt is nan ----'
@@ -135,7 +139,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    ! Step 1) Get atomic data [done], aboundence data [done], Line data [done] (use X = 1 for H no Y|=0 !!)
    !WRITE(*,*)'Initialise ATOM and NUMB'
    CALL ATOM_DATA%Initialise(verbose=ver)
-   CALL NUMB_DENS%Initialise(ATOM_DATA, X_frac=X_mass, Y_frac=Y_mass, DIR=DIR, verbose=ver)
+   CALL NUMB_DENS%Initialise(ATOM_DATA, DIR=DIR, verbose=ver)
    !WRITE(*,*) 'X=',NUMB_DENS%X_frac,'Y=',NUMB_DENS%Y_frac,'Z=',1.0d0 - NUMB_DENS%x_frac - NUMB_DENS%Y_frac
    !IF (X_mass.GT.-1) THEN
    !   WRITE(*,*) "  >Using input composition"
@@ -267,6 +271,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
             
             ! write the CAK t and M(t)
             WRITE(ID_Mt,*) tt_list(ind1), Mt
+            Mt_list(ind1) = Mt
             
          END DO
 
@@ -297,7 +302,7 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    CLOSE(ID_Ke)
    !WRITE(*,*)'Write kappa e - done'
 
-   WRITE(*,*)'Mforce - done'
+   !WRITE(*,*)'Mforce - done'
    CALL  flush(stdout) 
 
 CONTAINS
