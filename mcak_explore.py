@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')  # Use this backend, as it is not interactive.
+# matplotlib.use('Agg')  # Use this backend, as it is not interactive.
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import sys
@@ -71,7 +71,12 @@ def fit_data(file_path, t_cri):
          alpha_l        alpha resulting from local fit
     """
 
-    lgt, Mt = np.loadtxt(file_path, unpack=True)
+    # Basic hack if lgt and Mt are known in memory, to not read in the file.
+    if isinstance(file_path, (tuple, list)):
+        if len(file_path) == 2:
+            lgt, Mt = file_path
+    else:
+        lgt, Mt = np.loadtxt(file_path, unpack=True)
     Qb = np.max(Mt)
 
     min_mt = Qb / 10**3
