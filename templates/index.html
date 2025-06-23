@@ -1095,9 +1095,9 @@ Star2, 200000, 21000, 20, 0.2, 0.280, 0.00005, 0.000000007, 0.0000000013</pre>
                     event.target.value = "";
                     return;
                 }
-        
-                const headers = rows[0].map(h => h.trim());  
-        
+
+                const headers = rows[0].map(h => h.trim());
+
                 // REQUIRED COLUMNS (CASE-SENSITIVE)
                 const requiredColumns = ["name", "luminosity", "teff", "mstar", "zscale", "HE"];
                 const missingColumns = requiredColumns.filter(col => !headers.includes(col));

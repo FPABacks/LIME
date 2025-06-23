@@ -736,6 +736,7 @@ def start_upload_csv():
 
     # Read in the data to check if all the columns are there
     df = pd.read_csv(io.BytesIO(file_data.encode()))
+    df.columns = df.columns.str.strip()  # Strip the possible white space from the column headers
     missing_columns = check_csv_input_file(df)
     if len(missing_columns) > 0:
         logging.error(f"Missing columns in CSV file! Missing: {missing_columns}")
