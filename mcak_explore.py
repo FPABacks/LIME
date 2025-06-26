@@ -7,8 +7,10 @@ import sys
 import cgs_constants as cgs
 from scipy.optimize import curve_fit
 import os
-from mforce import get_force_multiplier
+from mforce import run_module
 import gc
+
+get_force_multiplier = run_module.get_force_multiplier
 
 matplotlib.rc_file("plotstyle.txt")
 

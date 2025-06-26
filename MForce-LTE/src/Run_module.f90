@@ -1,3 +1,7 @@
+module Run_module
+   implicit None
+
+   contains
 subroutine get_force_multiplier(lgTmin,lgTmax,lgDmin,lgDmax,lgttmin,lgttmax,Ke_norm,&
 X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
 
@@ -45,7 +49,6 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
    INTEGER(I4B) :: Ll, I, Z
    
    ! INTEGER(I4B) :: exclude = 23
-   INTEGER(I4B) :: Nlines(30,9) = 29
 
    INTEGER(I4B) :: ind1,ind2
    CHARACTER(10) str_2
@@ -200,8 +203,6 @@ X_mass,Z_mass,N_tt,N_lgT,N_lgD,ver,DIR)
             Z = LINE_DATA%ID(ind1,Z_)
             Lam = LINE_DATA%Lambda(ind1)* Aa2cgs
 
-            ! IF(Z.EQ.exclude) CYCLE
-            Nlines(Z,I) = Nlines(Z,I)+1
 
             ! check if the given level is available in atomic data
 !            IF (Ll.GT.ATOM_DATA%List_L(I,Z)) STOP '---- exceeding the available level ----'
@@ -354,3 +355,5 @@ CONTAINS
    END SUBROUTINE linspace
 
 end subroutine get_force_multiplier
+
+end module Run_module
