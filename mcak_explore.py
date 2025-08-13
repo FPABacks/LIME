@@ -189,28 +189,31 @@ def plot_convergence(random_subdir, it_num, mdot_num, qbar_num, alpha_num, q0_nu
                     "linestyle":'--', "linewidth":2}
 
     axes[0].plot(it_num, np.log10([mdot * cgs.year / cgs.Msun for mdot in mdot_num]), **style_kwargs)
-    axes[1].plot(it_num, np.log10(qbar_num), **style_kwargs)
+    axes[1].plot(it_num, qbar_num, **style_kwargs)
     axes[2].plot(it_num, alpha_num, **style_kwargs)
-    axes[3].plot(it_num, np.log10(q0_num), **style_kwargs)
+    axes[3].plot(it_num, q0_num, **style_kwargs)
     axes[4].plot(it_num, np.log10(eps_num), **style_kwargs)
     axes[5].plot(it_num, np.log10(delrho_num), **style_kwargs)
 
-    axes[0].set_ylabel(r"$\dot{M} [M_\odot/yr]$")
-    axes[1].set_ylabel(r"$\log_{10}(\bar{Q})$")
+    axes[0].set_ylabel(r"$\log_{10} \dot{M} [M_\odot/yr]$")
+    axes[1].set_ylabel(r"$\bar{Q}$")
     axes[2].set_ylabel(r"$\alpha$")
-    axes[3].set_ylabel(r"$\log_{10}(Q_0)$")
-    axes[4].set_ylabel(r"log $\epsilon_{\dot{M}}$")
-    axes[5].set_ylabel(r"log $\epsilon_{\rho}$")
+    axes[3].set_ylabel(r"$Q_0$")
+    axes[4].set_ylabel(r"$\log_{10} \epsilon_{\dot{M}}$")
+    axes[5].set_ylabel(r"$\log_{10} \epsilon_{\rho}$")
     # Set x-label for the bottom row only
     for ax in axes[-2:]:
         ax.set_xlabel("Iteration")
     for ax in axes:
+        ax.set_xticks(it_num, minor=False)
+        ax.set_xticks([], minor=True)
         ax.xaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
         ax.yaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
         ax.ticklabel_format(useOffset=False, style='plain', axis='both')
 
     plt.tight_layout()
     plt.savefig(f"{random_subdir}/sim_log.png")
+    # plt.savefig(f"sim_log_convergence.pdf")
     plt.close()
 
 
@@ -387,9 +390,20 @@ def main(lum, T_eff, M_star, Z_star, Yhe, random_subdir, does_plot=False, max_it
     q0_num = []
     eps_num = []
     delrho_num = []
-
+    rel_mdot = np.nan
+    rel_rho = np.nan
     # Start the interation loop
     for iteration in range(max_iterations):
+
+        # Track values at start of each iteration (and in the end after loop)
+        it_num.append(iteration)
+        mdot_num.append(mdot)
+        qbar_num.append(qbar)
+        alpha_num.append(alpha)
+        q0_num.append(q0)
+        eps_num.append(np.abs(rel_mdot))
+        delrho_num.append(np.abs(rel_rho))
+
         # Update to the density to the new values
         parameters.update({"lgDmin": f"{np.log10(rho):.5e}",
                            "lgDmax": f"{np.log10(rho):.5e}"})
@@ -464,14 +478,6 @@ def main(lum, T_eff, M_star, Z_star, Yhe, random_subdir, does_plot=False, max_it
             result_dict["fail_reason"] = f"NaN in Rho at iteration: {iteration}"
             return result_dict
 
-        it_num.append(iteration)
-        mdot_num.append(mdot)
-        qbar_num.append(qbar)
-        alpha_num.append(alpha)
-        q0_num.append(q0)
-        eps_num.append(np.abs(rel_mdot))
-        delrho_num.append(np.abs(rel_rho))
-
         # Make some logs
         mdot_lim = gamma_e*(1.+qbar)
         if log:
@@ -536,6 +542,15 @@ def main(lum, T_eff, M_star, Z_star, Yhe, random_subdir, does_plot=False, max_it
         
         # Update the density to the target density for the next iteration
         rho = rho_target
+
+    # Track final values
+    it_num.append(iteration + 1)  # + 1 as the iteration is done
+    mdot_num.append(mdot)
+    qbar_num.append(qbar)
+    alpha_num.append(alpha)
+    q0_num.append(q0)
+    eps_num.append(np.abs(rel_mdot))
+    delrho_num.append(np.abs(rel_rho))
 
     # If the calculation was successful make some diagnostic plots and log the values
     # Also allows the figure to be made if the failure reason suggests to look at the expert output.
